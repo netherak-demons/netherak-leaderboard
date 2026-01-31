@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 import BackofficeAuth from '../components/BackofficeAuth'
-import { searchUser, updateUser, User, UpdateUserParams } from '../services/userService'
+import { searchUser, updateUser, User, UpdateUserParams } from '../services/backofficeUserService'
 
 export default function Backoffice() {
   const [searchType, setSearchType] = useState<'wallet' | 'username'>('wallet')
@@ -136,7 +136,7 @@ export default function Backoffice() {
                 <button
                   onClick={handleSearch}
                   disabled={loading}
-                  className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base hover:bg-[#d4c9b0] hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base hover:bg-[#d4c9b0] hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </button>
@@ -203,7 +203,7 @@ export default function Backoffice() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base hover:bg-[#d4c9b0] hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base hover:bg-[#d4c9b0] hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>

@@ -1,8 +1,13 @@
 import { createConfig } from '@0xsequence/connect'
 import { somniaMainnet, somniaTestnet } from './chains'
 
-const projectAccessKey = "AQAAAAAAAJbd_5JOcE50AqglZCtvu51YlGI"
-const waasConfigKey = "eyJwcm9qZWN0SWQiOjQwNjExLCJycGNTZXJ2ZXIiOiJodHRwczovL3dhYXMuc2VxdWVuY2UuYXBwIn0="
+// Sequence credentials - should be in environment variables
+// These are public keys that can be exposed to the client, but it's better practice to use env vars
+const projectAccessKey = process.env.NEXT_PUBLIC_SEQUENCE_PROJECT_ACCESS_KEY || ''
+const waasConfigKey = process.env.NEXT_PUBLIC_SEQUENCE_WAAS_CONFIG_KEY || ''
+
+console.log('projectAccessKey', projectAccessKey)
+console.log('waasConfigKey', waasConfigKey)
 
 export const config = createConfig('waas', {
   projectAccessKey,

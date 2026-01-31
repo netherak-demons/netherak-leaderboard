@@ -2,16 +2,15 @@
 
 /**
  * Authentication component for backoffice
- * Protects the backoffice route with a password
- * 
- * Note: This is a simple frontend-only authentication.
- * For production, password validation should be done on the backend.
+ * Protects the backoffice route with password authentication via backend API
+ * Password is hashed and validated server-side for security
  */
 
 import { useState, useEffect } from 'react'
+import { authenticate, verifyAuth } from '../services/netherakClient'
 
-const BACKOFFICE_PASSWORD = 'demons'
 const AUTH_KEY = 'backoffice_authenticated'
+const TOKEN_KEY = 'backoffice_token'
 
 interface BackofficeAuthProps {
   children: React.ReactNode
@@ -22,27 +21,52 @@ export default function BackofficeAuth({ children }: BackofficeAuthProps) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [checking, setChecking] = useState(true)
+  const [authenticating, setAuthenticating] = useState(false)
 
   useEffect(() => {
     // Check if user is already authenticated
-    const authStatus = sessionStorage.getItem(AUTH_KEY)
-    if (authStatus === 'true') {
-      setIsAuthenticated(true)
+    const checkAuth = async () => {
+      const token = sessionStorage.getItem(TOKEN_KEY)
+      if (token) {
+        // Verify token is still valid
+        const isValid = await verifyAuth()
+        if (isValid) {
+          setIsAuthenticated(true)
+        } else {
+          // Token invalid, clear it
+          sessionStorage.removeItem(TOKEN_KEY)
+          sessionStorage.removeItem(AUTH_KEY)
+        }
+      }
+      setChecking(false)
     }
-    setChecking(false)
+    checkAuth()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setAuthenticating(true)
 
-    if (password === BACKOFFICE_PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, 'true')
-      setIsAuthenticated(true)
+    try {
+      // Authenticate via backend API (password is hashed server-side)
+      const result = await authenticate(password)
+
+      if (result.success && result.token) {
+        // Store authentication status
+        sessionStorage.setItem(AUTH_KEY, 'true')
+        sessionStorage.setItem(TOKEN_KEY, result.token)
+        setIsAuthenticated(true)
+        setPassword('')
+      } else {
+        setError(result.error || 'Incorrect password')
+        setPassword('')
+      }
+    } catch (err) {
+      setError('Authentication failed. Please try again.')
       setPassword('')
-    } else {
-      setError('Incorrect password')
-      setPassword('')
+    } finally {
+      setAuthenticating(false)
     }
   }
 
@@ -83,10 +107,10 @@ export default function BackofficeAuth({ children }: BackofficeAuthProps) {
             )}
             <button
               type="submit"
-              className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base w-full hover:bg-[#d4c9b0] hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={checking}
+              className="py-3 px-6 bg-[#eae3d3] text-[#1a1a2e] border-none rounded-md cursor-pointer font-semibold transition-all duration-300 text-base w-full hover:bg-[#d4c9b0] hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={checking || authenticating}
             >
-              {checking ? 'Authenticating...' : 'Enter'}
+              {authenticating ? 'Authenticating...' : 'Enter'}
             </button>
           </form>
         </div>

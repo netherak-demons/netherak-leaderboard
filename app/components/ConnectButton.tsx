@@ -45,7 +45,7 @@ export default function ConnectButton({
 
   return (
     <button
-      className={`bg-[rgba(131,233,150,0.2)] border-2 border-green-netherak text-connect-button-text py-[0.8rem] px-[1.5rem] text-[0.9rem] font-medium rounded-lg cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-[1px] backdrop-blur-[10px] shadow-[0_4px_15px_rgba(131,233,150,0.3)] ${
+      className={`bg-[rgba(131,233,150,0.2)] border-2 border-green-netherak text-connect-button-text py-[0.8rem] px-6 text-[0.9rem] font-medium rounded-lg cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-[1px] backdrop-blur-[10px] shadow-[0_4px_15px_rgba(131,233,150,0.3)] ${
         disabled 
           ? 'opacity-50 cursor-not-allowed hover:transform-none hover:shadow-[0_4px_15px_rgba(131,233,150,0.3)]' 
           : isHovered 
