@@ -1,26 +1,98 @@
 @import "tailwindcss";
 
+/* Zachar Fonts */
+@font-face {
+  font-family: 'Zachar';
+  src: url('/media/fonts/zachar-book.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zachar';
+  src: url('/media/fonts/zachar-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zachar Scratched';
+  src: url('/media/fonts/zachar-mediumscratched.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Harmonique Display Fonts */
+@font-face {
+  font-family: 'Harmonique Display';
+  src: url('/media/fonts/HarmoniqueDisplay-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Harmonique Display';
+  src: url('/media/fonts/HarmoniqueDisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Harmonique Display';
+  src: url('/media/fonts/HarmoniqueDisplay-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Harmonique Display';
+  src: url('/media/fonts/HarmoniqueDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  font-family: 'Zachar', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #000000;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Netherak Color Variables */
+  --color-green-netherak: #83E996;
+  --color-red-netherak: #F3BAA9;
+  --color-connect-button-text: #FFF1E6;
+
+  /* Font Variables */
+  --font-zachar: 'Zachar', serif;
+  --font-zachar-scratched: 'Zachar Scratched', serif;
+  --font-harmonique: 'Harmonique Display', serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #000000;
+  color: rgba(255, 255, 255, 0.87);
 }
