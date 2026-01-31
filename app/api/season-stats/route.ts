@@ -31,8 +31,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log('Request body:', body);
-
     // Prepare request body with only the fields we need
     const requestBody: any = {
       seasonId: body.seasonId,
@@ -46,11 +44,17 @@ export async function POST(request: NextRequest) {
       requestBody.lastKey = body.lastKey;
     }
 
-    console.log('Sending request to API with body:', requestBody);
-
     // AWS API expects GET with body (non-standard)
     const apiUrl = 'https://yv97bn1mj3.execute-api.us-east-1.amazonaws.com/stage-1/stats/season';
-    console.log('API URL:', apiUrl);
+    const apiKey = process.env.NETHERAK_API_KEY;
+    
+    if (!apiKey) {
+      console.error('NETHERAK_API_KEY environment variable is not set');
+      return NextResponse.json(
+        { error: 'Server configuration error: API key not configured' },
+        { status: 500 }
+      );
+    }
     
     // Validate and sanitize input
     const seasonId = String(requestBody.seasonId || '0').trim();
@@ -72,8 +76,6 @@ export async function POST(request: NextRequest) {
       ...(lastKey && /^[a-zA-Z0-9_-]+$/.test(lastKey) ? { lastKey } : {})
     });
     
-    console.log('Calling AWS API with GET method, body:', bodyData);
-    
     // AWS API expects GET with body (non-standard HTTP)
     // Use Node.js https module to make GET request with body
     const url = new URL(apiUrl);
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'REDACTED',
+          'x-api-key': apiKey,
           'Content-Length': Buffer.byteLength(bodyData),
         },
       };
@@ -113,12 +115,14 @@ export async function POST(request: NextRequest) {
       req.end();
     }).catch(async (error) => {
       // Fallback: try with fetch if https module fails
-      console.log('Trying with fetch fallback...', error.message);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Trying with fetch fallback...', error.message);
+      }
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': 'REDACTED',
+          'x-api-key': apiKey,
         },
         body: bodyData,
       });

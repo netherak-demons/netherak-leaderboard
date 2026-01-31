@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-green-netherak: #83E996;
+  --color-red-netherak: #F3BAA9;
+  --color-connect-button-text: #FFF1E6;
+}
+
 /* Zachar Fonts */
 @font-face {
   font-family: 'Zachar';
@@ -83,16 +89,12 @@
   --font-harmonique: 'Harmonique Display', serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   background-color: #000000;
   color: rgba(255, 255, 255, 0.87);
+  font-family: var(--font-zachar);
 }
+

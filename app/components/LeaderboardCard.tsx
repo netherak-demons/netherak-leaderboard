@@ -84,7 +84,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           </span>
         </div>
 
-        <div className="max-h-[350px] overflow-y-auto overflow-x-hidden">
+        <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
           {entries.map((entry) => {
             const isUser = isCurrentUser(entry.address)
             return (
