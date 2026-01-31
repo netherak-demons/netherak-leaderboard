@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { calculateEvilPoints } from '../utils/evilPoints'
-import { mockDungeonsLeaderboard, mockEnemiesLeaderboard } from './mockData'
+import { mockDungeonsLeaderboard, mockEnemiesLeaderboard, mockEvilPointsLeaderboard } from './mockData'
 
 const API_URL = '/api/season-stats'
 
@@ -72,6 +72,7 @@ export function useSeasonStats(seasonId: string = '0') {
         setTimeout(() => {
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setEnemiesLeaderboard(mockEnemiesLeaderboard)
+          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
           setTotalPlayers(20)
           setLoading(false)
         }, 500) // Simulate loading delay
@@ -101,6 +102,7 @@ export function useSeasonStats(seasonId: string = '0') {
               console.warn(`⚠️ API error (${response.status}), falling back to mock data`)
               setDungeonsLeaderboard(mockDungeonsLeaderboard)
               setEnemiesLeaderboard(mockEnemiesLeaderboard)
+              setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
               setTotalPlayers(20)
               setLoading(false)
               setError(null) // No mostrar error cuando se usa mock data
@@ -183,6 +185,7 @@ export function useSeasonStats(seasonId: string = '0') {
           console.warn('⚠️ API error, falling back to mock data:', err)
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setEnemiesLeaderboard(mockEnemiesLeaderboard)
+          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
           setTotalPlayers(20)
           setError(null) // No mostrar error cuando se usa mock data
         } else {
