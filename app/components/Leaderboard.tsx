@@ -12,8 +12,8 @@ const Leaderboard: React.FC = () => {
   if (loading) {
     return (
       <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center">
-        <div className="fixed top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat -z-10" style={{ backgroundImage: "url('/background.svg')" }}></div>
-        <div className="flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
+        <div className="relative z-10 flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
           <div className="text-[#EAE3D3] text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Loading leaderboards...
           </div>
@@ -25,8 +25,8 @@ const Leaderboard: React.FC = () => {
   if (error) {
     return (
       <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center">
-        <div className="fixed top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat -z-10" style={{ backgroundImage: "url('/background.svg')" }}></div>
-        <div className="flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
+        <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
+        <div className="relative z-10 flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
           <div className="text-[#FF8C8A] text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Error loading leaderboards: {error}
           </div>
@@ -37,8 +37,8 @@ const Leaderboard: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center">
-      <div className="fixed top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat -z-10" style={{ backgroundImage: "url('/background.svg')" }}></div>
-      <div className="flex gap-12 md:gap-8 sm:gap-4 justify-center items-center w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 md:pt-20 sm:pt-20 box-border lg:flex-row flex-col">
+      <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
+      <div className="relative z-10 flex gap-12 md:gap-8 sm:gap-4 justify-center items-center w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 md:pt-20 sm:pt-20 box-border lg:flex-row flex-col">
         <LeaderboardCard
           title="Dungeons Completed"
           icon="/dungeons.svg"

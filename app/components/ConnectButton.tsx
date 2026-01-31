@@ -45,9 +45,14 @@ export default function ConnectButton({
 
   return (
     <button
-      className={`netherak-connect-button ${className} ${
-        disabled ? 'disabled' : ''
-      } ${isHovered ? 'hovered' : ''}`}
+      className={`bg-[rgba(131,233,150,0.2)] border-2 border-green-netherak text-connect-button-text py-[0.8rem] px-[1.5rem] text-[0.9rem] font-medium rounded-lg cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-[1px] backdrop-blur-[10px] shadow-[0_4px_15px_rgba(131,233,150,0.3)] ${
+        disabled 
+          ? 'opacity-50 cursor-not-allowed hover:transform-none hover:shadow-[0_4px_15px_rgba(131,233,150,0.3)]' 
+          : isHovered 
+            ? 'bg-[rgba(131,233,150,0.3)] border-green-netherak shadow-[0_6px_20px_rgba(131,233,150,0.4)] -translate-y-0.5' 
+            : 'hover:bg-[rgba(131,233,150,0.3)] hover:border-green-netherak hover:shadow-[0_6px_20px_rgba(131,233,150,0.4)] hover:-translate-y-0.5'
+      } ${className}`}
+      style={{ fontFamily: 'var(--font-zachar-scratched)' }}
       onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={disabled ? undefined : handleClick}
