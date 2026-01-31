@@ -69,13 +69,13 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
 
       <div className="p-0">
         <div className="grid grid-cols-[100px_1fr_180px] md:grid-cols-[50px_1fr_80px] sm:grid-cols-[45px_1fr_75px] py-5 px-8 md:py-3 md:px-3 sm:py-2.5 sm:px-2.5 border-b-2 border-[#242424] bg-black/30">
-          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-[8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal md:break-words sm:break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
+          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Ranking
           </span>
-          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-[8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal md:break-words sm:break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
+          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-[8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Demon
           </span>
-          <span className="text-[#BFBFBF] text-[15px] md:text-[10px] sm:text-[7.5px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal md:break-words sm:break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
+          <span className="text-[#BFBFBF] text-[15px] md:text-[10px] sm:text-[7.5px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
             {scoreLabel}
           </span>
         </div>
