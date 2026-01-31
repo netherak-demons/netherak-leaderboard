@@ -3,7 +3,7 @@
  * Service for managing users in the backoffice (search, update whitelist, extra points)
  */
 
-import { apiPost, apiPut } from './netherakClient'
+import { apiPost, apiPut, type ApiResponse } from './netherakClient'
 
 export interface User {
   wallet: string
@@ -66,8 +66,9 @@ export async function searchUser(
   const maxUsers = 500
 
   // Fetch users in batches until we find the user or reach max
+  let response: ApiResponse<SeasonStatsResponse>
   do {
-    const response = await apiPost<SeasonStatsResponse>('/stats/season', {
+    response = await apiPost<SeasonStatsResponse>('/stats/season', {
       seasonId: '0',
       limit: 100,
       ...(lastKey && { lastKey }),

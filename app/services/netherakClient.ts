@@ -5,7 +5,7 @@
 
 const API_BASE_URL = '/api/netherak'
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   data?: T
   error?: string
 }
