@@ -6,7 +6,7 @@ import { useSeasonStats } from '../hooks/useSeasonStats'
 import { useAccount } from 'wagmi'
 
 const Leaderboard: React.FC = () => {
-  const { dungeonsLeaderboard, enemiesLeaderboard, loading, error } = useSeasonStats('0')
+  const { dungeonsLeaderboard, enemiesLeaderboard, evilPointsLeaderboard, loading, error } = useSeasonStats('0')
   const { address } = useAccount()
 
   if (loading) {
@@ -56,6 +56,16 @@ const Leaderboard: React.FC = () => {
           scoreLabel="Enemies killed"
           entries={enemiesLeaderboard}
           titleType="enemies"
+          userAddress={address}
+        />
+
+        <LeaderboardCard
+          title="Evil Points"
+          icon="/dungeons.svg"
+          subtitle="LEADERBOARD"
+          scoreLabel="Evil Points"
+          entries={evilPointsLeaderboard}
+          titleType="evilpoints"
           userAddress={address}
         />
       </div>

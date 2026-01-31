@@ -18,7 +18,7 @@ interface LeaderboardCardProps {
   subtitle: string
   scoreLabel: string
   entries: LeaderboardEntry[]
-  titleType?: 'dungeons' | 'enemies'
+  titleType?: 'dungeons' | 'enemies' | 'evilpoints'
   userAddress?: string
 }
 
@@ -59,6 +59,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             ) : titleType === 'enemies' ? (
               <>
                 Enemies' <span className="text-[#FF8C8A]">Kills</span>
+              </>
+            ) : titleType === 'evilpoints' ? (
+              <>
+                <span className="text-[#B388FF]">Evil</span> Points
               </>
             ) : (
               title

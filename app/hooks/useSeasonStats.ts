@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { calculateEvilPoints } from '../utils/evilPoints'
 
 const API_URL = '/api/season-stats'
 
@@ -19,6 +20,7 @@ interface PlayerSeasonStats {
   stats: {
     enemiesKilled?: EnemiesKilled
     dungeonsCompleted?: DungeonsCompleted
+    skillsUsed?: Record<string, number>
   }
 }
 
@@ -47,6 +49,7 @@ export function useSeasonStats(seasonId: string = '0') {
   const [error, setError] = useState<string | null>(null)
   const [dungeonsLeaderboard, setDungeonsLeaderboard] = useState<LeaderboardEntry[]>([])
   const [enemiesLeaderboard, setEnemiesLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [evilPointsLeaderboard, setEvilPointsLeaderboard] = useState<LeaderboardEntry[]>([])
   const [totalPlayers, setTotalPlayers] = useState(0)
 
   useEffect(() => {
@@ -113,6 +116,36 @@ export function useSeasonStats(seasonId: string = '0') {
             .slice(0, 10)
             .map((p, i) => ({ ...p, ranking: i + 1 }))
         )
+
+        // Process for Evil Points leaderboard
+        setEvilPointsLeaderboard(
+          players
+            .map(p => {
+              // TODO: Get actual pfpCount from PFP system when feature/pfp-system is merged
+              // TODO: Get extraPoints from backoffice endpoint when implemented
+              const pfpCount = 0
+              const extraPoints = 0
+
+              const evilPointsCalc = calculateEvilPoints(
+                p.stats || {},
+                pfpCount,
+                extraPoints
+              )
+
+              return {
+                ranking: 0,
+                demon: p.username || p.profile?.username || 'Unknown',
+                avatar: '/demons/avatar1.svg',
+                score: evilPointsCalc.totalPoints,
+                address: p.wallet,
+                username: p.username || p.profile?.username || 'Unknown',
+              }
+            })
+            .filter(p => p.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map((p, i) => ({ ...p, ranking: i + 1 }))
+        )
       } catch (err) {
         console.error(err)
         setError(err instanceof Error ? err.message : 'Unknown error')
@@ -127,6 +160,7 @@ export function useSeasonStats(seasonId: string = '0') {
   return {
     dungeonsLeaderboard,
     enemiesLeaderboard,
+    evilPointsLeaderboard,
     loading,
     error,
     totalPlayers,
