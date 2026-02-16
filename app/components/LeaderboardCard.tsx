@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { CircleCheck } from 'lucide-react'
 
 interface LeaderboardEntry {
   ranking: number
@@ -10,6 +11,8 @@ interface LeaderboardEntry {
   address?: string
   tokenId?: string
   username?: string
+  evilPoints: number
+  rewards: boolean
 }
 
 interface LeaderboardCardProps {
@@ -18,7 +21,6 @@ interface LeaderboardCardProps {
   subtitle: string
   scoreLabel: string
   entries: LeaderboardEntry[]
-  titleType?: 'dungeons' | 'enemies' | 'evilpoints'
   userAddress?: string
 }
 
@@ -27,7 +29,6 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   icon,
   scoreLabel,
   entries,
-  titleType,
   userAddress
 }) => {
   const shortenAddress = (address: string) => {
@@ -40,47 +41,55 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   }
 
   return (
-    <div className="relative bg-[#00000080] border border-[#242424] rounded-xl w-full max-w-[580px] md:max-w-[500px] mt-12 md:mt-8">
-      <img 
-        src={icon} 
-        alt={title} 
-        className="absolute -top-8 md:-top-6 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-12 md:h-12 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10" 
+    <div
+      className="relative rounded-xl w-full min-w-0 mt-12 md:mt-8 p-6 md:p-5 sm:p-4"
+      style={{
+        backgroundColor: 'transparent',
+        backdropFilter: 'blur(30px)',
+        WebkitBackdropFilter: 'blur(30px)',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+      }}
+    >
+      <img
+        src={icon}
+        alt={title}
+        className="absolute -top-8 md:-top-16 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-22 md:h-22 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10"
       />
-      <div className="p-8 md:p-6 sm:p-5 pb-6 md:pb-4 sm:pb-3 border-b-2 border-[#242424] bg-black/20 text-center">
-        <div className="text-center">
-          <h2 className="text-[#EAE3D3] text-base md:text-[13px] sm:text-[11px] font-medium m-0 tracking-[4px] md:tracking-[2px] sm:tracking-[1px] uppercase" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            LEADERBOARD
-          </h2>
-          <h3 className="text-[#EAE3D3] text-[1.4rem] md:text-base sm:text-sm font-medium m-[0.3rem_0_0_0] drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            {titleType === 'dungeons' ? (
-              <>
-                <span className="text-[#FFB38A]">Dungeons</span> Completed
-              </>
-            ) : titleType === 'enemies' ? (
-              <>
-                Enemies' <span className="text-[#FF8C8A]">Kills</span>
-              </>
-            ) : titleType === 'evilpoints' ? (
-              <>
-                <span className="text-[#B388FF]">Evil</span> Points
-              </>
-            ) : (
-              title
-            )}
-          </h3>
-        </div>
+      <div className="pb-4 border-b-2 border-[#242424] text-center">
+        <h2
+          className="text-base font-medium m-0 tracking-[4px] md:tracking-[2px] sm:tracking-[1px] uppercase text-primary"
+          style={{ fontFamily: 'var(--font-harmonique)' }}
+        >
+          {title}
+        </h2>
       </div>
 
-      <div className="p-0">
-        <div className="grid grid-cols-[100px_1fr_180px] md:grid-cols-[50px_1fr_80px] sm:grid-cols-[45px_1fr_75px] py-5 px-8 md:py-3 md:px-3 sm:py-2.5 sm:px-2.5 border-b-2 border-[#242424] bg-black/30">
-          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Ranking
-          </span>
-          <span className="text-[#BFBFBF] text-[15px] md:text-[11px] sm:text-[8px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
+      <div className="pt-4">
+        {/* Column headers: Demon, Stats, Evil, Rewards */}
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-[#242424]">
+          <span
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
             Demon
           </span>
-          <span className="text-[#BFBFBF] text-[15px] md:text-[10px] sm:text-[7.5px] font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal md:wrap-break-words sm:wrap-break-words md:leading-tight sm:leading-tight" style={{ fontFamily: 'var(--font-harmonique)' }}>
+          <span
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal text-secondary"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
             {scoreLabel}
+          </span>
+          <span
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal text-secondary"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            Evil
+          </span>
+          <span
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            Rewards
           </span>
         </div>
 
@@ -89,35 +98,70 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             const isUser = isCurrentUser(entry.address)
             return (
               <div
-                key={entry.ranking}
-                className={`grid grid-cols-[100px_1fr_180px] md:grid-cols-[50px_1fr_80px] sm:grid-cols-[45px_1fr_75px] py-5 px-8 md:py-3 md:px-3 sm:py-2.5 sm:px-2.5 border-b border-[#242424] items-center transition-all duration-200 bg-black/20 ${
-                  isUser 
-                    ? 'bg-[rgba(131,233,150,0.15)] border border-[#83E996] border-l-[3px] border-l-[#83E996] shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]' 
+                key={`${entry.address}-${entry.ranking}`}
+                className={`grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-[#242424] items-center transition-all duration-200 ${
+                  isUser
+                    ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
                 } last:border-b-0 last:rounded-b-xl`}
               >
-                <span className={`text-center text-2xl md:text-base sm:text-sm font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] ${
-                  isUser ? 'text-[#83E996] drop-shadow-[0_0_8px_rgba(131,233,150,0.5)]' : 'text-[#FFF1E6]'
-                }`} style={{ fontFamily: 'var(--font-harmonique)' }}>
-                  {entry.ranking}
-                </span>
-                <div className="flex items-center gap-4 md:gap-2.5 sm:gap-1.5">
-                  <img 
-                    src={entry.avatar} 
-                    alt={entry.demon} 
-                    className="w-10 h-10 md:w-8 md:h-8 sm:w-6.5 sm:h-6.5 rounded-full border-2 border-[#242424] bg-[#2a2a2a] shadow-[0_2px_8px_rgba(0,0,0,0.4)]" 
+                {/* Demon column: number + avatar + name */}
+                <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
+                  <span
+                    className={`text-sm font-bold shrink-0 ${
+                      isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)]' : 'text-white'
+                    }`}
+                    style={{ fontFamily: 'var(--font-harmonique)' }}
+                  >
+                    {entry.ranking}
+                  </span>
+                  <img
+                    src={entry.avatar}
+                    alt={entry.demon}
+                    className="w-10 h-10 md:w-8 md:h-8 sm:w-6.5 sm:h-6.5 rounded-full shrink-0 bg-[#2a2a2a] shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
+                    style={{
+                      border: '0.25px solid #FD9D83',
+                    }}
                   />
-                  <span className={`text-lg md:text-sm sm:text-xs font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap ${
-                    isUser ? 'text-[#83E996] drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-[#FFF1E6]'
-                  }`} style={{ fontFamily: 'var(--font-zachar)' }}>
+                  <span
+                    className={`text-sm font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap ${
+                      isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-primary'
+                    }`}
+                    style={{ fontFamily: 'var(--font-zachar)' }}
+                  >
                     {entry.username || (entry.address ? shortenAddress(entry.address) : entry.demon)}
                   </span>
                 </div>
-                <span className={`text-right text-xl md:text-sm sm:text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] ${
-                  isUser ? 'text-[#83E996] drop-shadow-[0_0_8px_rgba(131,233,150,0.5)]' : 'text-[#FFF1E6]'
-                }`} style={{ fontFamily: 'var(--font-harmonique)' }}>
+                {/* Stats column */}
+                <span
+                  className="text-sm font-bold text-right text-white"
+                  style={{ fontFamily: 'var(--font-harmonique)' }}
+                >
                   {entry.score.toLocaleString()}
                 </span>
+                {/* Evil column: logo + number */}
+                <div className="flex items-center justify-end gap-1.5">
+                  <img
+                    src="/evil-point-logo.svg"
+                    alt="Evil points"
+                    className="w-5 h-6 shrink-0"
+                  />
+                  <span
+                    className="text-sm font-bold text-white"
+                    style={{ fontFamily: 'var(--font-harmonique)' }}
+                  >
+                    {entry.evilPoints.toLocaleString()}
+                  </span>
+                </div>
+                {/* Rewards column */}
+                <div className="flex justify-center">
+                  {entry.rewards ? (
+                    <CircleCheck
+                      className="w-5 h-5 shrink-0 text-white"
+                      strokeWidth={2.5}
+                    />
+                  ) : null}
+                </div>
               </div>
             )
           })}

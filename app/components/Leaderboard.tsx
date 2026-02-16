@@ -6,7 +6,14 @@ import { useSeasonStats } from '../hooks/useSeasonStats'
 import { useAccount } from 'wagmi'
 
 const Leaderboard: React.FC = () => {
-  const { dungeonsLeaderboard, enemiesLeaderboard, evilPointsLeaderboard, loading, error } = useSeasonStats('0')
+  const {
+    dungeonsLeaderboard,
+    slayedHumansLeaderboard,
+    harvestedSoulsLeaderboard,
+    wavesLeaderboard,
+    loading,
+    error,
+  } = useSeasonStats('0')
   const { address } = useAccount()
 
   if (loading) {
@@ -14,7 +21,7 @@ const Leaderboard: React.FC = () => {
       <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center">
         <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
         <div className="relative z-10 flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
-          <div className="text-[#EAE3D3] text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
+          <div className="text-primary text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Loading leaderboards...
           </div>
         </div>
@@ -38,36 +45,44 @@ const Leaderboard: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center">
       <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
-      <div className="relative z-10 flex gap-12 md:gap-8 sm:gap-4 justify-center items-center w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 md:pt-20 sm:pt-20 box-border lg:flex-row flex-col">
-        <LeaderboardCard
-          title="Dungeons Completed"
-          icon="/dungeons.svg"
-          subtitle="LEADERBOARD"
-          scoreLabel="Dungeons Completed"
-          entries={dungeonsLeaderboard}
-          titleType="dungeons"
-          userAddress={address}
-        />
+      <div className="relative z-10 w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 md:pt-20 sm:pt-20 box-border">
+        <div className="grid grid-cols-2 gap-12 md:gap-8 sm:gap-4">
+          <LeaderboardCard
+            title="DUNGEONS COMPLETED"
+            icon="/dungeons.svg"
+            subtitle=""
+            scoreLabel="Stats"
+            entries={dungeonsLeaderboard}
+            userAddress={address}
+          />
 
-        <LeaderboardCard
-          title="Enemies' Kills"
-          icon="/enemies.svg"
-          subtitle="LEADERBOARD"
-          scoreLabel="Enemies killed"
-          entries={enemiesLeaderboard}
-          titleType="enemies"
-          userAddress={address}
-        />
+          <LeaderboardCard
+            title="SLAYED HUMANS"
+            icon="/enemies.svg"
+            subtitle=""
+            scoreLabel="Stats"
+            entries={slayedHumansLeaderboard}
+            userAddress={address}
+          />
 
-        <LeaderboardCard
-          title="Evil Points"
-          icon="/dungeons.svg"
-          subtitle="LEADERBOARD"
-          scoreLabel="Evil Points"
-          entries={evilPointsLeaderboard}
-          titleType="evilpoints"
-          userAddress={address}
-        />
+          <LeaderboardCard
+            title="HARVESTED SOULS"
+            icon="/harvested.svg"
+            subtitle=""
+            scoreLabel="Stats"
+            entries={harvestedSoulsLeaderboard}
+            userAddress={address}
+          />
+
+          <LeaderboardCard
+            title="WAVES COMPLETED"
+            icon="/dungeons.svg"
+            subtitle=""
+            scoreLabel="Stats"
+            entries={wavesLeaderboard}
+            userAddress={address}
+          />
+        </div>
       </div>
     </div>
   )

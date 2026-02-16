@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { calculateEvilPoints } from '../utils/evilPoints'
-import { mockDungeonsLeaderboard, mockEnemiesLeaderboard, mockEvilPointsLeaderboard } from './mockData'
+import {
+  mockDungeonsLeaderboard,
+  mockEnemiesLeaderboard,
+  mockSoulsLeaderboard,
+  mockWavesLeaderboard,
+} from './mockData'
 
 const API_URL = '/api/season-stats'
 
@@ -9,7 +14,6 @@ const API_URL = '/api/season-stats'
 // - NEXT_PUBLIC_USE_MOCK_DATA=false: Always use API (default in production)
 // - Not set: Use API, but fallback to mock on errors (default behavior)
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
-const NODE_ENV = process.env.NODE_ENV || 'development'
 const FORCE_API = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'false'
 
 interface EnemiesKilled {
@@ -30,6 +34,7 @@ interface PlayerSeasonStats {
     enemiesKilled?: EnemiesKilled
     dungeonsCompleted?: DungeonsCompleted
     skillsUsed?: Record<string, number>
+    wavesCompleted?: number
   }
 }
 
@@ -46,6 +51,8 @@ export interface LeaderboardEntry {
   score: number
   address: string
   username: string
+  evilPoints: number
+  rewards: boolean
 }
 
 function sumObjectValues(obj?: Record<string, number>): number {
@@ -53,12 +60,21 @@ function sumObjectValues(obj?: Record<string, number>): number {
   return Object.values(obj).reduce((sum, v) => sum + v, 0)
 }
 
+function getHarvestedSouls(stats?: PlayerSeasonStats['stats']): number {
+  return stats?.skillsUsed?.DrainSoul ?? 0
+}
+
+function getWavesCompleted(stats?: PlayerSeasonStats['stats']): number {
+  return stats?.wavesCompleted ?? 0
+}
+
 export function useSeasonStats(seasonId: string = '0') {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [dungeonsLeaderboard, setDungeonsLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [enemiesLeaderboard, setEnemiesLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [evilPointsLeaderboard, setEvilPointsLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [slayedHumansLeaderboard, setSlayedHumansLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [harvestedSoulsLeaderboard, setHarvestedSoulsLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [wavesLeaderboard, setWavesLeaderboard] = useState<LeaderboardEntry[]>([])
   const [totalPlayers, setTotalPlayers] = useState(0)
 
   useEffect(() => {
@@ -71,8 +87,9 @@ export function useSeasonStats(seasonId: string = '0') {
         console.log('🔧 Using mock data (NEXT_PUBLIC_USE_MOCK_DATA=true)')
         setTimeout(() => {
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
-          setEnemiesLeaderboard(mockEnemiesLeaderboard)
-          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
+          setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
+          setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
+          setWavesLeaderboard(mockWavesLeaderboard)
           setTotalPlayers(20)
           setLoading(false)
         }, 500) // Simulate loading delay
@@ -101,11 +118,12 @@ export function useSeasonStats(seasonId: string = '0') {
             if (!FORCE_API && (response.status === 429 || response.status >= 500)) {
               console.warn(`⚠️ API error (${response.status}), falling back to mock data`)
               setDungeonsLeaderboard(mockDungeonsLeaderboard)
-              setEnemiesLeaderboard(mockEnemiesLeaderboard)
-              setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
+              setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
+              setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
+              setWavesLeaderboard(mockWavesLeaderboard)
               setTotalPlayers(20)
               setLoading(false)
-              setError(null) // No mostrar error cuando se usa mock data
+              setError(null)
               return
             }
             throw new Error(`API error: ${response.status}`)
@@ -118,76 +136,81 @@ export function useSeasonStats(seasonId: string = '0') {
 
         setTotalPlayers(players.length)
 
+        // Build player map for evil points and rewards (rewards not from API yet)
+        const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
+        for (const p of players) {
+          const pfpCount = 0
+          const extraPoints = 0
+          const evilPointsCalc = calculateEvilPoints(p.stats || {}, pfpCount, extraPoints)
+          playerMap.set(p.wallet, {
+            evilPoints: evilPointsCalc.totalPoints,
+            rewards: false, // TODO: from API when implemented
+          })
+        }
+
+        const toEntry = (
+          p: PlayerSeasonStats,
+          score: number,
+          index: number
+        ): LeaderboardEntry => {
+          const { evilPoints, rewards } = playerMap.get(p.wallet) ?? { evilPoints: 0, rewards: false }
+          return {
+            ranking: index + 1,
+            demon: p.username || p.profile?.username || 'Unknown',
+            avatar: '/demons/avatar1.svg',
+            score,
+            address: p.wallet,
+            username: p.username || p.profile?.username || 'Unknown',
+            evilPoints,
+            rewards,
+          }
+        }
+
         setDungeonsLeaderboard(
           players
-            .map(p => ({
-              ranking: 0,
-              demon: p.username || p.profile?.username || 'Unknown',
-              avatar: '/demons/avatar1.svg',
-              score: sumObjectValues(p.stats?.dungeonsCompleted),
-              address: p.wallet,
-              username: p.username || p.profile?.username || 'Unknown',
-            }))
-            .filter(p => p.score > 0)
+            .map(p => ({ p, score: sumObjectValues(p.stats?.dungeonsCompleted) }))
+            .filter(x => x.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .map((p, i) => ({ ...p, ranking: i + 1 }))
+            .map(({ p, score }, i) => toEntry(p, score, i))
         )
 
-        setEnemiesLeaderboard(
+        setSlayedHumansLeaderboard(
           players
-            .map(p => ({
-              ranking: 0,
-              demon: p.username || p.profile?.username || 'Unknown',
-              avatar: '/demons/avatar2.svg',
-              score: sumObjectValues(p.stats?.enemiesKilled),
-              address: p.wallet,
-              username: p.username || p.profile?.username || 'Unknown',
-            }))
-            .filter(p => p.score > 0)
+            .map(p => ({ p, score: sumObjectValues(p.stats?.enemiesKilled) }))
+            .filter(x => x.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .map((p, i) => ({ ...p, ranking: i + 1 }))
+            .map(({ p, score }, i) => toEntry(p, score, i))
         )
 
-        // Process for Evil Points leaderboard
-        setEvilPointsLeaderboard(
+        setHarvestedSoulsLeaderboard(
           players
-            .map(p => {
-              // TODO: Get actual pfpCount from PFP system when feature/pfp-system is merged
-              // TODO: Get extraPoints from backoffice endpoint when implemented
-              const pfpCount = 0
-              const extraPoints = 0
-
-              const evilPointsCalc = calculateEvilPoints(
-                p.stats || {},
-                pfpCount,
-                extraPoints
-              )
-
-              return {
-                ranking: 0,
-                demon: p.username || p.profile?.username || 'Unknown',
-                avatar: '/demons/avatar1.svg',
-                score: evilPointsCalc.totalPoints,
-                address: p.wallet,
-                username: p.username || p.profile?.username || 'Unknown',
-              }
-            })
-            .filter(p => p.score > 0)
+            .map(p => ({ p, score: getHarvestedSouls(p.stats) }))
+            .filter(x => x.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .map((p, i) => ({ ...p, ranking: i + 1 }))
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+
+        setWavesLeaderboard(
+          players
+            .map(p => ({ p, score: getWavesCompleted(p.stats) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
         )
       } catch (err) {
         // Fall back to mock data on any error (unless FORCE_API is true)
         if (!FORCE_API) {
           console.warn('⚠️ API error, falling back to mock data:', err)
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
-          setEnemiesLeaderboard(mockEnemiesLeaderboard)
-          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
+          setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
+          setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
+          setWavesLeaderboard(mockWavesLeaderboard)
           setTotalPlayers(20)
-          setError(null) // No mostrar error cuando se usa mock data
+          setError(null)
         } else {
           console.error('❌ API error (FORCE_API=true, not using mock):', err)
           setError(err instanceof Error ? err.message : 'Unknown error')
@@ -202,8 +225,9 @@ export function useSeasonStats(seasonId: string = '0') {
 
   return {
     dungeonsLeaderboard,
-    enemiesLeaderboard,
-    evilPointsLeaderboard,
+    slayedHumansLeaderboard,
+    harvestedSoulsLeaderboard,
+    wavesLeaderboard,
     loading,
     error,
     totalPlayers,
