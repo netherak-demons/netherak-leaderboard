@@ -106,7 +106,7 @@ export default function AchievementCard({
 
   return (
     <div
-      className="flex items-center gap-4 p-4 rounded-xl w-full text-white"
+      className="flex items-center gap-4 p-4 rounded-xl w-full text-white text-base"
     >
       {/* Left: Achievement icon */}
       <AchievementIcon iconUrl={iconUrl} />
@@ -114,7 +114,7 @@ export default function AchievementCard({
       {/* Center: Title, description, progress */}
       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <h4
-          className="text-sm font-medium uppercase tracking-wider truncate"
+          className="font-medium uppercase tracking-wider truncate"
           style={{
             fontFamily: 'var(--font-harmonique)',
           }}
@@ -122,9 +122,9 @@ export default function AchievementCard({
           {title}
         </h4>
         <p
-          className="text-xs"
+          className="text-sm"
           style={{
-            fontFamily: 'var(--font-zachar)',
+            fontFamily: 'var(--font-harmonique)',
             opacity: 0.9,
           }}
         >
@@ -146,9 +146,9 @@ export default function AchievementCard({
               }}
             />
           </div>
-          <div className="flex justify-between items-baseline">
+          <div className="flex justify-between items-baseline text-[14px]">
             <span
-              className="text-sm font-medium uppercase tracking-wider"
+              className="font-medium uppercase tracking-wider"
               style={{
                 fontFamily: 'var(--font-harmonique)',
                 color: completed ? LUMINOUS_GREEN : 'rgba(234, 227, 211, 0.6)',
@@ -157,9 +157,8 @@ export default function AchievementCard({
               {completed ? 'COMPLETED' : 'IN PROGRESS'}
             </span>
             <span
-              className="text-sm"
               style={{
-                fontFamily: 'var(--font-zachar)',
+                fontFamily: 'var(--font-harmonique)',
                 color: completed ? LUMINOUS_GREEN : '#EAE3D3',
               }}
             >
@@ -184,7 +183,7 @@ export default function AchievementCard({
         >
           <img src="/evil-point-logo.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
           <span
-            className="text-sm font-medium"
+            className="font-medium"
             style={{
               fontFamily: 'var(--font-zachar)',
               color: LUMINOUS_GREEN,
