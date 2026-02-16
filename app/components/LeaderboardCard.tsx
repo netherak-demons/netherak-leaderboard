@@ -57,7 +57,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       />
       <div className="pb-4 border-b-2 border-[#242424] text-center">
         <h2
-          className="text-base font-medium m-0 tracking-[4px] md:tracking-[2px] sm:tracking-[1px] uppercase text-primary"
+          className="text-base font-medium m-0 tracking-[4px] md:tracking-[3px] sm:tracking-[1px] uppercase text-primary"
           style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           {title}
@@ -74,13 +74,13 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             Demon
           </span>
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             {scoreLabel}
           </span>
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-right md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             Evil
@@ -124,7 +124,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     }}
                   />
                   <span
-                    className={`text-sm font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap ${
+                    className={`text-sm font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap lowercase ${
                       isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-primary'
                     }`}
                     style={{ fontFamily: 'var(--font-zachar)' }}
@@ -134,13 +134,13 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 </div>
                 {/* Stats column */}
                 <span
-                  className="text-sm font-bold text-right text-white"
+                  className="text-sm font-bold text-center text-white"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
                   {entry.score.toLocaleString()}
                 </span>
                 {/* Evil column: logo + number */}
-                <div className="flex items-center justify-end gap-1.5">
+                <div className="flex items-center justify-center gap-1.5">
                   <img
                     src="/evil-point-logo.svg"
                     alt="Evil points"
