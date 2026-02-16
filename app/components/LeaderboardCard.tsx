@@ -58,7 +58,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       <div className="pb-4 border-b-2 border-[#242424] text-center">
         <h2
           className="text-base font-medium m-0 tracking-[4px] md:tracking-[3px] sm:tracking-[1px] uppercase text-primary"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
+          style={{ fontFamily: 'var(--font-zachar-scratched)' }}
         >
           {title}
         </h2>
