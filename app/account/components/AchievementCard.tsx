@@ -185,7 +185,7 @@ export default function AchievementCard({
           <span
             className="font-medium"
             style={{
-              fontFamily: 'var(--font-zachar)',
+              fontFamily: 'var(--font-zachar-scratched)',
               color: LUMINOUS_GREEN,
             }}
           >

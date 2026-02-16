@@ -58,7 +58,7 @@ export default function ProfileInfo() {
         <div className="flex flex-col gap-0.5 min-w-0">
           <span
             className="text-white font-medium truncate"
-            style={{ fontFamily: 'var(--font-zachar)' }}
+            style={{ fontFamily: 'var(--font-zachar-scratched)' }}
           >
             {displayName}
           </span>
@@ -157,7 +157,7 @@ export default function ProfileInfo() {
       {/* 5) Imuran book text */}
       <span
         className="text-white text-[18px] font-medium text-center uppercase"
-        style={{ fontFamily: 'var(--font-zachar)', letterSpacing: '0.16em' }}
+        style={{ fontFamily: 'var(--font-zachar-scratched)', letterSpacing: '0.16em' }}
       >
         Imuran book
       </span>

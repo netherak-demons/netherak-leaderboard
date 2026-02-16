@@ -127,7 +127,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     className={`text-sm font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap lowercase ${
                       isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-primary'
                     }`}
-                    style={{ fontFamily: 'var(--font-zachar)' }}
+                    style={{ fontFamily: 'var(--font-zachar-scratched)' }}
                   >
                     {entry.username || (entry.address ? shortenAddress(entry.address) : entry.demon)}
                   </span>

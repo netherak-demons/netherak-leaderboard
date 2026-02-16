@@ -101,7 +101,7 @@ body {
   min-height: 100vh;
   background-color: #000000;
   color: rgba(255, 255, 255, 0.87);
-  font-family: var(--font-zachar);
+  font-family: var(--font-zachar-scratched);
 }
 
 button {
