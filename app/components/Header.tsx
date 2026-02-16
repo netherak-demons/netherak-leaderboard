@@ -17,12 +17,8 @@ interface HeaderProps {
 export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between gap-4"
+      className="relative z-50 px-6 py-4 flex items-center justify-between gap-4"
       style={{
-        backgroundColor: 'transparent',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(36, 36, 36, 0.8)',
         fontFamily: 'var(--font-harmonique)',
       }}
     >

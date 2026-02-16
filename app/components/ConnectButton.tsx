@@ -1,9 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { LogOut } from 'lucide-react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { useOpenConnectModal } from '@0xsequence/connect'
+
+const BUTTON_IMAGES = {
+  normal: '/media/buttons/view_eligibility_button_normal.png',
+  hover: '/media/buttons/view_eligibility_button_hover.png',
+  disabled: '/media/buttons/view_eligibility_button_disabled.png',
+}
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -69,22 +76,40 @@ export default function ConnectButton({
     )
   }
 
+  const getButtonImage = () => {
+    if (disabled) return BUTTON_IMAGES.disabled
+    if (isHovered) return BUTTON_IMAGES.hover
+    return BUTTON_IMAGES.normal
+  }
+
+  const getButtonText = () => children ?? 'Sign in with Sequence'
+
   return (
     <button
-      className={`bg-[rgba(131,233,150,0.2)] border-2 border-green-netherak text-connect-button-text py-[0.8rem] px-6 text-[0.9rem] font-medium rounded-lg cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-[1px] backdrop-blur-[10px] shadow-[0_4px_15px_rgba(131,233,150,0.3)] ${
-        disabled 
-          ? 'opacity-50 cursor-not-allowed hover:transform-none hover:shadow-[0_4px_15px_rgba(131,233,150,0.3)]' 
-          : isHovered 
-            ? 'bg-[rgba(131,233,150,0.3)] border-green-netherak shadow-[0_6px_20px_rgba(131,233,150,0.4)] -translate-y-0.5' 
-            : 'hover:bg-[rgba(131,233,150,0.3)] hover:border-green-netherak hover:shadow-[0_6px_20px_rgba(131,233,150,0.4)] hover:-translate-y-0.5'
-      } ${className}`}
-      style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+      className={`relative overflow-hidden min-w-[240px]  cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      style={{ aspectRatio: '532/252' }}
       onMouseEnter={() => !disabled && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={disabled ? undefined : handleConnectClick}
       disabled={disabled}
     >
-      {children ?? "Sign in with Sequence"}
+      <Image
+        draggable={false}
+        className="absolute inset-0 w-full h-full object-contain"
+        src={getButtonImage()}
+        alt="Button Background"
+        width={532}
+        height={252}
+        unoptimized
+      />
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
+        <span
+          className="text-primary text-sm font-medium uppercase tracking-[0.02em] filter drop-shadow-[0_2px_4px_rgba(255,255,255,0.5)]"
+          style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+        >
+          {getButtonText()}
+        </span>
+      </div>
     </button>
   )
 }
