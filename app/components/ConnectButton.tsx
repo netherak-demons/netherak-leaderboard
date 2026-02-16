@@ -57,13 +57,13 @@ export default function ConnectButton({
           style={{ border: '0.25px solid #FD9D83' }}
         />
         <button
-          className="flex items-center gap-2 border border-secondary text-connect-button-text py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-[1px] hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+          className="flex items-center gap-2 border border-secondary text-connect-button-text py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={disabled ? undefined : handleLogoutClick}
           disabled={disabled}
+          style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           <LogOut className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-          LOGOUT
+          Logout
         </button>
       </div>
     )

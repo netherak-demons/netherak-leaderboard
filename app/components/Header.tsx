@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import ConnectButton from './ConnectButton'
+import { Flame } from 'lucide-react'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -22,23 +23,23 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(36, 36, 36, 0.8)',
+        fontFamily: 'var(--font-harmonique)',
       }}
     >
       {/* Left: placeholder stats */}
-      <div className="flex items-center gap-6 min-w-0">
+      <div className="flex items-center gap-4 min-w-0">
         <div
-          className="text-sm font-medium text-primary flex items-center gap-2"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
+          className="font-medium text-primary flex items-center gap-2"
         >
-          <span className="text-secondary">Evil points:</span>
-          <span className="text-white">x</span>
+          <img src="/evil-point-logo.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+          <span className="text-green-netherak">32</span>
+          <span className="text-white">EVIL</span>
         </div>
         <div
-          className="text-sm font-medium text-primary flex items-center gap-2"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
+          className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1"
         >
-          <span className="text-secondary">Multiplier:</span>
-          <span className="text-white">x</span>
+          <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+          <span className="text-white">x1.5</span>
         </div>
       </div>
 
@@ -51,7 +52,6 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
               ? 'text-primary'
               : 'text-secondary hover:text-primary'
           }`}
-          style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           My account
         </Link>
@@ -62,7 +62,6 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
               ? 'text-primary'
               : 'text-secondary hover:text-primary'
           }`}
-          style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           Leaderboards
         </Link>
@@ -71,7 +70,6 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-base font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           Imuran shop
         </a>
@@ -80,7 +78,6 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-base font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
         >
           Marketplace
         </a>
