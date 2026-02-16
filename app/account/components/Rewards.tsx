@@ -21,7 +21,7 @@ export default function Rewards() {
 
   return (
     <div
-      className="flex flex-col gap-5 w-fit min-w-[460px] shrink-0 rounded-xl p-6 h-fit"
+      className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(4px)',
