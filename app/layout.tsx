@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./components/Providers";
 import Footer from "./components/Footer";
+import AppShell from "./components/AppShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,8 +31,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <div className="flex flex-col min-h-screen">
-            <main className="flex-1">{children}</main>
+          <div className="flex flex-col min-h-screen relative">
+            {/* Fade overlay: black top, transparent center, black bottom */}
+            <div
+              className="fixed inset-0 w-full h-full pointer-events-none"
+              style={{
+                zIndex: 1,
+                background: 'linear-gradient(to bottom, #000 0%, transparent 15%, transparent 95%, #000 100%)',
+              }}
+            />
+            <AppShell>{children}</AppShell>
             <Footer />
           </div>
         </Providers>

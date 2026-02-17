@@ -88,7 +88,7 @@ export default function Backoffice() {
     <BackofficeAuth>
       <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-start p-8">
         <div className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none" style={{ backgroundImage: "url('/background.svg')", zIndex: 0 }}></div>
-        <div className="relative z-10 max-w-[800px] w-full bg-[#00000080] border border-[#242424] rounded-xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+        <div className="relative z-10 max-w-[800px] w-full bg-[#00000080] border border-white/5 rounded-xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
           <h1 className="text-[#eae3d3] text-[2.5rem] mb-2" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Backoffice
           </h1>

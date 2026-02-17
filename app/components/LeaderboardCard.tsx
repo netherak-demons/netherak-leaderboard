@@ -53,9 +53,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       <img
         src={icon}
         alt={title}
-        className="absolute -top-8 md:-top-16 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-22 md:h-22 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10"
+        className="absolute -top-8 md:-top-14 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-22 md:h-22 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10"
       />
-      <div className="pb-4 border-b-2 border-[#242424] text-center">
+      <div className="pb-4 border-b-2 border-white/5 text-center">
         <h2
           className="text-base font-medium m-0 tracking-[4px] md:tracking-[3px] sm:tracking-[1px] uppercase text-primary"
           style={{ fontFamily: 'var(--font-zachar-scratched)' }}
@@ -66,7 +66,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
 
       <div className="pt-4">
         {/* Column headers: Demon, Stats, Evil, Rewards */}
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-[#242424]">
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5">
           <span
             className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
@@ -99,7 +99,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-[#242424] items-center transition-all duration-200 ${
+                className={`grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
