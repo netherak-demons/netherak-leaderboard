@@ -37,7 +37,7 @@ export default function RootLayout({
               className="fixed inset-0 w-full h-full pointer-events-none"
               style={{
                 zIndex: 1,
-                background: 'linear-gradient(to bottom, #000 0%, transparent 15%, transparent 95%, #000 100%)',
+                background: 'linear-gradient(to bottom, #000 0%, transparent 25%, transparent 85%, #000 100%)',
               }}
             />
             <AppShell>{children}</AppShell>

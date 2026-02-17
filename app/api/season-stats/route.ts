@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import https from 'https';
 
+const LOG_PREFIX = '[API /api/season-stats]';
+
+function logError(context: string, error: unknown, extra?: Record<string, unknown>) {
+  const timestamp = new Date().toISOString();
+  console.error('\n' + '═'.repeat(60));
+  console.error(`❌ ${LOG_PREFIX} ${context}`);
+  console.error('─'.repeat(60));
+  console.error(`   Timestamp: ${timestamp}`);
+  if (extra) {
+    Object.entries(extra).forEach(([key, value]) => {
+      console.error(`   ${key}:`, value);
+    });
+  }
+  console.error('   Error:', error instanceof Error ? error.message : error);
+  if (error instanceof Error && error.stack) {
+    console.error('   Stack:', error.stack);
+  }
+  console.error('═'.repeat(60) + '\n');
+}
+
 export async function GET(request: NextRequest) {
   return NextResponse.json(
     { 
@@ -49,7 +69,9 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.NETHERAK_API_KEY;
     
     if (!apiKey) {
-      console.error('NETHERAK_API_KEY environment variable is not set');
+      logError('Configuration error', new Error('NETHERAK_API_KEY not set'), {
+        hint: 'Add NETHERAK_API_KEY to .env.local',
+      });
       return NextResponse.json(
         { error: 'Server configuration error: API key not configured' },
         { status: 500 }
@@ -116,7 +138,7 @@ export async function POST(request: NextRequest) {
     }).catch(async (error) => {
       // Fallback: try with fetch if https module fails
       if (process.env.NODE_ENV === 'development') {
-        console.log('Trying with fetch fallback...', error.message);
+        console.warn(`\n⚠️ ${LOG_PREFIX} HTTPS failed, trying fetch fallback:`, error instanceof Error ? error.message : error);
       }
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -137,7 +159,10 @@ export async function POST(request: NextRequest) {
     const awsRes = { statusCode: 200 }; // Success if we got here
     
     if (awsRes.statusCode < 200 || awsRes.statusCode >= 300) {
-      console.error('AWS API error:', awsRes.statusCode, responseText);
+      logError('Upstream API error', new Error(`HTTP ${awsRes.statusCode}`), {
+        statusCode: awsRes.statusCode,
+        responseBody: responseText,
+      });
       return NextResponse.json(
         { 
           error: `API Error: ${awsRes.statusCode}`,
@@ -166,7 +191,9 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (e) {
-      console.error('Failed to parse response:', e);
+      logError('Failed to parse upstream response', e, {
+        responsePreview: responseText?.substring?.(0, 200),
+      });
       return NextResponse.json(
         { error: 'Invalid upstream response' },
         { status: 502 }
@@ -175,7 +202,9 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching season stats:', error);
+    logError('Unexpected error', error, {
+      method: request.method,
+    });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error desconocido' },
       { status: 500 }

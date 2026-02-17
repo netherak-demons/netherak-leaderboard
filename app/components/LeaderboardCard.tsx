@@ -1,7 +1,98 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { CircleCheck } from 'lucide-react'
+import Link from 'next/link'
+
+const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
+
+function RewardsCell() {
+  const [showOverlay, setShowOverlay] = useState(false)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!showOverlay || !triggerRef.current) return
+    const rect = triggerRef.current.getBoundingClientRect()
+    setPosition({
+      top: rect.top - 8,
+      left: rect.left + rect.width / 2,
+    })
+  }, [showOverlay])
+
+  const handleTriggerLeave = () => {
+    leaveTimeoutRef.current = setTimeout(() => setShowOverlay(false), 100)
+  }
+
+  const handleOverlayEnter = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+      leaveTimeoutRef.current = null
+    }
+    setShowOverlay(true)
+  }
+
+  const handleOverlayLeave = () => {
+    setShowOverlay(false)
+  }
+
+  return (
+    <>
+      <div
+        ref={triggerRef}
+        className="relative flex justify-center pt-8 -mt-8"
+        onMouseEnter={() => {
+          if (leaveTimeoutRef.current) {
+            clearTimeout(leaveTimeoutRef.current)
+            leaveTimeoutRef.current = null
+          }
+          setShowOverlay(true)
+        }}
+        onMouseLeave={handleTriggerLeave}
+      >
+        <CircleCheck
+          className="w-5 h-5 shrink-0 text-white cursor-pointer"
+          strokeWidth={2.5}
+        />
+      </div>
+      {showOverlay &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="fixed flex flex-col gap-2 p-4 rounded-md min-w-[160px] z-50 -translate-x-1/2 -translate-y-full"
+            style={{
+              top: position.top,
+              left: position.left,
+              backgroundColor: 'rgba(26, 26, 26, 0.98)',
+              border: '0.5px solid rgba(255, 255, 255, 0.15)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+            }}
+            onMouseEnter={handleOverlayEnter}
+            onMouseLeave={handleOverlayLeave}
+          >
+            <span
+              className="text-primary text-center"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              Elegible for rewards
+            </span>
+            <Link
+              href={IMURAN_SHOP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 border border-secondary text-white py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary text-sm font-medium bg-white/5 hover:bg-white/10"
+              style={{ fontFamily: 'var(--font-zachar)' }}
+            >
+              Mint book
+            </Link>
+          </div>,
+          document.body
+        )}
+    </>
+  )
+}
 
 interface LeaderboardEntry {
   ranking: number
@@ -42,7 +133,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
 
   return (
     <div
-      className="relative rounded-xl w-full min-w-0 mt-12 md:mt-8 p-6 md:p-5 sm:p-4"
+      className="relative rounded-xl w-full min-w-0 mt-12 md:mt-8 p-6 md:p-5 md:pt-10 sm:p-4"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(30px)',
@@ -94,7 +185,14 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
-          {entries.map((entry) => {
+          {entries.length === 0 ? (
+            <div
+              className="py-12 px-4 text-center text-secondary"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              No data to display yet
+            </div>
+          ) : entries.map((entry) => {
             const isUser = isCurrentUser(entry.address)
             return (
               <div
@@ -156,10 +254,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 {/* Rewards column */}
                 <div className="flex justify-center">
                   {entry.rewards ? (
-                    <CircleCheck
-                      className="w-5 h-5 shrink-0 text-white"
-                      strokeWidth={2.5}
-                    />
+                    <RewardsCell />
                   ) : null}
                 </div>
               </div>

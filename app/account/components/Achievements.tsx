@@ -50,8 +50,8 @@ export default function Achievements() {
       className="flex flex-col gap-5 w-fit min-w-[460px] shrink-0 rounded-xl p-6 h-fit"
       style={{
         backgroundColor: 'transparent',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
         border: '0.5px solid rgba(255, 255, 255, 0.1)',
       }}

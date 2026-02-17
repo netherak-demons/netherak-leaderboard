@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
+const LOG_PREFIX = '[API /api/auth/backoffice]'
+
+function logError(context: string, error: unknown, extra?: Record<string, unknown>) {
+  const timestamp = new Date().toISOString()
+  console.error('\n' + '═'.repeat(60))
+  console.error(`❌ ${LOG_PREFIX} ${context}`)
+  console.error('─'.repeat(60))
+  console.error(`   Timestamp: ${timestamp}`)
+  if (extra) {
+    Object.entries(extra).forEach(([key, value]) => {
+      console.error(`   ${key}:`, value)
+    })
+  }
+  console.error('   Error:', error instanceof Error ? error.message : error)
+  if (error instanceof Error && error.stack) {
+    console.error('   Stack:', error.stack)
+  }
+  console.error('═'.repeat(60) + '\n')
+}
+
 /**
  * Backoffice authentication endpoint
  * Validates password using hashed comparison for security
@@ -47,7 +67,9 @@ export async function POST(request: NextRequest) {
     const storedPasswordSalt = process.env.BACKOFFICE_PASSWORD_SALT
 
     if (!storedPasswordHash) {
-      console.error('BACKOFFICE_PASSWORD_HASH environment variable is not set')
+      logError('Configuration error', new Error('BACKOFFICE_PASSWORD_HASH not set'), {
+        hint: 'Add BACKOFFICE_PASSWORD_HASH to .env.local (use GET /api/auth/backoffice?password=xxx to generate)',
+      })
       return NextResponse.json(
         { success: false, error: 'Server configuration error' },
         { status: 500 }
@@ -70,7 +92,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!salt) {
-      console.error('Password salt is missing')
+      logError('Configuration error', new Error('Password salt is missing'), {
+        hint: 'BACKOFFICE_PASSWORD_HASH should be "hash:salt" or set BACKOFFICE_PASSWORD_SALT separately',
+      })
       return NextResponse.json(
         { success: false, error: 'Server configuration error' },
         { status: 500 }
@@ -101,7 +125,7 @@ export async function POST(request: NextRequest) {
       expiresAt,
     })
   } catch (error) {
-    console.error('Backoffice auth error:', error)
+    logError('Unexpected error', error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

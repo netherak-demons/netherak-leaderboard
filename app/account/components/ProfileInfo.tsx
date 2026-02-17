@@ -10,7 +10,7 @@ function ImuranBookImage() {
   const [error, setError] = useState(false)
 
   return (
-    <div className="w-full aspect-[3/4] max-h-[200px] rounded-lg flex items-center justify-center overflow-hidden relative">
+    <div className="w-full aspect-3/4 max-h-[200px] rounded-lg flex items-center justify-center overflow-hidden relative">
       <img
         src="/imuran-book.png"
         alt="Imuran Book"
@@ -38,16 +38,23 @@ export default function ProfileInfo() {
   const hasImuranBook = false
 
   return (
+    
+    // create div with gradient background
     <div
-      className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6"
+      className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
       style={{
-        backgroundColor: 'transparent',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
-        border: '0.5px solid rgba(255, 255, 255, 0.1)',
       }}
     >
+      <div
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6"
+        style={{
+          backgroundColor: '#00000090',
+        }}
+      >
       {/* 1) PFP + name, ranking, eligible */}
       <div className="flex items-center gap-3">
         <img
@@ -62,7 +69,7 @@ export default function ProfileInfo() {
           >
             {displayName}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
               <span
@@ -76,7 +83,7 @@ export default function ProfileInfo() {
               <div className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
                 <span
-                  className="text-xs font-medium uppercase"
+                  className="text-sm font-medium uppercase"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
                   ELIGIBLE
@@ -88,7 +95,7 @@ export default function ProfileInfo() {
                   <Minus className="w-3 h-3 text-white" strokeWidth={2.5} />
                 </div>
                 <span
-                  className="text-xs font-medium uppercase text-white"
+                  className="text-sm font-medium uppercase text-white"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
                   NOT ELIGIBLE
@@ -183,10 +190,20 @@ export default function ProfileInfo() {
 
       {/* 7) Get Book button */}
       <button
-        className="w-full bg-[rgba(131,233,150,0.2)] border-2 border-green-netherak text-connect-button-text py-3 px-4 rounded-lg font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[rgba(131,233,150,0.3)] hover:shadow-[0_4px_15px_rgba(131,233,150,0.3)] cursor-pointer"
-        style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+        className="relative min-h-[80px] overflow-hidden cursor-pointer rounded-lg hover:scale-105 transition-all duration-300 hover:brightness-110"
+        style={{
+          backgroundImage: 'url(/media/buttons/button_positive.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          fontFamily: 'var(--font-zachar-scratched)',
+        }}
       >
-        Get Book
+        <span
+          className="relative z-10 flex items-center justify-center w-full h-full min-h-[48px] py-3 text-primary text-base font-medium uppercase tracking-wider"
+          style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+        >
+          Get Book
+        </span>
       </button>
 
       {/* 8) Pay with $OMI */}
@@ -199,6 +216,7 @@ export default function ProfileInfo() {
           Pay with $OMI
         </span>
       </div>
+    </div>
     </div>
   )
 }
