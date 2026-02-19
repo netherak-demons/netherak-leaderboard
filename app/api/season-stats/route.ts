@@ -3,6 +3,7 @@ import https from 'https';
 import crypto from 'crypto';
 
 const LOG_PREFIX = '[API /api/season-stats]';
+const isDev = process.env.NODE_ENV === 'development';
 
 function logError(context: string, error: unknown, extra?: Record<string, unknown>) {
   const timestamp = new Date().toISOString();
@@ -20,6 +21,12 @@ function logError(context: string, error: unknown, extra?: Record<string, unknow
     console.error('   Stack:', error.stack);
   }
   console.error('═'.repeat(60) + '\n');
+}
+
+function logInfo(context: string, extra?: Record<string, unknown>) {
+  if (!isDev) return;
+  const timestamp = new Date().toISOString();
+  console.log(`✓ ${LOG_PREFIX} ${context} | ${timestamp}`, extra ?? '');
 }
 
 export async function GET(request: NextRequest) {
@@ -47,10 +54,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    logError('Request received', null, {
+    logInfo('Request received', {
       requestId,
       method: request.method,
-      url: request.url,
       body: { seasonId: body.seasonId, limit: body.limit, hasLastKey: !!body.lastKey },
     });
     
@@ -200,7 +206,7 @@ export async function POST(request: NextRequest) {
       }
       
       const duration = Date.now() - startTime;
-      logError('Request successful', null, {
+      logInfo('Request successful', {
         requestId,
         duration: `${duration}ms`,
         playersCount: data.seasonStats?.length || 0,

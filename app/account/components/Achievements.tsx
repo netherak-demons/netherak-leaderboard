@@ -2,9 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import AchievementCard from './AchievementCard'
-import { useAccount } from 'wagmi'
-import { useUserStats } from '../../hooks/useUserStats'
-import { getDataMode, getEffectiveWallet } from '../../utils/dataMode'
+import { useUserStatsContext } from '../context/UserStatsContext'
 
 // Achievement definitions
 const ACHIEVEMENTS_DEFINITIONS = [
@@ -43,12 +41,7 @@ const ACHIEVEMENTS_DEFINITIONS = [
 ]
 
 export default function Achievements() {
-  const { address, isConnected } = useAccount()
-  const dataMode = getDataMode()
-  const effectiveWallet = getEffectiveWallet(address)
-  // In observation/preview mode, we can show data without wallet connection
-  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
-  const { userStats, loading, hasNoData, error } = useUserStats(effectiveWallet)
+  const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
   const [activeTab, setActiveTab] = useState<'ongoing' | 'completed'>('ongoing')
 
   // Calculate achievements from user stats

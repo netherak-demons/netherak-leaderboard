@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react'
 import { Trophy, Flame, BookCheck, Sparkles, Minus, CircleAlert } from 'lucide-react'
-import { useAccount } from 'wagmi'
-import { useUserStats } from '../../hooks/useUserStats'
-import { getDataMode, getEffectiveWallet } from '../../utils/dataMode'
+import { useUserStatsContext } from '../context/UserStatsContext'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -29,12 +27,7 @@ function ImuranBookImage() {
 }
 
 export default function ProfileInfo() {
-  const { address, isConnected } = useAccount()
-  const dataMode = getDataMode()
-  const effectiveWallet = getEffectiveWallet(address)
-  // In observation/preview mode, we can show data without wallet connection
-  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
-  const { userStats, loading, hasNoData, error } = useUserStats(effectiveWallet)
+  const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -173,7 +166,7 @@ export default function ProfileInfo() {
   }
 
   // Use actual data from API
-  const displayName = userStats.username || (address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Guest')
+  const displayName = userStats.username || (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
   const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
   const isEligible = true // TODO: determine from API
   const evilPoints = userStats.evilPoints

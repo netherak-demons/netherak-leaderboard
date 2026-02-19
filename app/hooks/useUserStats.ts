@@ -7,12 +7,14 @@ import {
   mockSoulsLeaderboard,
   mockWavesLeaderboard,
 } from './mockData'
+import { getCachedPlayers, setCachedPlayers } from './playersCache'
 
 const API_URL = '/api/season-stats'
 
 // Get data mode
 const DATA_MODE = getDataMode()
 const USE_MOCK_DATA = shouldUseMockData()
+const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
 
 interface EnemiesKilled {
   [enemyType: string]: number
@@ -98,7 +100,7 @@ export function useUserStats(
       // undefined means no shared data is expected (e.g., on account page)
       if (allPlayersData === null) {
         // Wait for shared data - don't fetch yet
-        console.log(`⏳ [${DATA_MODE.toUpperCase()}] useUserStats: Waiting for shared data from useSeasonStats...`)
+        if (isDev) console.log(`⏳ [${DATA_MODE.toUpperCase()}] useUserStats: Waiting for shared data from useSeasonStats...`)
         // Keep loading state true while waiting
         return
       }
@@ -113,7 +115,7 @@ export function useUserStats(
 
       // Use mock data in preview mode
       if (USE_MOCK_DATA) {
-        console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock user stats`)
+        if (isDev) console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock user stats`)
         
         // Find user in mock data (use first entry as example)
         const mockUser = mockDungeonsLeaderboard[0]
@@ -141,48 +143,56 @@ export function useUserStats(
       }
 
       try {
-        // Log data mode
-        if (DATA_MODE === 'observation') {
-          console.log(`👁️ [OBSERVATION] Fetching user stats for wallet: ${effectiveWallet}`)
-        } else {
-          console.log(`🚀 [PRODUCTION] Fetching user stats for wallet: ${effectiveWallet}`)
+        if (isDev) {
+          if (DATA_MODE === 'observation') {
+            console.log(`👁️ [OBSERVATION] Fetching user stats for wallet: ${effectiveWallet}`)
+          } else {
+            console.log(`🚀 [PRODUCTION] Fetching user stats for wallet: ${effectiveWallet}`)
+          }
         }
 
         let players: PlayerSeasonStats[] = []
 
         // Reuse data from useSeasonStats if provided (avoids duplicate API calls)
         if (allPlayersData && Array.isArray(allPlayersData) && allPlayersData.length > 0) {
-          console.log(`♻️ [${DATA_MODE.toUpperCase()}] useUserStats: REUSING data from useSeasonStats (${allPlayersData.length} players) - NO API CALL`)
+          if (isDev) console.log(`♻️ [${DATA_MODE.toUpperCase()}] useUserStats: REUSING data from useSeasonStats (${allPlayersData.length} players) - NO API CALL`)
           players = allPlayersData
         } else if (allPlayersData === undefined) {
-          // Only fetch if no shared data is expected (e.g., on account page)
-          console.log(`📡 [${DATA_MODE.toUpperCase()}] useUserStats: No shared data expected, fetching from API...`)
-          let lastKey: string | null = null
-          let requestCount = 0
-          do {
-            requestCount++
-            console.log(`📡 [${DATA_MODE.toUpperCase()}] useUserStats: API call #${requestCount}${lastKey ? ` (pagination)` : ''}`)
-            const response = await fetch(API_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                seasonId,
-                limit: 50,
-                ...(lastKey ? { lastKey } : {}),
-              }),
-            })
+          // Check cache first
+          const cached = getCachedPlayers(seasonId)
+          if (cached && cached.length > 0) {
+            if (isDev) console.log(`♻️ [${DATA_MODE.toUpperCase()}] useUserStats: Using cached data (${cached.length} players)`)
+            players = cached
+          } else {
+            // Fetch from API
+            if (isDev) console.log(`📡 [${DATA_MODE.toUpperCase()}] useUserStats: Fetching from API...`)
+            let lastKey: string | null = null
+            let requestCount = 0
+            do {
+              requestCount++
+              const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  seasonId,
+                  limit: 50,
+                  ...(lastKey ? { lastKey } : {}),
+                }),
+              })
 
-            if (!response.ok) {
-              throw new Error(`API error: ${response.status}`)
-            }
+              if (!response.ok) {
+                throw new Error(`API error: ${response.status}`)
+              }
 
-            const data: SeasonStatsResponse = await response.json()
-            players.push(...data.seasonStats)
-            lastKey = data.lastEvaluatedKey
-          } while (lastKey)
-          console.log(`✅ [${DATA_MODE.toUpperCase()}] useUserStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
+              const data: SeasonStatsResponse = await response.json()
+              players.push(...data.seasonStats)
+              lastKey = data.lastEvaluatedKey
+            } while (lastKey)
+            setCachedPlayers(seasonId, players)
+            if (isDev) console.log(`✅ [${DATA_MODE.toUpperCase()}] useUserStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
+          }
         }
 
         // Find the user's data
@@ -249,7 +259,7 @@ export function useUserStats(
           },
         })
       } catch (err) {
-        console.error(`❌ [${DATA_MODE.toUpperCase()}] Error loading user stats:`, err)
+        if (isDev) console.error(`❌ [${DATA_MODE.toUpperCase()}] Error loading user stats:`, err)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setLoading(false)

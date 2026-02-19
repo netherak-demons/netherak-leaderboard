@@ -7,12 +7,14 @@ import {
   mockWavesLeaderboard,
 } from './mockData'
 import { shouldUseMockData, getDataMode } from '../utils/dataMode'
+import { setCachedPlayers } from './playersCache'
 
 const API_URL = '/api/season-stats'
 
 // Get data mode
 const DATA_MODE = getDataMode()
 const USE_MOCK_DATA = shouldUseMockData()
+const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
 
 interface EnemiesKilled {
   [enemyType: string]: number
@@ -95,7 +97,7 @@ export function useSeasonStats(seasonId: string = '0') {
 
       // Use mock data if in preview mode
       if (USE_MOCK_DATA) {
-        console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock data`)
+        if (isDev) console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock data`)
         setTimeout(() => {
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
@@ -109,11 +111,12 @@ export function useSeasonStats(seasonId: string = '0') {
         return
       }
 
-      // Log data mode
-      if (DATA_MODE === 'observation') {
-        console.log(`👁️ [OBSERVATION] Fetching real data from API`)
-      } else {
-        console.log(`🚀 [PRODUCTION] Fetching real data from API`)
+      if (isDev) {
+        if (DATA_MODE === 'observation') {
+          console.log(`👁️ [OBSERVATION] Fetching real data from API`)
+        } else {
+          console.log(`🚀 [PRODUCTION] Fetching real data from API`)
+        }
       }
 
       try {
@@ -123,7 +126,7 @@ export function useSeasonStats(seasonId: string = '0') {
 
         do {
           requestCount++
-          console.log(`📡 [${DATA_MODE.toUpperCase()}] useSeasonStats: API call #${requestCount}${lastKey ? ` (pagination)` : ''}`)
+          if (isDev) console.log(`📡 [${DATA_MODE.toUpperCase()}] useSeasonStats: API call #${requestCount}${lastKey ? ` (pagination)` : ''}`)
           const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -148,7 +151,8 @@ export function useSeasonStats(seasonId: string = '0') {
 
         setTotalPlayers(players.length)
         setAllPlayers(players) // Store raw players data for reuse
-        console.log(`✅ [${DATA_MODE.toUpperCase()}] useSeasonStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
+        setCachedPlayers(seasonId, players) // Populate cache for useUserStats (e.g. when navigating to account page)
+        if (isDev) console.log(`✅ [${DATA_MODE.toUpperCase()}] useSeasonStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
 
         // Build player map for evil points and rewards (rewards not from API yet)
         const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
@@ -227,7 +231,7 @@ export function useSeasonStats(seasonId: string = '0') {
           setError(null)
         } else {
           // In production/observation mode, show error
-          console.error(`❌ [${DATA_MODE.toUpperCase()}] API error:`, err)
+          if (isDev) console.error(`❌ [${DATA_MODE.toUpperCase()}] API error:`, err)
           setError(err instanceof Error ? err.message : 'Unknown error')
           // Set empty arrays instead of mock data
           setDungeonsLeaderboard([])

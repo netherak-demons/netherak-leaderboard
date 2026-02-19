@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useAccount } from 'wagmi'
-import { useUserStats } from '../../hooks/useUserStats'
-import { getDataMode, getEffectiveWallet } from '../../utils/dataMode'
+import { useUserStatsContext } from '../context/UserStatsContext'
 
 function CursedItemImage({
   src,
@@ -47,12 +45,7 @@ function CursedItemImage({
 }
 
 export default function CursedItems() {
-  const { address, isConnected } = useAccount()
-  const dataMode = getDataMode()
-  const effectiveWallet = getEffectiveWallet(address)
-  // In observation/preview mode, we can show data without wallet connection
-  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
-  const { userStats, loading, hasNoData, error } = useUserStats(effectiveWallet)
+  const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
 
   // TODO: Replace with actual cursed items data from API when available
   const cursedItems: Array<{ id: number; src: string | null; alt: string }> = []
