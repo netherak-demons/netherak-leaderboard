@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { Trophy, Flame, BookCheck, Sparkles, Minus, CircleAlert } from 'lucide-react'
 import { useAccount } from 'wagmi'
+import { useUserStats } from '../../hooks/useUserStats'
+import { getDataMode, getEffectiveWallet } from '../../utils/dataMode'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -28,14 +30,155 @@ function ImuranBookImage() {
 
 export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
+  const dataMode = getDataMode()
+  const effectiveWallet = getEffectiveWallet(address)
+  // In observation/preview mode, we can show data without wallet connection
+  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
+  const { userStats, loading, hasNoData, error } = useUserStats(effectiveWallet)
 
-  // Hardcoded data for display
-  const displayName = isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Guest'
-  const rankingPosition = 42
-  const isEligible = true
-  const evilPoints = 1284
-  const multiplier = 2
-  const hasImuranBook = false
+  // Show skeleton when not connected (unless in observation/preview mode)
+  if (!canShowData) {
+    return (
+      <div
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          style={{
+            backgroundColor: '#00000090',
+          }}
+        >
+          <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            There&apos;s no data to display
+          </p>
+          <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            Please log in to view your profile
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading skeleton
+  if (loading) {
+    return (
+      <div
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px animate-pulse"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6"
+          style={{
+            backgroundColor: '#00000090',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-[62px] h-[62px] rounded-full bg-white/10 shrink-0" />
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="h-5 bg-white/10 rounded w-3/4" />
+              <div className="h-4 bg-white/10 rounded w-1/2" />
+            </div>
+          </div>
+          <div className="h-px w-full bg-white/10 rounded-full" />
+          <div className="flex items-center gap-3">
+            <div className="h-6 bg-white/10 rounded w-24" />
+            <div className="h-4 w-px bg-white/10 shrink-0" />
+            <div className="h-12 bg-white/10 rounded w-16" />
+          </div>
+          <div className="h-px w-full bg-white/10 rounded-full" />
+          <div className="w-full aspect-3/4 max-h-[200px] rounded-lg bg-white/10" />
+          <div className="h-5 bg-white/10 rounded w-32 mx-auto" />
+          <div className="flex flex-col gap-2">
+            <div className="h-4 bg-white/10 rounded w-full" />
+            <div className="h-4 bg-white/10 rounded w-3/4" />
+            <div className="h-4 bg-white/10 rounded w-2/3" />
+          </div>
+          <div className="min-h-[80px] bg-white/10 rounded-lg" />
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-5 h-5 bg-white/10 rounded" />
+            <div className="h-4 bg-white/10 rounded w-24" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error message
+  if (error) {
+    return (
+      <div
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          style={{
+            backgroundColor: '#00000090',
+          }}
+        >
+          <p className="text-[#FF8C8A] text-base text-center mb-2" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            We are experiencing some issues
+          </p>
+          <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            We&apos;ll fix this soon. Please try again later.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show no data message
+  if (hasNoData || !userStats) {
+    return (
+      <div
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          style={{
+            backgroundColor: '#00000090',
+          }}
+        >
+          <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            No data available for your wallet address
+          </p>
+          <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
+            Start playing to see your stats here!
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Use actual data from API
+  const displayName = userStats.username || (address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Guest')
+  const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
+  const isEligible = true // TODO: determine from API
+  const evilPoints = userStats.evilPoints
+  const multiplier = 2 // TODO: get from API
+  const hasImuranBook = false // TODO: get from API
 
   return (
     

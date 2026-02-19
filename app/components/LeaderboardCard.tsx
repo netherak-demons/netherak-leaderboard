@@ -113,6 +113,10 @@ interface LeaderboardCardProps {
   scoreLabel: string
   entries: LeaderboardEntry[]
   userAddress?: string
+  skeleton?: boolean
+  showLoginMessage?: boolean
+  hasNoData?: boolean
+  error?: string | null
 }
 
 const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
@@ -120,7 +124,11 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   icon,
   scoreLabel,
   entries,
-  userAddress
+  userAddress,
+  skeleton = false,
+  showLoginMessage = false,
+  hasNoData = false,
+  error = null
 }) => {
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -129,6 +137,53 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   const isCurrentUser = (entryAddress?: string) => {
     if (!userAddress || !entryAddress) return false
     return userAddress.toLowerCase() === entryAddress.toLowerCase()
+  }
+
+  // Skeleton state
+  if (skeleton) {
+    return (
+      <div
+        className="relative rounded-xl w-full min-w-0 mt-12 md:mt-8 p-6 md:p-5 md:pt-10 sm:p-4 animate-pulse"
+        style={{
+          backgroundColor: 'transparent',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div className="absolute -top-8 md:-top-14 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-22 md:h-22 sm:w-10 sm:h-10 bg-white/10 rounded-full z-10" />
+        <div className="pb-4 border-b-2 border-white/5 text-center">
+          <div className="h-5 bg-white/10 rounded w-3/4 mx-auto" />
+        </div>
+
+        <div className="pt-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5">
+            <div className="h-4 bg-white/10 rounded w-20" />
+            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
+            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
+            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
+          </div>
+
+          <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center"
+              >
+                <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
+                  <div className="w-6 h-4 bg-white/10 rounded shrink-0" />
+                  <div className="w-10 h-10 md:w-8 md:h-8 sm:w-6.5 sm:h-6.5 rounded-full bg-white/10 shrink-0" />
+                  <div className="h-4 bg-white/10 rounded flex-1 max-w-[120px]" />
+                </div>
+                <div className="h-4 bg-white/10 rounded w-12 mx-auto" />
+                <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
+                <div className="h-5 w-5 bg-white/10 rounded mx-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -185,12 +240,43 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
-          {entries.length === 0 ? (
+          {showLoginMessage ? (
+            <div
+              className="py-12 px-4 text-center"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              <p className="text-secondary text-base mb-2">
+                There&apos;s no data to display
+              </p>
+              <p className="text-secondary/70 text-sm">
+                Please log in to view leaderboards
+              </p>
+            </div>
+          ) : error ? (
+            <div
+              className="py-12 px-4 text-center"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              <p className="text-[#FF8C8A] text-base mb-2">
+                We are experiencing some issues
+              </p>
+              <p className="text-secondary/70 text-sm">
+                We&apos;ll fix this soon. Please try again later.
+              </p>
+            </div>
+          ) : hasNoData ? (
             <div
               className="py-12 px-4 text-center text-secondary"
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
-              No data to display yet
+              No scores for this address
+            </div>
+          ) : entries.length === 0 ? (
+            <div
+              className="py-12 px-4 text-center text-secondary"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              No campaigns yet
             </div>
           ) : entries.map((entry) => {
             const isUser = isCurrentUser(entry.address)

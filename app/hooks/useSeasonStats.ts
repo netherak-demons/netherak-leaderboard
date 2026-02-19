@@ -6,15 +6,13 @@ import {
   mockSoulsLeaderboard,
   mockWavesLeaderboard,
 } from './mockData'
+import { shouldUseMockData, getDataMode } from '../utils/dataMode'
 
 const API_URL = '/api/season-stats'
 
-// Control mock data usage:
-// - NEXT_PUBLIC_USE_MOCK_DATA=true: Always use mock data
-// - NEXT_PUBLIC_USE_MOCK_DATA=false: Always use API (default in production)
-// - Not set: Use API, but fallback to mock on errors (default behavior)
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
-const FORCE_API = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'false'
+// Get data mode
+const DATA_MODE = getDataMode()
+const USE_MOCK_DATA = shouldUseMockData()
 
 interface EnemiesKilled {
   [enemyType: string]: number
@@ -76,31 +74,56 @@ export function useSeasonStats(seasonId: string = '0') {
   const [harvestedSoulsLeaderboard, setHarvestedSoulsLeaderboard] = useState<LeaderboardEntry[]>([])
   const [wavesLeaderboard, setWavesLeaderboard] = useState<LeaderboardEntry[]>([])
   const [totalPlayers, setTotalPlayers] = useState(0)
+  const [allPlayers, setAllPlayers] = useState<PlayerSeasonStats[]>([]) // Expose raw players data
 
   useEffect(() => {
     async function load() {
+      // Don't fetch if seasonId is empty (user not connected)
+      if (!seasonId) {
+        setLoading(false)
+        setDungeonsLeaderboard([])
+        setSlayedHumansLeaderboard([])
+        setHarvestedSoulsLeaderboard([])
+        setWavesLeaderboard([])
+        setTotalPlayers(0)
+        setAllPlayers([])
+        return
+      }
+
       setLoading(true)
       setError(null)
 
-      // Use mock data if explicitly enabled
+      // Use mock data if in preview mode
       if (USE_MOCK_DATA) {
-        console.log('🔧 Using mock data (NEXT_PUBLIC_USE_MOCK_DATA=true)')
+        console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock data`)
         setTimeout(() => {
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
           setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
           setWavesLeaderboard(mockWavesLeaderboard)
           setTotalPlayers(20)
+          // For mock data, create empty array (useUserStats will use mock data separately)
+          setAllPlayers([])
           setLoading(false)
         }, 500) // Simulate loading delay
         return
       }
 
+      // Log data mode
+      if (DATA_MODE === 'observation') {
+        console.log(`👁️ [OBSERVATION] Fetching real data from API`)
+      } else {
+        console.log(`🚀 [PRODUCTION] Fetching real data from API`)
+      }
+
       try {
         const players: PlayerSeasonStats[] = []
         let lastKey: string | null = null
+        let requestCount = 0
 
         do {
+          requestCount++
+          console.log(`📡 [${DATA_MODE.toUpperCase()}] useSeasonStats: API call #${requestCount}${lastKey ? ` (pagination)` : ''}`)
           const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -114,18 +137,7 @@ export function useSeasonStats(seasonId: string = '0') {
           })
 
           if (!response.ok) {
-            // If rate limited or error, fall back to mock data (unless FORCE_API is true)
-            if (!FORCE_API && (response.status === 429 || response.status >= 500)) {
-              console.warn(`⚠️ API error (${response.status}), falling back to mock data`)
-              setDungeonsLeaderboard(mockDungeonsLeaderboard)
-              setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
-              setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
-              setWavesLeaderboard(mockWavesLeaderboard)
-              setTotalPlayers(20)
-              setLoading(false)
-              setError(null)
-              return
-            }
+            // In production/observation mode, show error (don't fall back to mock)
             throw new Error(`API error: ${response.status}`)
           }
 
@@ -135,6 +147,8 @@ export function useSeasonStats(seasonId: string = '0') {
         } while (lastKey)
 
         setTotalPlayers(players.length)
+        setAllPlayers(players) // Store raw players data for reuse
+        console.log(`✅ [${DATA_MODE.toUpperCase()}] useSeasonStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
 
         // Build player map for evil points and rewards (rewards not from API yet)
         const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
@@ -202,9 +216,9 @@ export function useSeasonStats(seasonId: string = '0') {
             .map(({ p, score }, i) => toEntry(p, score, i))
         )
       } catch (err) {
-        // Fall back to mock data on any error (unless FORCE_API is true)
-        if (!FORCE_API) {
-          console.warn('⚠️ API error, falling back to mock data:', err)
+        // In preview mode, we shouldn't reach here, but handle it anyway
+        if (USE_MOCK_DATA) {
+          console.warn('⚠️ Error in preview mode, using mock data as fallback')
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
           setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
@@ -212,8 +226,16 @@ export function useSeasonStats(seasonId: string = '0') {
           setTotalPlayers(20)
           setError(null)
         } else {
-          console.error('❌ API error (FORCE_API=true, not using mock):', err)
+          // In production/observation mode, show error
+          console.error(`❌ [${DATA_MODE.toUpperCase()}] API error:`, err)
           setError(err instanceof Error ? err.message : 'Unknown error')
+          // Set empty arrays instead of mock data
+          setDungeonsLeaderboard([])
+          setSlayedHumansLeaderboard([])
+          setHarvestedSoulsLeaderboard([])
+          setWavesLeaderboard([])
+          setTotalPlayers(0)
+          setAllPlayers([])
         }
       } finally {
         setLoading(false)
@@ -231,5 +253,6 @@ export function useSeasonStats(seasonId: string = '0') {
     loading,
     error,
     totalPlayers,
+    allPlayers, // Expose raw players data for reuse in useUserStats
   }
 }

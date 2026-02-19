@@ -6,8 +6,8 @@ import { somniaMainnet, somniaTestnet } from './chains'
 const projectAccessKey = process.env.NEXT_PUBLIC_SEQUENCE_PROJECT_ACCESS_KEY || ''
 const waasConfigKey = process.env.NEXT_PUBLIC_SEQUENCE_WAAS_CONFIG_KEY || ''
 
-console.log('projectAccessKey', projectAccessKey)
-console.log('waasConfigKey', waasConfigKey)
+// console.log('projectAccessKey', projectAccessKey)
+// console.log('waasConfigKey', waasConfigKey)
 
 export const config = createConfig('waas', {
   projectAccessKey,

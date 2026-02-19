@@ -3,43 +3,89 @@
 import React from 'react'
 import LeaderboardCard from './LeaderboardCard'
 import { useSeasonStats } from '../hooks/useSeasonStats'
+import { useUserStats } from '../hooks/useUserStats'
 import { useAccount } from 'wagmi'
+import { getDataMode, getEffectiveWallet } from '../utils/dataMode'
 
 const Leaderboard: React.FC = () => {
+  const { address, isConnected } = useAccount()
+  const dataMode = getDataMode()
+  const effectiveWallet = getEffectiveWallet(address)
+  
+  // In observation/preview mode, we can show data without wallet connection
+  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
+  
+  // Fetch leaderboard data when we can show data
   const {
     dungeonsLeaderboard,
     slayedHumansLeaderboard,
     harvestedSoulsLeaderboard,
     wavesLeaderboard,
-    loading,
+    loading: leaderboardLoading,
     error,
-  } = useSeasonStats('0')
-  const { address } = useAccount()
+    allPlayers, // Get raw players data to reuse
+  } = useSeasonStats(canShowData ? '0' : '')
+  
+  // Check if user has data - reuse allPlayers data to avoid duplicate API calls
+  // Pass null initially (to signal we want to wait), then pass the array when ready
+  const { userStats, loading: userLoading, hasNoData } = useUserStats(
+    effectiveWallet, 
+    '0',
+    leaderboardLoading ? null : (allPlayers.length > 0 ? allPlayers : undefined)
+  )
+  
+  const loading = userLoading || leaderboardLoading
 
+  // Show login message when not connected (unless in observation/preview mode)
+  if (!canShowData) {
+    return (
+      <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
+        <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
+          <div className="grid grid-cols-2 gap-12 sm:gap-20">
+            {[1, 2, 3, 4].map((i) => (
+              <LeaderboardCard
+                key={i}
+                title=""
+                icon=""
+                subtitle=""
+                scoreLabel=""
+                entries={[]}
+                userAddress={undefined}
+                skeleton={true}
+                showLoginMessage={true}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading skeleton
   if (loading) {
     return (
       <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
-        <div className="flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
-          <div className="text-primary text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Loading leaderboards...
+        <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
+          <div className="grid grid-cols-2 gap-12 sm:gap-20">
+            {[1, 2, 3, 4].map((i) => (
+              <LeaderboardCard
+                key={i}
+                title=""
+                icon=""
+                subtitle=""
+                scoreLabel=""
+                entries={[]}
+                userAddress={undefined}
+                skeleton={true}
+              />
+            ))}
           </div>
         </div>
       </div>
     )
   }
 
-  if (error) {
-    return (
-      <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
-        <div className="flex gap-12 justify-center items-center w-full max-w-[1200px] mx-auto p-8">
-          <div className="text-[#FF8C8A] text-center text-xl" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Error loading leaderboards: {error}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
+  // Always show leaderboards when connected (even if there's an error or user has no data)
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
       <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
@@ -50,7 +96,9 @@ const Leaderboard: React.FC = () => {
             subtitle=""
             scoreLabel="Stats"
             entries={dungeonsLeaderboard}
-            userAddress={address}
+            userAddress={effectiveWallet || address}
+            hasNoData={hasNoData}
+            error={error}
           />
 
           <LeaderboardCard
@@ -59,7 +107,9 @@ const Leaderboard: React.FC = () => {
             subtitle=""
             scoreLabel="Stats"
             entries={slayedHumansLeaderboard}
-            userAddress={address}
+            userAddress={effectiveWallet || address}
+            hasNoData={hasNoData}
+            error={error}
           />
 
           <LeaderboardCard
@@ -68,7 +118,9 @@ const Leaderboard: React.FC = () => {
             subtitle=""
             scoreLabel="Stats"
             entries={harvestedSoulsLeaderboard}
-            userAddress={address}
+            userAddress={effectiveWallet || address}
+            hasNoData={hasNoData}
+            error={error}
           />
 
           <LeaderboardCard
@@ -77,7 +129,9 @@ const Leaderboard: React.FC = () => {
             subtitle=""
             scoreLabel="Stats"
             entries={wavesLeaderboard}
-            userAddress={address}
+            userAddress={effectiveWallet || address}
+            hasNoData={hasNoData}
+            error={error}
           />
         </div>
       </div>
