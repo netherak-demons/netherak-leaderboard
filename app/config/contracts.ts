@@ -1,3 +1,34 @@
+/** PFP (profile picture) NFT contract for avatar display */
+export const PFP_CONTRACT = {
+  address: '0x9559ff653d4c8cc3565Dd639963597F1aAaE6A6A' as `0x${string}`,
+  abi: [
+    {
+      type: 'function',
+      name: 'balanceOf',
+      inputs: [{ name: 'owner', type: 'address', internalType: 'address' }],
+      outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'tokenOfOwnerByIndex',
+      inputs: [
+        { name: 'owner', type: 'address', internalType: 'address' },
+        { name: 'index', type: 'uint256', internalType: 'uint256' },
+      ],
+      outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'tokenURI',
+      inputs: [{ name: 'tokenId', type: 'uint256', internalType: 'uint256' }],
+      outputs: [{ name: '', type: 'string', internalType: 'string' }],
+      stateMutability: 'view',
+    },
+  ] as const,
+}
+
 export const NETHERAK_NFT_CONTRACT = {
   address: '0x5c72d14ba0563ba056c51a5a823b0a68b7e91c53' as `0x${string}`,
   abi: [

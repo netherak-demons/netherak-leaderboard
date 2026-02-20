@@ -2,9 +2,25 @@
 
 import React, { useState } from 'react'
 import { Trophy, Flame, BookCheck, Sparkles, Minus, CircleAlert } from 'lucide-react'
+import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
+import { useUserPfp } from '../../hooks/useUserPfp'
+import { getEffectiveWallet } from '../../utils/dataMode'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
+
+function ProfileAvatar({ pfpUrl }: { pfpUrl: string | null }) {
+  const [useDefault, setUseDefault] = useState(false)
+  const src = !useDefault && pfpUrl ? pfpUrl : DEFAULT_PFP
+  return (
+    <img
+      src={src}
+      alt="Profile"
+      className="w-[62px] h-[62px] rounded-full shrink-0 object-cover bg-[#2a2a2a] border-2 border-green-netherak"
+      onError={() => setUseDefault(true)}
+    />
+  )
+}
 
 function ImuranBookImage() {
   const [error, setError] = useState(false)
@@ -27,7 +43,10 @@ function ImuranBookImage() {
 }
 
 export default function ProfileInfo() {
+  const { address } = useAccount()
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
+  const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
+  const { pfpUrl } = useUserPfp(walletForPfp)
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -193,11 +212,7 @@ export default function ProfileInfo() {
       >
       {/* 1) PFP + name, ranking, eligible */}
       <div className="flex items-center gap-3">
-        <img
-          src={DEFAULT_PFP}
-          alt="Profile"
-          className="w-[62px] h-[62px] rounded-full shrink-0 object-cover bg-[#2a2a2a] border-2 border-green-netherak"
-        />
+        <ProfileAvatar pfpUrl={pfpUrl} />
         <div className="flex flex-col gap-0.5 min-w-0">
           <span
             className="text-white font-medium truncate"

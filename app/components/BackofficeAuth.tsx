@@ -82,7 +82,7 @@ export default function BackofficeAuth({ children }: BackofficeAuthProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex justify-center items-center p-8">
+      <div className="min-h-screen flex justify-center items-center p-8">
         <div className="bg-[rgba(0,0,0,0.9)] rounded-xl p-12 shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-[rgba(234,227,211,0.1)] max-w-[400px] w-full">
           <h1 className="text-[#eae3d3] text-3xl mb-2 text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Backoffice Access

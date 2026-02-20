@@ -1,6 +1,20 @@
 'use client'
 
 import React, { useState } from 'react'
+
+function ConnectButtonAvatar({ pfpUrl }: { pfpUrl?: string }) {
+  const [useDefault, setUseDefault] = useState(false)
+  const src = !useDefault && pfpUrl ? pfpUrl : DEFAULT_PFP
+  return (
+    <img
+      src={src}
+      alt="Profile"
+      className="w-[52px] h-[52px] rounded-full shrink-0 object-cover bg-[#2a2a2a]"
+      style={{ border: '0.25px solid #FD9D83' }}
+      onError={() => setUseDefault(true)}
+    />
+  )
+}
 import Image from 'next/image'
 import { LogOut } from 'lucide-react'
 import { useAccount, useDisconnect } from 'wagmi'
@@ -57,12 +71,7 @@ export default function ConnectButton({
   if (isConnected && !children) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <img
-          src={pfpUrl || DEFAULT_PFP}
-          alt="Profile"
-          className="w-[52px] h-[52px] rounded-full shrink-0 object-cover bg-[#2a2a2a]"
-          style={{ border: '0.25px solid #FD9D83' }}
-        />
+        <ConnectButtonAvatar pfpUrl={pfpUrl} />
         <button
           className="flex items-center gap-2 border border-secondary text-connect-button-text py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={disabled ? undefined : handleLogoutClick}

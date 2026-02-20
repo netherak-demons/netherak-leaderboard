@@ -2,8 +2,10 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
 import { Flame } from 'lucide-react'
+import { useUserPfp } from '../hooks/useUserPfp'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -15,6 +17,9 @@ interface HeaderProps {
 }
 
 export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
+  const { address } = useAccount()
+  const { pfpUrl } = useUserPfp(address)
+
   return (
     <header
       className="relative z-50 px-6 py-4 flex items-center justify-between gap-4"
@@ -81,7 +86,7 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
 
       {/* Right: connect button */}
       <div className="shrink-0">
-        <ConnectButton />
+        <ConnectButton pfpUrl={pfpUrl ?? undefined} />
       </div>
     </header>
   )

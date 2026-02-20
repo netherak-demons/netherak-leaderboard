@@ -1,60 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useReadContract } from 'wagmi'
 import { NETHERAK_NFT_CONTRACT, PlayerStats, LeaderboardEntry } from '../config/contracts'
-
-// Función para parsear metadata del tokenURI
-async function fetchTokenMetadata(tokenURI: string): Promise<any> {
-  try {
-    console.log('Parsing tokenURI:', tokenURI)
-
-    // Si es un data URI base64, parsearlo directamente
-    if (tokenURI.startsWith('data:application/json;base64,')) {
-      const base64Data = tokenURI.replace('data:application/json;base64,', '')
-      const jsonString = atob(base64Data)
-      return JSON.parse(jsonString)
-    }
-
-    // Si es otro tipo de data URI JSON
-    if (tokenURI.startsWith('data:application/json,')) {
-      const jsonString = tokenURI.replace('data:application/json,', '')
-      return JSON.parse(decodeURIComponent(jsonString))
-    }
-
-    // Si es una URL HTTP/HTTPS, hacer fetch
-    if (tokenURI.startsWith('http://') || tokenURI.startsWith('https://')) {
-      const response = await fetch(tokenURI)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return await response.json()
-    }
-
-    // Si es IPFS con diferentes formatos
-    if (tokenURI.startsWith('ipfs://')) {
-      const url = tokenURI.replace('ipfs://', 'https://ipfs.io/ipfs/')
-      const response = await fetch(url)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return await response.json()
-    }
-
-    // Si es un hash IPFS directo (sin protocolo)
-    if (tokenURI.match(/^Qm[a-zA-Z0-9]{44}$/) || tokenURI.match(/^ba[a-zA-Z0-9]{57}$/)) {
-      const url = `https://ipfs.io/ipfs/${tokenURI}`
-      const response = await fetch(url)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return await response.json()
-    }
-
-    // Si ya es JSON directo (string), intentar parsearlo
-    if (tokenURI.startsWith('{') && tokenURI.endsWith('}')) {
-      return JSON.parse(tokenURI)
-    }
-
-    console.log('Unknown tokenURI format:', tokenURI)
-    throw new Error(`Unsupported tokenURI format: ${tokenURI.substring(0, 100)}`)
-  } catch (error) {
-    console.error('Error fetching token metadata:', error)
-    return null
-  }
-}
+import { fetchTokenMetadata } from '../utils/nftMetadata'
 
 export function useRealLeaderboards() {
   const [playersData, setPlayersData] = useState<PlayerStats[]>([])
