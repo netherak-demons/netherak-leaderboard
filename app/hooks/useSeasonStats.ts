@@ -29,6 +29,7 @@ interface PlayerSeasonStats {
   username: string
   profile: {
     username: string
+    extraPoints?: number
   }
   stats: {
     enemiesKilled?: EnemiesKilled
@@ -158,7 +159,7 @@ export function useSeasonStats(seasonId: string = '0') {
         const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
         for (const p of players) {
           const pfpCount = 0
-          const extraPoints = 0
+          const extraPoints = p.profile?.extraPoints ?? 0
           const evilPointsCalc = calculateEvilPoints(p.stats || {}, pfpCount, extraPoints)
           playerMap.set(p.wallet, {
             evilPoints: evilPointsCalc.totalPoints,

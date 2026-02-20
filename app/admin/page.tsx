@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 import BackofficeAuth from '../components/BackofficeAuth'
-import { searchUser, updateUser, User, UpdateUserParams } from '../services/backofficeUserService'
+import { searchUser, updateUser, updateExtraPoints, User, UpdateUserParams } from '../services/backofficeUserService'
 
 export default function Backoffice() {
   const [searchType, setSearchType] = useState<'wallet' | 'username'>('wallet')
@@ -46,7 +46,8 @@ export default function Backoffice() {
     if (result.user) {
       setUser(result.user)
       setIsWhitelisted(result.user.isWhitelisted || false)
-      setExtraPoints(result.user.extraPoints || 0)
+      const points = result.user.extraPoints ?? result.user.profile?.extraPoints ?? 0
+      setExtraPoints(points)
     }
 
     setLoading(false)
@@ -59,15 +60,28 @@ export default function Backoffice() {
     setError(null)
     setSaveSuccess(false)
 
+    const newExtraPoints = Number(extraPoints) || 0
+    const currentExtraPoints = user.extraPoints ?? user.profile?.extraPoints ?? 0
+    const extraPointsDelta = newExtraPoints - currentExtraPoints
+
+    // Update extra points via AWS extrapoints API (amount = add/subtract delta)
+    if (extraPointsDelta !== 0) {
+      const extraResult = await updateExtraPoints(user.wallet, extraPointsDelta)
+      if (extraResult.error) {
+        setError(extraResult.error)
+        setSaving(false)
+        return
+      }
+    }
+
+    // Update whitelist via updateUser (optional - endpoint may not exist)
     const params: UpdateUserParams = {
       wallet: user.wallet,
       isWhitelisted,
-      extraPoints: Number(extraPoints) || 0,
     }
-
     const result = await updateUser(params)
-
-    if (result.error) {
+    if (result.error && extraPointsDelta === 0) {
+      // Only fail if we had nothing else to save (no extra points change)
       setError(result.error)
       setSaving(false)
       return
@@ -80,7 +94,7 @@ export default function Backoffice() {
     setUser({
       ...user,
       isWhitelisted,
-      extraPoints: Number(extraPoints) || 0,
+      extraPoints: newExtraPoints,
     })
   }
 

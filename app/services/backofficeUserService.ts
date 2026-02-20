@@ -10,6 +10,7 @@ export interface User {
   username?: string
   profile?: {
     username?: string
+    extraPoints?: number
   }
   isWhitelisted?: boolean
   extraPoints?: number
@@ -99,6 +100,41 @@ export async function searchUser(
       ? `User with wallet ${params.wallet} not found`
       : `User with username ${params.username} not found`,
   }
+}
+
+/**
+ * Add or subtract extra points for a user
+ * Calls the AWS extrapoints API. Amount can be positive (add) or negative (subtract).
+ */
+export async function updateExtraPoints(
+  wallet: string,
+  amount: number
+): Promise<{ success: boolean; error: string | null }> {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('backoffice_token') : null
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  }
+
+  const res = await fetch('/api/user/extrapoints', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ wallet, amount }),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    let message: string
+    try {
+      const json = JSON.parse(text)
+      message = json.error || text
+    } catch {
+      message = text || `HTTP ${res.status}`
+    }
+    return { success: false, error: message }
+  }
+
+  return { success: true, error: null }
 }
 
 /**

@@ -29,6 +29,7 @@ interface PlayerSeasonStats {
   username: string
   profile: {
     username: string
+    extraPoints?: number
   }
   stats: {
     enemiesKilled?: EnemiesKilled
@@ -212,9 +213,9 @@ export function useUserStats(
         const harvestedSouls = getHarvestedSouls(userData.stats)
         const wavesCompleted = getWavesCompleted(userData.stats)
 
-        // Calculate evil points
+        // Calculate evil points (include profile.extraPoints from backoffice)
         const pfpCount = 0
-        const extraPoints = 0
+        const extraPoints = userData.profile?.extraPoints ?? 0
         const evilPointsCalc = calculateEvilPoints(userData.stats || {}, pfpCount, extraPoints)
 
         // Calculate rankings
