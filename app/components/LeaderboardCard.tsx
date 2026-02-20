@@ -164,7 +164,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
           </div>
 
-          <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
+          <div className="overflow-x-hidden">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div
                 key={i}
@@ -239,7 +239,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           </span>
         </div>
 
-        <div className="max-h-[500px] md:max-h-[400px] sm:max-h-[350px] overflow-y-auto overflow-x-hidden">
+        <div className="overflow-x-hidden">
           {showLoginMessage ? (
             <div
               className="py-12 px-4 text-center"

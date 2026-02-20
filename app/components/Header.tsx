@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
 import { Flame } from 'lucide-react'
@@ -12,11 +13,9 @@ const EXTERNAL_LINKS = {
   marketplace: 'https://fascinating-alpaca-40611.sequence.market/market/',
 }
 
-interface HeaderProps {
-  currentRoute?: 'leaderboards' | 'account'
-}
-
-export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
+export default function Header() {
+  const pathname = usePathname()
+  const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
   const { address } = useAccount()
   const { pfpUrl } = useUserPfp(address)
 

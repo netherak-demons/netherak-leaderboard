@@ -39,7 +39,7 @@ const Leaderboard: React.FC = () => {
   // Show login message when not connected (unless in observation/preview mode)
   if (!canShowData) {
     return (
-      <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
+      <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-2 gap-12 sm:gap-20">
             {[1, 2, 3, 4].map((i) => (
@@ -64,7 +64,7 @@ const Leaderboard: React.FC = () => {
   // Show loading skeleton
   if (loading) {
     return (
-      <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
+      <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-2 gap-12 sm:gap-20">
             {[1, 2, 3, 4].map((i) => (
@@ -87,7 +87,7 @@ const Leaderboard: React.FC = () => {
 
   // Always show leaderboards when connected (even if there's an error or user has no data)
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden flex justify-center items-center ">
+    <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
       <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
         <div className="grid grid-cols-2 gap-12 sm:gap-20">
           <LeaderboardCard

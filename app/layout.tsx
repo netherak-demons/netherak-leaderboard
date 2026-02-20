@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./components/Providers";
+import Header from "./components/Header";
 import Footer from "./components/Footer";
-import AppShell from "./components/AppShell";
+import BackgroundOverlay from "./components/BackgroundOverlay";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,16 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <div className="flex flex-col min-h-screen relative">
-            {/* Fade overlay: black top, transparent center, black bottom */}
-            <div
-              className="fixed inset-0 w-full h-full pointer-events-none"
-              style={{
-                zIndex: 1,
-                background: 'linear-gradient(to bottom, #000 0%, transparent 25%, transparent 85%, #000 100%)',
-              }}
-            />
-            <AppShell>{children}</AppShell>
+          <BackgroundOverlay />
+          <div className="relative z-10 flex min-h-screen flex-col max-w-[1200px] mx-auto w-full">
+            <Header />
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </Providers>
