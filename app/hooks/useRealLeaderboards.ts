@@ -25,7 +25,7 @@ export function useRealLeaderboards() {
         return
       }
 
-      if (!totalSupply || totalSupply === 0n) {
+      if (!totalSupply || totalSupply === BigInt(0)) {
         setError('No NFTs found in contract')
         setLoading(false)
         return
@@ -192,8 +192,8 @@ export function useRealLeaderboards() {
           name: metadata.name || `Player Career ${tokenId}`,
           description: metadata.description || '',
           image: metadata.image || '',
-          monstersKilled: metadata.properties?.["Monsters Killed"] || 0,
-          dungeonsCompleted: metadata.properties?.["Dungeons Completed"] || 0,
+          monstersKilled: Number(metadata.properties?.['Monsters Killed']) || 0,
+          dungeonsCompleted: Number(metadata.properties?.['Dungeons Completed']) || 0,
           avatar: metadata.image || `/demons/avatar${(tokenId % 2) + 1}.svg`
         }
 

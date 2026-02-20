@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 function ConnectButtonAvatar({ pfpUrl }: { pfpUrl?: string }) {
   const [useDefault, setUseDefault] = useState(false)
@@ -44,9 +44,12 @@ export default function ConnectButton({
   pfpUrl
 }: ConnectButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const { setOpenConnectModal } = useOpenConnectModal()
+
+  useEffect(() => setMounted(true), [])
 
   const handleConnectClick = () => {
     if (onClick) {
@@ -68,7 +71,7 @@ export default function ConnectButton({
     disconnect()
   }
 
-  if (isConnected && !children) {
+  if (mounted && isConnected && !children) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
         <ConnectButtonAvatar pfpUrl={pfpUrl} />

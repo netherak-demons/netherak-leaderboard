@@ -1,7 +1,14 @@
 /**
  * Fetches and parses NFT token metadata from tokenURI
  */
-export async function fetchTokenMetadata(tokenURI: string): Promise<{ image?: string; name?: string } | null> {
+export interface NFTMetadata {
+  image?: string
+  name?: string
+  description?: string
+  properties?: Record<string, unknown>
+}
+
+export async function fetchTokenMetadata(tokenURI: string): Promise<NFTMetadata | null> {
   try {
     if (tokenURI.startsWith('data:application/json;base64,')) {
       const base64Data = tokenURI.replace('data:application/json;base64,', '')
