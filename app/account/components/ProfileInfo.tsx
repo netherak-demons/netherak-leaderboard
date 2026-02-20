@@ -254,7 +254,7 @@ export default function ProfileInfo() {
       {/* 3) EvilPoints | Multiplier */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5">
-          <img src="/evil-point-logo.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+          <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
           <span
             className="text-green-netherak font-bold text-lg"
             style={{ fontFamily: 'var(--font-harmonique)' }}

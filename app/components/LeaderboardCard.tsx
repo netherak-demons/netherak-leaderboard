@@ -326,7 +326,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 {/* Evil column: logo + number */}
                 <div className="flex items-center justify-center gap-1.5">
                   <img
-                    src="/evil-point-logo.svg"
+                    src="/evil.svg"
                     alt="Evil points"
                     className="w-5 h-6 shrink-0"
                   />

@@ -27,7 +27,7 @@ export default function Header({ currentRoute = 'leaderboards' }: HeaderProps) {
         <div
           className="font-medium text-primary flex items-center gap-2"
         >
-          <img src="/evil-point-logo.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+          <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
           <span className="text-green-netherak">32</span>
           <span className="text-white">EVIL</span>
         </div>

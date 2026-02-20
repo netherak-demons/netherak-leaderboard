@@ -181,7 +181,7 @@ export default function AchievementCard({
             boxShadow: completed ? `0 0 12px rgba(131, 233, 150, 0.2)` : 'none',
           }}
         >
-          <img src="/evil-point-logo.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+          <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
           <span
             className="font-medium"
             style={{

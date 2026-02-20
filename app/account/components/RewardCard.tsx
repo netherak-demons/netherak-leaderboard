@@ -49,7 +49,7 @@ export default function RewardCard({ questName, amount }: RewardCardProps) {
         </span>
         <div className="flex items-center gap-1.5">
           <img
-            src="/evil-point-logo.svg"
+            src="/evil.svg"
             alt="Evil points"
             className="w-4 h-5 shrink-0"
           />
