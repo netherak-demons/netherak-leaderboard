@@ -18,7 +18,7 @@ export default function Rewards() {
   if (!canShowData) {
     return (
       <div
-        className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -44,7 +44,7 @@ export default function Rewards() {
   if (loading) {
     return (
       <div
-        className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit animate-pulse"
+        className="flex flex-col gap-5 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 h-fit animate-pulse"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -55,7 +55,7 @@ export default function Rewards() {
       >
         <div className="h-5 bg-white/10 rounded w-24" />
         <div className="h-px w-full bg-white/10 rounded-full" />
-        <div className="flex items-center justify-between w-full gap-6 px-10">
+        <div className="flex items-center justify-between w-full gap-4 md:gap-6 px-4 md:px-10">
           <div className="h-5 bg-white/10 rounded w-20" />
           <div className="h-5 bg-white/10 rounded w-24" />
         </div>
@@ -76,7 +76,7 @@ export default function Rewards() {
   if (error) {
     return (
       <div
-        className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -107,7 +107,7 @@ export default function Rewards() {
   if (hasNoData || !userStats) {
     return (
       <div
-        className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -131,7 +131,7 @@ export default function Rewards() {
 
   return (
     <div
-      className="flex flex-col gap-5 w-[350px] shrink-0 rounded-xl p-6 h-fit"
+      className="flex flex-col gap-5 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(16px)',
@@ -156,7 +156,7 @@ export default function Rewards() {
       />
 
       {/* Tab buttons */}
-      <div className="flex items-center justify-between w-full gap-6 px-10">
+      <div className="flex items-center justify-between w-full gap-4 md:gap-6 px-4 md:px-10">
         <button
           type="button"
           onClick={() => setActiveTab('history')}

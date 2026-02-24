@@ -17,16 +17,15 @@ interface AchievementCardProps {
 }
 
 function AchievementIcon({ iconUrl }: { iconUrl?: string }) {
-  const size = 112
-  if (!iconUrl) return <div className="shrink-0 rounded-lg bg-white/10" style={{ width: size, height: size }} />
+  if (!iconUrl) return <div className="shrink-0 w-12 h-12 md:w-28 md:h-28 rounded-lg bg-white/10" />
 
   return (
-    <div className="relative shrink-0 overflow-hidden rounded-lg" style={{ width: size, height: size }}>
+    <div className="relative shrink-0 w-12 h-12 md:w-28 md:h-28 overflow-hidden rounded-lg">
       <Image
         src={iconUrl}
         alt=""
-        width={size}
-        height={size}
+        width={112}
+        height={112}
         className="w-full h-full object-cover"
       />
     </div>
@@ -47,7 +46,7 @@ export default function AchievementCard({
 
   return (
     <div
-      className="flex items-center gap-4 p-4 rounded-xl w-full text-white text-base"
+      className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl w-full text-white text-base"
     >
       {/* Left: Achievement icon */}
       <AchievementIcon iconUrl={iconUrl} />

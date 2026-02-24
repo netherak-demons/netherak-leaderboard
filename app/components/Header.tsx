@@ -1,11 +1,11 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
-import { Flame, Settings } from 'lucide-react'
+import { Flame, Settings, Menu, X } from 'lucide-react'
 import { useUserPfp } from '../hooks/useUserPfp'
 import { useUserStats } from '../hooks/useUserStats'
 import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
@@ -20,7 +20,7 @@ const EXTERNAL_LINKS = {
 export default function Header() {
   const pathname = usePathname()
   const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
   const { pfpUrl } = useUserPfp(effectiveWallet)
   const { userStats } = useUserStats(effectiveWallet)
@@ -29,81 +29,151 @@ export default function Header() {
   const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
   const evilPoints = userStats?.evilPoints ?? 0
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const navLinkBase =
+    'nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors'
+  const navLinkActive = 'nav-link-underline-active'
+
+  const navLinks = (
+    <>
+      <Link
+        href="/account"
+        onClick={() => setMobileMenuOpen(false)}
+        className={`${navLinkBase} ${
+          currentRoute === 'account'
+            ? 'text-primary ' + navLinkActive
+            : 'text-secondary hover:text-primary'
+        }`}
+      >
+        My Demon
+      </Link>
+      <Link
+        href="/"
+        onClick={() => setMobileMenuOpen(false)}
+        className={`${navLinkBase} ${
+          currentRoute === 'leaderboards'
+            ? 'text-primary ' + navLinkActive
+            : 'text-secondary hover:text-primary'
+        }`}
+      >
+        Leaderboards
+      </Link>
+      <a
+        href={EXTERNAL_LINKS.shop}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${navLinkBase} text-secondary hover:text-primary text-center`}
+      >
+        Imuran shop
+      </a>
+      <a
+        href={EXTERNAL_LINKS.marketplace}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${navLinkBase} text-secondary hover:text-primary`}
+      >
+        Marketplace
+      </a>
+    </>
+  )
+
   return (
-    <header
-      className="relative z-50 px-6 py-4 flex items-center justify-between gap-4"
-      style={{
-        fontFamily: 'var(--font-harmonique)',
-      }}
-    >
-      {/* Left: evil points + multiplier */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div
-          className="font-medium text-primary flex items-center gap-2"
-        >
-          <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
-          <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
-          <span className="text-white text-lg">EVIL</span>
+    <>
+      <header
+        className="relative z-50 px-4 sm:px-6 py-4 flex items-center justify-between gap-4"
+        style={{
+          fontFamily: 'var(--font-harmonique)',
+        }}
+      >
+        {/* Mobile: hamburger left (below lg) */}
+        <div className="flex items-center gap-4 min-w-0 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="rounded p-2 text-secondary hover:bg-white/10 hover:text-primary transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" strokeWidth={2} />
+          </button>
         </div>
-        <div
-          className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1"
-        >
-          <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
-          <span className="text-white text-lg">x{multiplier}</span>
+
+        {/* Desktop: evil points + multiplier left (lg+) */}
+        <div className="hidden lg:flex items-center gap-4 min-w-0">
+          <div className="font-medium text-primary flex items-center gap-2">
+            <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+            <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
+            <span className="text-white text-lg">EVIL</span>
+          </div>
+          <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
+            <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+            <span className="text-white text-lg">x{multiplier}</span>
+          </div>
         </div>
-      </div>
 
-      {/* Center: nav links */}
-      <nav className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-        <Link
-          href="/account"
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            currentRoute === 'account'
-              ? 'text-primary'
-              : 'text-secondary hover:text-primary'
-          }`}
-        >
-          My account
-        </Link>
-        <Link
-          href="/"
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            currentRoute === 'leaderboards'
-              ? 'text-primary'
-              : 'text-secondary hover:text-primary'
-          }`}
-        >
-          Leaderboards
-        </Link>
-        <a
-          href={EXTERNAL_LINKS.shop}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-base font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors"
-        >
-          Imuran shop
-        </a>
-        <a
-          href={EXTERNAL_LINKS.marketplace}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-base font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors"
-        >
-          Marketplace
-        </a>
-      </nav>
+        {/* Desktop: center nav (lg+) */}
+        <nav className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          {navLinks}
+        </nav>
 
-      {/* Right: settings + connect button */}
-      <div className="relative shrink-0 flex items-center gap-3">
-        <button
-          type="button"
-          className="z-10 absolute left-1/2 ranslate-x-1/2 bottom-1/2 rounded-full p-2 text-secondary transition-colors"
-          aria-label="Settings"
-        >
-          <Settings className="w-5 h-5" strokeWidth={2} />
-        </button>
-        <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
-      </div>
-    </header>
+        {/* Right: PFP + settings (settings only when connected, desktop only) */}
+        <div className="shrink-0 flex items-center gap-2">
+          {isConnected && (
+            <button
+              type="button"
+              className="rounded-full p-2 text-secondary hover:bg-white/10 hover:text-primary transition-colors hidden lg:block"
+              aria-label="Settings"
+            >
+              <Settings className="w-5 h-5" strokeWidth={2} />
+            </button>
+          )}
+          <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
+        </div>
+      </header>
+
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-[60] bg-black/60 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed top-0 left-0 z-[61] w-full max-w-[280px] h-full bg-[#1a1a1a] border-r border-white/10 shadow-xl lg:hidden flex flex-col p-6"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-lg font-medium text-primary uppercase tracking-wider">Menu</h2>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded p-2 text-secondary hover:bg-white/10 hover:text-primary"
+                aria-label="Close menu"
+              >
+                <X className="w-6 h-6" strokeWidth={2} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-4">
+                <div className="font-medium text-primary flex items-center gap-2">
+                  <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+                  <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
+                  <span className="text-white">EVIL</span>
+                </div>
+                <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
+                  <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+                  <span className="text-white">x{multiplier}</span>
+                </div>
+              </div>
+              <div className="h-px bg-white/10" />
+              <nav className="flex flex-col gap-4">
+                {navLinks}
+              </nav>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   )
 }

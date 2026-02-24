@@ -54,7 +54,7 @@ export default function CursedItems() {
   if (!canShowData) {
     return (
       <div
-        className="flex flex-col gap-4 w-[350px] shrink-0 rounded-xl p-6"
+        className="flex flex-col gap-4 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -80,7 +80,7 @@ export default function CursedItems() {
   if (loading) {
     return (
       <div
-        className="flex flex-col gap-4 w-[350px] shrink-0 rounded-xl p-6 animate-pulse"
+        className="flex flex-col gap-4 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6 animate-pulse"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -104,7 +104,7 @@ export default function CursedItems() {
   if (error) {
     return (
       <div
-        className="flex flex-col gap-4 w-[350px] shrink-0 rounded-xl p-6"
+        className="flex flex-col gap-4 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -135,7 +135,7 @@ export default function CursedItems() {
   if (hasNoData || !userStats) {
     return (
       <div
-        className="flex flex-col gap-4 w-[350px] shrink-0 rounded-xl p-6"
+        className="flex flex-col gap-4 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -159,7 +159,7 @@ export default function CursedItems() {
 
   return (
     <div
-      className="flex flex-col gap-4 w-[350px] shrink-0 rounded-xl p-6"
+      className="flex flex-col gap-4 w-full md:w-[350px] shrink-0 rounded-xl p-4 md:p-6"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(16px)',

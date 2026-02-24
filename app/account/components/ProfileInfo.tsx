@@ -30,13 +30,12 @@ function ImuranBookImage() {
   return (
     <div className="w-full aspect-3/4 max-h-[200px] rounded-lg flex items-center justify-center overflow-hidden relative">
       <video
-        src="/immuran-book.webm"
+        src="/imuran-book.webm"
         autoPlay
         loop
         muted
         playsInline
         className={`bg-transparent w-full h-full object-contain ${error ? 'hidden' : ''}`}
-        style={{ mixBlendMode: 'screen' }}
         onError={() => setError(true)}
       />
       {error && (
@@ -60,7 +59,7 @@ export default function ProfileInfo() {
   if (!canShowData) {
     return (
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
         style={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
           backdropFilter: 'blur(16px)',
@@ -69,7 +68,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -89,7 +88,7 @@ export default function ProfileInfo() {
   if (loading) {
     return (
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px animate-pulse"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px animate-pulse"
         style={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
           backdropFilter: 'blur(16px)',
@@ -98,7 +97,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -138,7 +137,7 @@ export default function ProfileInfo() {
   if (error) {
     return (
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
         style={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
           backdropFilter: 'blur(16px)',
@@ -147,7 +146,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -167,7 +166,7 @@ export default function ProfileInfo() {
   if (hasNoData || !userStats) {
     return (
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
         style={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
           backdropFilter: 'blur(16px)',
@@ -176,7 +175,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -203,7 +202,7 @@ export default function ProfileInfo() {
     
     // create div with gradient background
     <div
-      className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-px"
+      className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
       style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
         backdropFilter: 'blur(16px)',
@@ -212,7 +211,7 @@ export default function ProfileInfo() {
       }}
     >
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full"
         style={{
           backgroundColor: '#00000090',
         }}

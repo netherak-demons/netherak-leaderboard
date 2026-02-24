@@ -163,7 +163,7 @@ export default function UserProfilePopup({
         aria-hidden="true"
       />
       <div
-        className="fixed left-1/2 top-1/2 z-101 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-[#1a1a1a] p-6 shadow-xl"
+        className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-6 shadow-xl"
         style={{ fontFamily: 'var(--font-harmonique)' }}
       >
         <div className="mb-4 flex items-center justify-between">

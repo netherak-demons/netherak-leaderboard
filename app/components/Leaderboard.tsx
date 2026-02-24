@@ -41,7 +41,7 @@ const Leaderboard: React.FC = () => {
     return (
       <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
-          <div className="grid grid-cols-2 gap-12 sm:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
             {[1, 2, 3, 4].map((i) => (
               <LeaderboardCard
                 key={i}
@@ -66,7 +66,7 @@ const Leaderboard: React.FC = () => {
     return (
       <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
-          <div className="grid grid-cols-2 gap-12 sm:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
             {[1, 2, 3, 4].map((i) => (
               <LeaderboardCard
                 key={i}
@@ -89,7 +89,7 @@ const Leaderboard: React.FC = () => {
   return (
     <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
       <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
-        <div className="grid grid-cols-2 gap-12 sm:gap-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
           <LeaderboardCard
             title="DUNGEONS COMPLETED"
             icon="/dungeons.svg"
