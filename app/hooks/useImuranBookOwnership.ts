@@ -31,6 +31,7 @@ export function useImuranBookOwnership(walletAddress: string | undefined): {
     let cancelled = false
 
     async function check() {
+      if (!walletAddress) return
       setLoading(true)
       setHasBook(false)
 
