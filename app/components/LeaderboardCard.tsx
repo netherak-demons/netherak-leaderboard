@@ -246,7 +246,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
               <p className="text-secondary text-base mb-2">
-                There&apos;s no data to display. Please log in to view achievements.
+                No data to display
+              </p>
+              <p className="text-primary/80 text-sm">
+                Please connect to view your profile
               </p>
             </div>
           ) : error ? (

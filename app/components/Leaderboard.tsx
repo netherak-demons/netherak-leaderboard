@@ -36,25 +36,17 @@ const Leaderboard: React.FC = () => {
   
   const loading = userLoading || leaderboardLoading
 
-  // Show login message when not connected (unless in observation/preview mode)
+  // Show all leaderboards with connect message when not connected (unless in observation/preview mode)
   if (!canShowData) {
+    const emptyCardProps = { entries: [], userAddress: undefined, showLoginMessage: true }
     return (
       <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
-            {[1, 2, 3, 4].map((i) => (
-              <LeaderboardCard
-                key={i}
-                title=""
-                icon=""
-                subtitle=""
-                scoreLabel=""
-                entries={[]}
-                userAddress={undefined}
-                skeleton={true}
-                showLoginMessage={true}
-              />
-            ))}
+            <LeaderboardCard title="DUNGEONS COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
+            <LeaderboardCard title="SLAYED HUMANS" icon="/enemies.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
+            <LeaderboardCard title="HARVESTED SOULS" icon="/harvested.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
+            <LeaderboardCard title="WAVES COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
           </div>
         </div>
       </div>
