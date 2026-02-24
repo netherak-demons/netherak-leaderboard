@@ -348,11 +348,10 @@ export default function ProfileInfo() {
       {/* 7) Get Book / Owned button */}
       <button
         className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 ${
-          hasImuranBook || bookLoading ? 'cursor-default' : 'cursor-pointer hover:scale-105 hover:brightness-110'
+          hasImuranBook || bookLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105 hover:brightness-110'
         }`}
         style={{
-          backgroundImage: hasImuranBook ? 'none' : 'url(/media/buttons/button_positive.png)',
-          backgroundColor: hasImuranBook ? 'rgba(131, 233, 150, 0.2)' : undefined,
+          backgroundImage: hasImuranBook ? 'url(/media/buttons/button_disabled.png)' : 'url(/media/buttons/button_normal.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           fontFamily: 'var(--font-zachar-scratched)',

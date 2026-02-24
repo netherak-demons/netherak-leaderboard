@@ -36,9 +36,9 @@ function ConnectButtonAvatar({
 }
 
 const BUTTON_IMAGES = {
-  normal: '/media/buttons/view_eligibility_button_normal.png',
-  hover: '/media/buttons/view_eligibility_button_hover.png',
-  disabled: '/media/buttons/view_eligibility_button_disabled.png',
+  normal: '/media/buttons/button_normal.png',
+  hover: '/media/buttons/button_hover.png',
+  disabled: '/media/buttons/button_disabled.png',
 }
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
