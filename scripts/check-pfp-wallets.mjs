@@ -74,6 +74,8 @@ async function fetchAllWallets(apiKey) {
     const stats = data.seasonStats || []
     for (const p of stats) {
       if (p.wallet) wallets.add(p.wallet.toLowerCase())
+      const linked = p.profile?.linkedWallet || p.profile?.LINKEDWALLET
+      if (linked) wallets.add(linked.toLowerCase())
     }
     lastKey = data.lastEvaluatedKey || null
   } while (lastKey)
