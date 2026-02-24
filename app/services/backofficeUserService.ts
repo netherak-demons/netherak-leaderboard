@@ -10,6 +10,7 @@ export interface User {
   username?: string
   profile?: {
     username?: string
+    linkedWallet?: string
     extraPoints?: number
   }
   isWhitelisted?: boolean

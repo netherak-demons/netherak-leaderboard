@@ -1,24 +1,39 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { useAccount, useDisconnect } from 'wagmi'
+import { useOpenConnectModal } from '@0xsequence/connect'
+import UserProfilePopup from './UserProfilePopup'
+import { getDataMode } from '../utils/dataMode'
+import type { UserStats } from '../hooks/useUserStats'
 
-function ConnectButtonAvatar({ pfpUrl }: { pfpUrl?: string }) {
+function ConnectButtonAvatar({
+  pfpUrl,
+  onClick,
+}: {
+  pfpUrl?: string
+  onClick?: () => void
+}) {
   const [useDefault, setUseDefault] = useState(false)
   const src = !useDefault && pfpUrl ? pfpUrl : DEFAULT_PFP
   return (
-    <img
-      src={src}
-      alt="Profile"
-      className="w-[52px] h-[52px] rounded-full shrink-0 object-cover bg-[#2a2a2a]"
-      style={{ border: '0.25px solid #FD9D83' }}
-      onError={() => setUseDefault(true)}
-    />
+    <button
+      type="button"
+      onClick={onClick}
+      className="shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-black"
+      aria-label="Open profile"
+    >
+      <img
+        src={src}
+        alt="Profile"
+        className="w-[52px] h-[52px] rounded-full object-cover bg-[#2a2a2a] cursor-pointer transition-opacity hover:opacity-90"
+        style={{ border: '0.25px solid #FD9D83' }}
+        onError={() => setUseDefault(true)}
+      />
+    </button>
   )
 }
-import Image from 'next/image'
-import { LogOut } from 'lucide-react'
-import { useAccount, useDisconnect } from 'wagmi'
-import { useOpenConnectModal } from '@0xsequence/connect'
 
 const BUTTON_IMAGES = {
   normal: '/media/buttons/view_eligibility_button_normal.png',
@@ -34,6 +49,7 @@ interface ConnectButtonProps {
   onClick?: () => void
   children?: React.ReactNode
   pfpUrl?: string
+  userStats?: UserStats | null
 }
 
 export default function ConnectButton({
@@ -41,13 +57,16 @@ export default function ConnectButton({
   disabled = false,
   onClick,
   children,
-  pfpUrl
+  pfpUrl,
+  userStats,
 }: ConnectButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const { address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
   const { setOpenConnectModal } = useOpenConnectModal()
+  const dataMode = getDataMode()
+  const isObservationMode = dataMode === 'observation'
 
   useEffect(() => setMounted(true), [])
 
@@ -56,34 +75,26 @@ export default function ConnectButton({
       onClick()
       return
     }
-    if (isConnected) {
-      disconnect()
-    } else {
+    if (!isConnected) {
       setOpenConnectModal(true)
     }
   }
 
-  const handleLogoutClick = () => {
-    if (onClick) {
-      onClick()
-      return
-    }
-    disconnect()
-  }
-
-  if (mounted && isConnected && !children) {
+  // Show profile (avatar + popup) when connected, OR in observation mode with userStats (for debug)
+  const showProfileView = isConnected || (isObservationMode && userStats)
+  if (mounted && showProfileView && !children) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <ConnectButtonAvatar pfpUrl={pfpUrl} />
-        <button
-          className="flex items-center gap-2 border border-secondary text-connect-button-text py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={disabled ? undefined : handleLogoutClick}
-          disabled={disabled}
-          style={{ fontFamily: 'var(--font-harmonique)' }}
-        >
-          <LogOut className="w-4 h-4 shrink-0" strokeWidth={2.5} />
-          Logout
-        </button>
+        <ConnectButtonAvatar
+          pfpUrl={pfpUrl}
+          onClick={() => !disabled && setProfileOpen(true)}
+        />
+        <UserProfilePopup
+          isOpen={profileOpen}
+          onClose={() => setProfileOpen(false)}
+          userStats={userStats ?? null}
+          pfpUrl={pfpUrl}
+        />
       </div>
     )
   }

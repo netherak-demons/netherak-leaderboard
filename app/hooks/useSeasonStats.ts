@@ -28,14 +28,15 @@ interface PlayerSeasonStats {
   wallet: string
   username: string
   profile: {
-    username: string
+    username?: string
+    linkedWallet?: string
     extraPoints?: number
   }
-  stats: {
+    stats: {
     enemiesKilled?: EnemiesKilled
     dungeonsCompleted?: DungeonsCompleted
     skillsUsed?: Record<string, number>
-    wavesCompleted?: number
+    wavesCompleted?: number | Record<string, number>
   }
 }
 
@@ -66,8 +67,13 @@ function getHarvestedSouls(stats?: PlayerSeasonStats['stats']): number {
 }
 
 function getWavesCompleted(stats?: PlayerSeasonStats['stats']): number {
-  return stats?.wavesCompleted ?? 0
+  const w = stats?.wavesCompleted
+  if (typeof w === 'number') return w
+  if (w && typeof w === 'object') return sumObjectValues(w as Record<string, number>)
+  return 0
 }
+
+const REFRESH_EVENT = 'netherak:refreshUser'
 
 export function useSeasonStats(seasonId: string = '0') {
   const [loading, setLoading] = useState(true)
@@ -78,6 +84,15 @@ export function useSeasonStats(seasonId: string = '0') {
   const [wavesLeaderboard, setWavesLeaderboard] = useState<LeaderboardEntry[]>([])
   const [totalPlayers, setTotalPlayers] = useState(0)
   const [allPlayers, setAllPlayers] = useState<PlayerSeasonStats[]>([]) // Expose raw players data
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  useEffect(() => {
+    const handler = () => setRefreshTrigger((n) => n + 1)
+    if (typeof window !== 'undefined') {
+      window.addEventListener(REFRESH_EVENT, handler)
+      return () => window.removeEventListener(REFRESH_EVENT, handler)
+    }
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -248,7 +263,7 @@ export function useSeasonStats(seasonId: string = '0') {
     }
 
     load()
-  }, [seasonId])
+  }, [seasonId, refreshTrigger])
 
   return {
     dungeonsLeaderboard,

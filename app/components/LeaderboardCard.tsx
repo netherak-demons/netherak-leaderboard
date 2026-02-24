@@ -246,10 +246,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
               <p className="text-secondary text-base mb-2">
-                There&apos;s no data to display
-              </p>
-              <p className="text-secondary/70 text-sm">
-                Please log in to view leaderboards
+                There&apos;s no data to display. Please log in to view achievements.
               </p>
             </div>
           ) : error ? (
@@ -258,10 +255,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
               <p className="text-[#FF8C8A] text-base mb-2">
-                We are experiencing some issues
+                Temporary error
               </p>
               <p className="text-secondary/70 text-sm">
-                We&apos;ll fix this soon. Please try again later.
+                Please try again later.
               </p>
             </div>
           ) : hasNoData ? (

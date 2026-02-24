@@ -8,7 +8,7 @@ const CACHE_TTL_MS = 30_000 // 30 seconds
 interface PlayerSeasonStats {
   wallet: string
   username: string
-  profile: { username: string }
+  profile: { username?: string; linkedWallet?: string; extraPoints?: number }
   stats: Record<string, unknown>
 }
 
@@ -28,4 +28,9 @@ export function getCachedPlayers(seasonId: string): PlayerSeasonStats[] | null {
 
 export function setCachedPlayers(seasonId: string, players: PlayerSeasonStats[]) {
   cache = { seasonId, players, ts: Date.now() }
+}
+
+/** Clear cache so components refetch fresh data (e.g. after profile PUT) */
+export function clearCachedPlayers() {
+  cache = null
 }

@@ -3,64 +3,50 @@
 import React, { useState, useMemo } from 'react'
 import AchievementCard from './AchievementCard'
 import { useUserStatsContext } from '../context/UserStatsContext'
+import { ACHIEVEMENT_CONFIG, getCurrentLevel, type AchievementCategory } from '../achievementsConfig'
 
-// Achievement definitions
-const ACHIEVEMENTS_DEFINITIONS = [
-  {
-    id: 1,
-    title: 'Extinction Warden',
-    description: 'Slay 500 Humans',
-    target: 500,
-    reward: 32,
-    getProgress: (stats: { slayedHumans: number }) => stats.slayedHumans,
-  },
-  {
-    id: 2,
-    title: 'First Dungeon',
-    description: 'Complete your first dungeon',
-    target: 1,
-    reward: 10,
-    getProgress: (stats: { dungeonsCompleted: number }) => stats.dungeonsCompleted,
-  },
-  {
-    id: 3,
-    title: 'Soul Collector',
-    description: 'Harvest 100 Souls',
-    target: 100,
-    reward: 25,
-    getProgress: (stats: { harvestedSouls: number }) => stats.harvestedSouls,
-  },
-  {
-    id: 4,
-    title: 'Demon Lord',
-    description: 'Reach wave 50',
-    target: 50,
-    reward: 50,
-    getProgress: (stats: { wavesCompleted: number }) => stats.wavesCompleted,
-  },
-]
+const CATEGORY_ORDER: AchievementCategory[] = ['monsters', 'dungeons', 'waves', 'souls']
 
 export default function Achievements() {
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
   const [activeTab, setActiveTab] = useState<'ongoing' | 'completed'>('ongoing')
 
-  // Calculate achievements from user stats
+  const stats = useMemo(
+    () =>
+      userStats
+        ? {
+            slayedHumans: userStats.slayedHumans,
+            dungeonsCompleted: userStats.dungeonsCompleted,
+            wavesCompleted: userStats.wavesCompleted,
+            harvestedSouls: userStats.harvestedSouls,
+          }
+        : null,
+    [userStats]
+  )
+
   const achievements = useMemo(() => {
-    if (!userStats) return []
+    if (!stats) return []
 
-    return ACHIEVEMENTS_DEFINITIONS.map((def) => ({
-      ...def,
-      progress: def.getProgress({
-        slayedHumans: userStats.slayedHumans,
-        dungeonsCompleted: userStats.dungeonsCompleted,
-        harvestedSouls: userStats.harvestedSouls,
-        wavesCompleted: userStats.wavesCompleted,
-      }),
-    }))
-  }, [userStats])
+    return CATEGORY_ORDER.map((category) => {
+      const config = ACHIEVEMENT_CONFIG[category]
+      const progress = config.getProgress(stats)
+      const { level, progress: p, target, isCompleted } = getCurrentLevel(category, progress)
 
-  const ongoing = achievements.filter((a) => a.progress < a.target)
-  const completed = achievements.filter((a) => a.progress >= a.target)
+      return {
+        id: category,
+        title: level.title,
+        description: level.getDescription(level.target),
+        progress: p,
+        target,
+        isCompleted,
+        progressLabel: level.progressLabel,
+        iconUrl: level.getIconPath(level.level),
+      }
+    })
+  }, [stats])
+
+  const ongoing = achievements.filter((a) => !a.isCompleted)
+  const completed = achievements.filter((a) => a.isCompleted)
   const displayed = activeTab === 'ongoing' ? ongoing : completed
 
   // Show skeleton when not connected (unless in observation/preview mode)
@@ -238,8 +224,8 @@ export default function Achievements() {
         {displayed.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <p className="text-secondary text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-              {activeTab === 'ongoing' 
-                ? 'No ongoing achievements' 
+              {activeTab === 'ongoing'
+                ? 'No ongoing achievements'
                 : 'No completed achievements'}
             </p>
           </div>
@@ -251,7 +237,8 @@ export default function Achievements() {
               description={a.description}
               progress={a.progress}
               target={a.target}
-              reward={a.reward}
+              progressLabel={a.progressLabel}
+              iconUrl={a.iconUrl}
             />
           ))
         )}

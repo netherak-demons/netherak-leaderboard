@@ -1,3 +1,8 @@
+/** Imuran Book NFT contract - ownership check for "Get Book" button */
+export const IMURAN_BOOK_CONTRACT = {
+  address: '0x1727C70bFcC64DF79Cd084b7197517ebFD44B6e7' as `0x${string}`,
+}
+
 /** PFP (profile picture) NFT contract for avatar display */
 export const PFP_CONTRACT = {
   address: '0x9559ff653d4c8cc3565Dd639963597F1aAaE6A6A' as `0x${string}`,

@@ -5,6 +5,7 @@ import { Trophy, Flame, BookCheck, Sparkles, Minus, CircleAlert } from 'lucide-r
 import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
+import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../../utils/dataMode'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
@@ -27,10 +28,14 @@ function ImuranBookImage() {
 
   return (
     <div className="w-full aspect-3/4 max-h-[200px] rounded-lg flex items-center justify-center overflow-hidden relative">
-      <img
-        src="/imuran-book.png"
-        alt="Imuran Book"
-        className={`w-full h-full object-contain ${error ? 'hidden' : ''}`}
+      <video
+        src="/immuran-book.webm"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={`bg-transparent w-full h-full object-contain ${error ? 'hidden' : ''}`}
+        style={{ mixBlendMode: 'screen' }}
         onError={() => setError(true)}
       />
       {error && (
@@ -47,6 +52,8 @@ export default function ProfileInfo() {
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
   const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
   const { pfpUrl } = useUserPfp(walletForPfp)
+  const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? getEffectiveWallet(address)
+  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletForBook)
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -67,10 +74,10 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            There&apos;s no data to display
+            No data to display
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Please log in to view your profile
+            Please connect to view your profile
           </p>
         </div>
       </div>
@@ -145,10 +152,10 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-[#FF8C8A] text-base text-center mb-2" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            We are experiencing some issues
+            Temporary error
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            We&apos;ll fix this soon. Please try again later.
+            Please try again later.
           </p>
         </div>
       </div>
@@ -174,7 +181,7 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            No data available for your wallet address
+            No data to display
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
             Start playing to see your stats here!
@@ -190,7 +197,6 @@ export default function ProfileInfo() {
   const isEligible = true // TODO: determine from API
   const evilPoints = userStats.evilPoints
   const multiplier = 2 // TODO: get from API
-  const hasImuranBook = false // TODO: get from API
 
   return (
     
@@ -339,34 +345,40 @@ export default function ProfileInfo() {
         </div>
       </div>
 
-      {/* 7) Get Book button */}
+      {/* 7) Get Book / Owned button */}
       <button
-        className="relative min-h-[80px] overflow-hidden cursor-pointer rounded-lg hover:scale-105 transition-all duration-300 hover:brightness-110"
+        className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 ${
+          hasImuranBook || bookLoading ? 'cursor-default' : 'cursor-pointer hover:scale-105 hover:brightness-110'
+        }`}
         style={{
-          backgroundImage: 'url(/media/buttons/button_positive.png)',
+          backgroundImage: hasImuranBook ? 'none' : 'url(/media/buttons/button_positive.png)',
+          backgroundColor: hasImuranBook ? 'rgba(131, 233, 150, 0.2)' : undefined,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           fontFamily: 'var(--font-zachar-scratched)',
         }}
+        disabled={hasImuranBook || bookLoading}
       >
         <span
           className="relative z-10 flex items-center justify-center w-full h-full min-h-[48px] py-3 text-primary text-base font-medium uppercase tracking-wider"
           style={{ fontFamily: 'var(--font-zachar-scratched)' }}
         >
-          Get Book
+          {bookLoading ? '...' : hasImuranBook ? 'Owned' : 'Get Book'}
         </span>
       </button>
 
-      {/* 8) Pay with $OMI */}
-      <div className="flex items-center justify-center gap-2">
-        <img src="/omi-logo.svg" alt="OMI" className="w-5 h-5" />
-        <span
-          className="text-white text-sm"
-          style={{ fontFamily: 'var(--font-harmonique)' }}
-        >
-          Pay with $OMI
-        </span>
-      </div>
+      {/* 8) Pay with $OMI - hide when owned */}
+      {!hasImuranBook && (
+        <div className="flex items-center justify-center gap-2">
+          <img src="/omi-logo.svg" alt="OMI" className="w-5 h-5" />
+          <span
+            className="text-white text-sm"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            Pay with $OMI
+          </span>
+        </div>
+      )}
     </div>
     </div>
   )

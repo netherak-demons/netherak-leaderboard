@@ -5,6 +5,7 @@ import { Providers } from "./components/Providers";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BackgroundOverlay from "./components/BackgroundOverlay";
+import ObservationBanner from "./components/ObservationBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <Providers>
           <BackgroundOverlay />
+          <ObservationBanner />
           <div className="relative z-10 flex min-h-screen flex-col max-w-[1200px] mx-auto w-full">
             <Header />
             <main className="flex-1">{children}</main>

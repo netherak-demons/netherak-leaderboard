@@ -7,6 +7,8 @@ import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
 import { Flame } from 'lucide-react'
 import { useUserPfp } from '../hooks/useUserPfp'
+import { useUserStats } from '../hooks/useUserStats'
+import { getEffectiveWallet } from '../utils/dataMode'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -17,7 +19,9 @@ export default function Header() {
   const pathname = usePathname()
   const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
   const { address } = useAccount()
-  const { pfpUrl } = useUserPfp(address)
+  const effectiveWallet = getEffectiveWallet(address)
+  const { pfpUrl } = useUserPfp(effectiveWallet)
+  const { userStats } = useUserStats(effectiveWallet)
 
   return (
     <header
@@ -85,7 +89,7 @@ export default function Header() {
 
       {/* Right: connect button */}
       <div className="shrink-0">
-        <ConnectButton pfpUrl={pfpUrl ?? undefined} />
+        <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
       </div>
     </header>
   )
