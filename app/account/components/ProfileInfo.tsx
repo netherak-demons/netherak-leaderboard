@@ -343,6 +343,10 @@ export default function ProfileInfo() {
           <BookCheck className="w-4 h-4 shrink-0" style={{ color: '#AAA2C1' }} strokeWidth={2} />
           <span className="text-white">Auto WL for Demon Crow</span>
         </div>
+        <div className="flex items-center gap-2">
+          <BookCheck className="w-4 h-4 shrink-0" style={{ color: '#AAA2C1' }} strokeWidth={2} />
+          <span className="text-white">Free Cursed Pass for next season by completing the game</span>
+        </div>
       </div>
 
       {/* 7) Get Book / Owned button */}

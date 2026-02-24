@@ -53,7 +53,7 @@ export default function Achievements() {
   if (!canShowData) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -117,7 +117,7 @@ export default function Achievements() {
   if (error) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -148,7 +148,7 @@ export default function Achievements() {
   if (hasNoData || !userStats) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -172,7 +172,7 @@ export default function Achievements() {
 
   return (
     <div
-      className="flex flex-col gap-5 w-full md:min-w-[460px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+      className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(16px)',
