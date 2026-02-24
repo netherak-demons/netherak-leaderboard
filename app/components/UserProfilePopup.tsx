@@ -250,7 +250,13 @@ export default function UserProfilePopup({
           <button
             onClick={handleSave}
             disabled={!canEdit || saving || (!username.trim() && !linkedWallet.trim())}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary bg-primary/10 py-2.5 text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 transition-colors disabled:opacity-50 ${
+              saved
+                ? 'border-green-netherak bg-green-netherak/20 text-green-netherak'
+                : error
+                  ? 'border-red-netherak bg-red-netherak/20 text-red-netherak'
+                  : 'border-primary bg-primary/10 text-primary hover:bg-primary/20'
+            }`}
           >
             <Save className="h-4 w-4" strokeWidth={2} />
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}

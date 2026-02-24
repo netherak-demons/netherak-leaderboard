@@ -21,7 +21,7 @@ function ConnectButtonAvatar({
     <button
       type="button"
       onClick={onClick}
-      className="shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-black"
+      className="shrink-0 rounded-full focus:outline-none border border-primary/50 focus:ring-2 focus:ring-primary/70 focus:ring-offset-2 focus:ring-offset-black"
       aria-label="Open profile"
     >
       <img

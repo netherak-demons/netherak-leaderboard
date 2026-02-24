@@ -5,10 +5,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
-import { Flame } from 'lucide-react'
+import { Flame, Settings } from 'lucide-react'
 import { useUserPfp } from '../hooks/useUserPfp'
 import { useUserStats } from '../hooks/useUserStats'
+import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../utils/dataMode'
+import { getMultiplier } from '../config/multiplier'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -22,6 +24,10 @@ export default function Header() {
   const effectiveWallet = getEffectiveWallet(address)
   const { pfpUrl } = useUserPfp(effectiveWallet)
   const { userStats } = useUserStats(effectiveWallet)
+  const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? effectiveWallet
+  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletForBook)
+  const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
+  const evilPoints = userStats?.evilPoints ?? 0
 
   return (
     <header
@@ -30,20 +36,20 @@ export default function Header() {
         fontFamily: 'var(--font-harmonique)',
       }}
     >
-      {/* Left: placeholder stats */}
+      {/* Left: evil points + multiplier */}
       <div className="flex items-center gap-4 min-w-0">
         <div
           className="font-medium text-primary flex items-center gap-2"
         >
           <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
-          <span className="text-green-netherak">32</span>
-          <span className="text-white">EVIL</span>
+          <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
+          <span className="text-white text-lg">EVIL</span>
         </div>
         <div
           className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1"
         >
-          <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
-          <span className="text-white">x1.5</span>
+          <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+          <span className="text-white text-lg">x{multiplier}</span>
         </div>
       </div>
 
@@ -87,8 +93,15 @@ export default function Header() {
         </a>
       </nav>
 
-      {/* Right: connect button */}
-      <div className="shrink-0">
+      {/* Right: settings + connect button */}
+      <div className="relative shrink-0 flex items-center gap-3">
+        <button
+          type="button"
+          className="z-10 absolute left-1/2 ranslate-x-1/2 bottom-1/2 rounded-full p-2 text-secondary transition-colors"
+          aria-label="Settings"
+        >
+          <Settings className="w-5 h-5" strokeWidth={2} />
+        </button>
         <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
       </div>
     </header>

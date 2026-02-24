@@ -7,6 +7,7 @@ import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
 import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../../utils/dataMode'
+import { getMultiplier } from '../../config/multiplier'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -68,7 +69,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -97,7 +98,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6"
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -146,7 +147,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -175,7 +176,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full items-center justify-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -194,9 +195,9 @@ export default function ProfileInfo() {
   // Use actual data from API
   const displayName = userStats.username || (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
   const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
-  const isEligible = true // TODO: determine from API
+  const isEligible = hasImuranBook
   const evilPoints = userStats.evilPoints
-  const multiplier = 2 // TODO: get from API
+  const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
 
   return (
     
@@ -211,7 +212,7 @@ export default function ProfileInfo() {
       }}
     >
       <div
-        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6"
+        className="flex flex-col gap-4 w-full max-w-[320px] shrink-0 rounded-xl p-6 h-full"
         style={{
           backgroundColor: '#00000090',
         }}
@@ -230,13 +231,13 @@ export default function ProfileInfo() {
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
               <span
-                className="text-sm font-medium"
+                className="text-base font-medium"
                 style={{ fontFamily: 'var(--font-harmonique)', color: '#DFB7A4' }}
               >
                 #{rankingPosition}
               </span>
             </div>
-            {isEligible ? (
+            {/* {isEligible ? (
               <div className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
                 <span
@@ -247,9 +248,9 @@ export default function ProfileInfo() {
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center shrink-0">
-                  <Minus className="w-3 h-3 text-white" strokeWidth={2.5} />
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full border border-white/40 flex items-center justify-center shrink-0">
+                  <Minus className="w-2 h-2 text-white" strokeWidth={2.5} />
                 </div>
                 <span
                   className="text-sm font-medium uppercase text-white"
@@ -259,7 +260,7 @@ export default function ProfileInfo() {
                 </span>
                 <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -283,7 +284,7 @@ export default function ProfileInfo() {
             {evilPoints.toLocaleString()}
           </span>
           <span
-            className="text-white text-sm"
+            className="text-white text-lg"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             EVIL Points
@@ -292,8 +293,8 @@ export default function ProfileInfo() {
         <div className="h-4 w-px bg-white/30 shrink-0" />
         <div className="flex flex-col gap-0.5 items-center">
           <div className="flex items-center gap-1">
-            <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
             <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
+            <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
           </div>
           <div className="flex items-center gap-1">
             <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
