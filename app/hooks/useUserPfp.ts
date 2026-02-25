@@ -3,9 +3,24 @@
 import { useState, useEffect } from 'react'
 import type { PfpApiResponse } from '../types/api'
 
+const PFP_CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+const pfpCache = new Map<string, { url: string; ts: number }>()
+
+function getCachedPfp(wallet: string): string | null {
+  const key = wallet.toLowerCase()
+  const entry = pfpCache.get(key)
+  if (!entry || Date.now() - entry.ts > PFP_CACHE_TTL_MS) return null
+  return entry.url
+}
+
+function setCachedPfp(wallet: string, url: string) {
+  pfpCache.set(wallet.toLowerCase(), { url, ts: Date.now() })
+}
+
 /**
  * Fetches PFP via our API proxy (avoids CORS from Somnia Explorer).
- * See https://explorer.somnia.network/api-docs
+ * Caches results so navigating away and back shows PFP immediately.
  */
 function toIpfsGateway(url: string): string {
   if (url.startsWith('ipfs://')) {
@@ -15,8 +30,11 @@ function toIpfsGateway(url: string): string {
 }
 
 export function useUserPfp(walletAddress: string | undefined): { pfpUrl: string | null; loading: boolean } {
-  const [pfpUrl, setPfpUrl] = useState<string | null>(null)
-  const [loading, setLoading] = useState(!!walletAddress)
+  const normalizedWallet = walletAddress?.toLowerCase()
+  const cached = normalizedWallet ? getCachedPfp(normalizedWallet) : null
+
+  const [pfpUrl, setPfpUrl] = useState<string | null>(() => cached)
+  const [loading, setLoading] = useState(!!walletAddress && !cached)
 
   useEffect(() => {
     if (!walletAddress) {
@@ -25,10 +43,17 @@ export function useUserPfp(walletAddress: string | undefined): { pfpUrl: string 
       return
     }
 
+    const wallet = walletAddress
+    const cachedUrl = getCachedPfp(wallet)
+    if (cachedUrl) {
+      setPfpUrl(cachedUrl)
+      setLoading(false)
+      return
+    }
+
     let cancelled = false
 
     async function load() {
-      const wallet = walletAddress
       if (!wallet) return
 
       setLoading(true)
@@ -60,7 +85,9 @@ export function useUserPfp(walletAddress: string | undefined): { pfpUrl: string 
           return
         }
 
-        setPfpUrl(toIpfsGateway(imageUrl))
+        const url = toIpfsGateway(imageUrl)
+        setCachedPfp(wallet, url)
+        setPfpUrl(url)
       } catch {
         setPfpUrl(null)
       } finally {

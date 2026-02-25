@@ -8,7 +8,7 @@ import {
 } from './mockData'
 import { shouldUseMockData, getDataMode } from '../utils/dataMode'
 import { parseApiError, parseFetchError } from '../utils/apiError'
-import { setCachedPlayers } from './playersCache'
+import { getCachedPlayers, setCachedPlayers } from './playersCache'
 
 const API_URL = '/api/season-stats'
 
@@ -105,6 +105,79 @@ export function useSeasonStats(seasonId: string = '0') {
         setWavesLeaderboard([])
         setTotalPlayers(0)
         setAllPlayers([])
+        return
+      }
+
+      // Use cache if valid (avoids refetch when navigating back to leaderboard)
+      const cached = getCachedPlayers(seasonId)
+      if (cached && cached.length > 0) {
+        const players = cached as PlayerSeasonStats[]
+        setTotalPlayers(players.length)
+        setAllPlayers(players)
+
+        const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
+        for (const p of players) {
+          const pfpCount = 0
+          const extraPoints = p.profile?.extraPoints ?? 0
+          const evilPointsCalc = calculateEvilPoints(p.stats || {}, pfpCount, extraPoints)
+          playerMap.set(p.wallet, {
+            evilPoints: evilPointsCalc.totalPoints,
+            rewards: false,
+          })
+        }
+
+        const toEntry = (
+          p: PlayerSeasonStats,
+          score: number,
+          index: number
+        ): LeaderboardEntry => {
+          const { evilPoints, rewards } = playerMap.get(p.wallet) ?? { evilPoints: 0, rewards: false }
+          return {
+            ranking: index + 1,
+            demon: p.username || p.profile?.username || 'Unknown',
+            avatar: '/demons/avatar1.svg',
+            score,
+            address: p.wallet,
+            username: p.username || p.profile?.username || 'Unknown',
+            evilPoints,
+            rewards,
+          }
+        }
+
+        setDungeonsLeaderboard(
+          players
+            .map(p => ({ p, score: sumObjectValues(p.stats?.dungeonsCompleted) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+        setSlayedHumansLeaderboard(
+          players
+            .map(p => ({ p, score: sumObjectValues(p.stats?.enemiesKilled) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+        setHarvestedSoulsLeaderboard(
+          players
+            .map(p => ({ p, score: getHarvestedSouls(p.stats) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+        setWavesLeaderboard(
+          players
+            .map(p => ({ p, score: getWavesCompleted(p.stats) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+        setError(null)
+        setLoading(false)
         return
       }
 
