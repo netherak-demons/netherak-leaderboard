@@ -80,8 +80,8 @@ export default function ConnectButton({
     }
   }
 
-  // Show profile (avatar + popup) when connected, OR in observation mode with userStats (for debug)
-  const showProfileView = isConnected || (isObservationMode && userStats)
+  // Show profile (avatar + popup) when connected, OR in observation mode with userStats or pfpUrl
+  const showProfileView = isConnected || (isObservationMode && (userStats || pfpUrl))
   if (mounted && showProfileView && !children) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>

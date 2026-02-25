@@ -48,10 +48,13 @@ function ImuranBookImage() {
 }
 
 export default function ProfileInfo() {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
+  // Use effective wallet for PFP (observation wallet in observation mode, userStats or connected wallet otherwise)
   const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
+  console.log('walletForPfp', walletForPfp)
   const { pfpUrl } = useUserPfp(walletForPfp)
+  console.log('pfpUrl', pfpUrl)
   const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? getEffectiveWallet(address)
   const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletForBook)
 
@@ -162,7 +165,7 @@ export default function ProfileInfo() {
     )
   }
 
-  // Show no data message
+  // Show no data message (still show PFP when we have a wallet, e.g. observation mode)
   if (hasNoData || !userStats) {
     return (
       <div
@@ -180,6 +183,17 @@ export default function ProfileInfo() {
             backgroundColor: '#00000090',
           }}
         >
+          {walletForPfp && (
+            <div className="flex flex-col items-center gap-3 mb-2">
+              <ProfileAvatar pfpUrl={pfpUrl} />
+              <span
+                className="text-white font-medium truncate max-w-full"
+                style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+              >
+                {walletForPfp.slice(0, 6)}...{walletForPfp.slice(-4)}
+              </span>
+            </div>
+          )}
           <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
             No data to display
           </p>

@@ -143,12 +143,12 @@ export default function SomniaQuesterPopUp({
   return (
     <>
       <div
-        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
-        className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 flex flex-col items-center text-center"
+        className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 flex flex-col items-center text-center"
         style={{ fontFamily: 'var(--font-harmonique)', ...glassStyle }}
       >
         <h2 className="text-xl font-semibold text-white mb-1">Somnia Quester?</h2>

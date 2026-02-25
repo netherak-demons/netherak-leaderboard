@@ -3,8 +3,11 @@
  * Check which wallets from season stats own a PFP NFT.
  * Use output for NEXT_PUBLIC_OBSERVATION_WALLET in observation mode.
  *
- * Usage: node scripts/check-pfp-wallets.mjs
- * Requires: .env.local with NETHERAK_API_KEY
+ * Usage:
+ *   node scripts/check-pfp-wallets.mjs              # check all wallets from season stats
+ *   node scripts/check-pfp-wallets.mjs 0x1234...    # check a custom wallet only
+ *
+ * Requires: .env.local with NETHERAK_API_KEY (only when not passing a custom wallet)
  */
 
 import https from 'https'
@@ -100,17 +103,36 @@ async function checkBalance(wallet) {
   return parseInt(json.result || '0x0', 16)
 }
 
+function parseWalletArg(arg) {
+  if (!arg || typeof arg !== 'string') return null
+  const trimmed = arg.trim()
+  if (!/^0x[a-fA-F0-9]{40}$/.test(trimmed)) return null
+  return trimmed.toLowerCase()
+}
+
 async function main() {
-  const env = loadEnv()
-  const apiKey = env.NETHERAK_API_KEY
-  if (!apiKey) {
-    console.error('NETHERAK_API_KEY not found in .env.local')
+  const arg = process.argv[2]
+  const customWallet = parseWalletArg(arg)
+  if (arg !== undefined && !customWallet) {
+    console.error('Invalid wallet. Use a valid 0x-prefixed Ethereum address (40 hex chars).')
     process.exit(1)
   }
+  let wallets
 
-  console.log('Fetching wallets from season stats...')
-  const wallets = await fetchAllWallets(apiKey)
-  console.log(`Found ${wallets.length} unique wallets\n`)
+  if (customWallet) {
+    wallets = [customWallet]
+    console.log(`Checking custom wallet: ${customWallet}\n`)
+  } else {
+    const env = loadEnv()
+    const apiKey = env.NETHERAK_API_KEY
+    if (!apiKey) {
+      console.error('NETHERAK_API_KEY not found in .env.local')
+      process.exit(1)
+    }
+    console.log('Fetching wallets from season stats...')
+    wallets = await fetchAllWallets(apiKey)
+    console.log(`Found ${wallets.length} unique wallets\n`)
+  }
 
   console.log(`Checking PFP ownership (contract ${PFP_CONTRACT})...`)
   const withPfp = []

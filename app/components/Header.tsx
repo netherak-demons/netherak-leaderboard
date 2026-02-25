@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
@@ -22,7 +22,9 @@ export default function Header() {
   const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
   const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
-  const { pfpUrl } = useUserPfp(effectiveWallet)
+  // Use effective wallet for PFP (observation wallet in observation mode, connected wallet otherwise)
+  const walletForPfp = effectiveWallet
+  const { pfpUrl } = useUserPfp(walletForPfp)
   const { userStats } = useUserStats(effectiveWallet)
   const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? effectiveWallet
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletForBook)
@@ -30,6 +32,8 @@ export default function Header() {
   const evilPoints = userStats?.evilPoints ?? 0
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const navLinkBase =
     'nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors'
@@ -118,7 +122,7 @@ export default function Header() {
 
         {/* Right: PFP + settings (settings only when connected, desktop only) */}
         <div className="shrink-0 flex items-center gap-2">
-          {isConnected && (
+          {mounted && isConnected && (
             <button
               type="button"
               className="rounded-full p-2 text-secondary hover:bg-white/10 hover:text-primary transition-colors hidden lg:block"
@@ -140,7 +144,7 @@ export default function Header() {
             aria-hidden="true"
           />
           <div
-            className="fixed top-0 left-0 z-[61] w-full max-w-[280px] h-full bg-[#1a1a1a] border-r border-white/10 shadow-xl lg:hidden flex flex-col p-6"
+            className="fixed top-0 left-0 z-61 w-full max-w-[280px] h-full bg-[#1a1a1a] border-r border-white/10 shadow-xl lg:hidden flex flex-col p-6"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             <div className="flex items-center justify-between mb-8">
