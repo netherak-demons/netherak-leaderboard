@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useAccount, useConnection } from 'wagmi'
-import { normalizeLinkedWallet } from '../utils/dataMode'
+import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 import SomniaQuesterPopUp from './SomniaQuesterPopUp'
 
 type ConnectorWithSequenceWaas = {
@@ -36,6 +36,14 @@ export default function SomniaQuesterHandler() {
 
   useEffect(() => {
     if (!isConnected || !address || !sequenceWaas) {
+      setShowPopup(false)
+      setLoading(false)
+      return
+    }
+
+    // In observation mode we show the observation wallet's data (which may have linkedWallet).
+    // Don't prompt the connected user to add their linked wallet—it's confusing.
+    if (getDataMode() === 'observation') {
       setShowPopup(false)
       setLoading(false)
       return

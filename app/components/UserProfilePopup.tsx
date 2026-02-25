@@ -35,6 +35,7 @@ export default function UserProfilePopup({
   const { connector } = useConnection()
   const { disconnect } = useDisconnect()
   const sequenceWaaS = (connector as ConnectorWithSequenceWaas)?.sequenceWaas
+  const modalRef = useModalA11y(isOpen, onClose)
 
   const [username, setUsername] = useState('')
   const [linkedWallet, setLinkedWallet] = useState('')
@@ -155,10 +156,6 @@ export default function UserProfilePopup({
     isObservationMode &&
     (!address || (userStats?.wallet && userStats.wallet.toLowerCase() !== address.toLowerCase()))
   const canEdit = !isViewingOtherUser && !!address
-
-  const modalRef = useModalA11y(isOpen, onClose)
-
-  if (!isOpen) return null
 
   return (
     <>

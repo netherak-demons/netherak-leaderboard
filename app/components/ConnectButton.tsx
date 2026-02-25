@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { useAccount, useDisconnect } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { useOpenConnectModal } from '@0xsequence/connect'
+import { Settings } from 'lucide-react'
 import UserProfilePopup from './UserProfilePopup'
 import { getDataMode } from '../utils/dataMode'
 import type { UserStats } from '../hooks/useUserStats'
@@ -85,10 +86,21 @@ export default function ConnectButton({
   if (mounted && showProfileView && !children) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <ConnectButtonAvatar
-          pfpUrl={pfpUrl}
-          onClick={() => !disabled && setProfileOpen(true)}
-        />
+        <div className="relative shrink-0">
+          <ConnectButtonAvatar
+            pfpUrl={pfpUrl}
+            onClick={() => !disabled && setProfileOpen(true)}
+          />
+          {isConnected && (
+            <button
+              type="button"
+              className="absolute top-0 right-0 rounded-full text-secondary transition-colors hidden lg:block shadow-lg"
+              aria-label="Settings"
+            >
+              <Settings className="w-4 h-4" strokeWidth={2} />
+            </button>
+          )}
+        </div>
         <UserProfilePopup
           isOpen={profileOpen}
           onClose={() => setProfileOpen(false)}

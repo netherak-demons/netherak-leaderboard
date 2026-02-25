@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
 import ConnectButton from './ConnectButton'
-import { Flame, Settings, Menu, X } from 'lucide-react'
+import { Flame, Menu, X } from 'lucide-react'
 import { useUserPfp } from '../hooks/useUserPfp'
 import { useUserStats } from '../hooks/useUserStats'
 import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
@@ -120,17 +120,8 @@ export default function Header() {
           {navLinks}
         </nav>
 
-        {/* Right: PFP + settings. Settings only when connected (not in observation mode without connection) */}
-        <div className="shrink-0 flex items-center gap-2">
-          {mounted && isConnected && (
-            <button
-              type="button"
-              className="rounded-full p-2 text-secondary hover:bg-white/10 hover:text-primary transition-colors hidden lg:block"
-              aria-label="Settings"
-            >
-              <Settings className="w-5 h-5" strokeWidth={2} />
-            </button>
-          )}
+        {/* Right: PFP (with settings overlay when connected) */}
+        <div className="shrink-0 flex items-center">
           <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
         </div>
       </header>
