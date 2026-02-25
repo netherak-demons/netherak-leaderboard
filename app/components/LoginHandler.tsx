@@ -10,6 +10,9 @@ type ConnectorWithSequenceWaas = {
 /**
  * On Sequence login, creates/registers the user in the DB via POST /api/user.
  * Uses JWT from sequenceWaas and a random default username.
+ *
+ * In observation/preview mode, data is shown without login. When user does
+ * connect, we still register them so profile editing and other features work.
  */
 export default function LoginHandler() {
   const { address, isConnected } = useAccount()

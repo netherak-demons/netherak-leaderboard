@@ -7,6 +7,7 @@ import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
 import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../../utils/dataMode'
+import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { getMultiplier } from '../../config/multiplier'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
@@ -52,9 +53,7 @@ export default function ProfileInfo() {
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
   // Use effective wallet for PFP (observation wallet in observation mode, userStats or connected wallet otherwise)
   const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
-  console.log('walletForPfp', walletForPfp)
   const { pfpUrl } = useUserPfp(walletForPfp)
-  console.log('pfpUrl', pfpUrl)
   const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? getEffectiveWallet(address)
   const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletForBook)
 
@@ -77,10 +76,10 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            No data to display
+            {EMPTY_STATE.connectTitle}
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Please connect to view your profile
+            {EMPTY_STATE.connectSubtext}
           </p>
         </div>
       </div>
@@ -92,6 +91,7 @@ export default function ProfileInfo() {
     return (
       <div
         className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px animate-pulse"
+        aria-busy="true"
         style={{
           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
           backdropFilter: 'blur(16px)',
@@ -155,10 +155,10 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-[#FF8C8A] text-base text-center mb-2" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Temporary error
+            {EMPTY_STATE.errorTitle}
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Please try again later.
+            {EMPTY_STATE.errorSubtext}
           </p>
         </div>
       </div>
@@ -195,10 +195,10 @@ export default function ProfileInfo() {
             </div>
           )}
           <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            No data to display
+            {EMPTY_STATE.noStatsTitle}
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            Start playing to see your stats here!
+            {EMPTY_STATE.noStatsSubtext}
           </p>
         </div>
       </div>

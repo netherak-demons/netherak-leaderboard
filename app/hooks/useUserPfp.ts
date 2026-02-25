@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { PfpApiResponse } from '../types/api'
 
 /**
  * Fetches PFP via our API proxy (avoids CORS from Somnia Explorer).
@@ -41,7 +42,7 @@ export function useUserPfp(walletAddress: string | undefined): { pfpUrl: string 
           return
         }
 
-        const data = await res.json()
+        const data: PfpApiResponse = await res.json()
         if (cancelled || !data?.items?.length) {
           setLoading(false)
           return

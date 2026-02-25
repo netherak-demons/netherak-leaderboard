@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import AchievementCard from './AchievementCard'
 import { useUserStatsContext } from '../context/UserStatsContext'
+import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { ACHIEVEMENT_CONFIG, getCurrentLevel, type AchievementCategory } from '../achievementsConfig'
 
 const CATEGORY_ORDER: AchievementCategory[] = ['monsters', 'dungeons', 'waves', 'souls']
@@ -68,7 +69,7 @@ export default function Achievements() {
         <div className="h-px w-full bg-white/10 rounded-full" />
         <div className="flex items-center justify-center py-8">
           <p className="text-secondary text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            There&apos;s no data to display. Please log in to view achievements.
+            {EMPTY_STATE.connectTitle}. {EMPTY_STATE.connectSubtext}
           </p>
         </div>
       </div>

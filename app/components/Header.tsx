@@ -120,7 +120,7 @@ export default function Header() {
           {navLinks}
         </nav>
 
-        {/* Right: PFP + settings (settings only when connected, desktop only) */}
+        {/* Right: PFP + settings. Settings only when connected (not in observation mode without connection) */}
         <div className="shrink-0 flex items-center gap-2">
           {mounted && isConnected && (
             <button

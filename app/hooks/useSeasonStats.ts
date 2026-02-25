@@ -7,6 +7,7 @@ import {
   mockWavesLeaderboard,
 } from './mockData'
 import { shouldUseMockData, getDataMode } from '../utils/dataMode'
+import { parseApiError, parseFetchError } from '../utils/apiError'
 import { setCachedPlayers } from './playersCache'
 
 const API_URL = '/api/season-stats'
@@ -145,8 +146,8 @@ export function useSeasonStats(seasonId: string = '0') {
           })
 
           if (!response.ok) {
-            // In production/observation mode, show error (don't fall back to mock)
-            throw new Error(`API error: ${response.status}`)
+            const msg = await parseApiError(response)
+            throw new Error(msg)
           }
 
           const data: SeasonStatsResponse = await response.json()
@@ -233,7 +234,7 @@ export function useSeasonStats(seasonId: string = '0') {
           setTotalPlayers(20)
           setError(null)
         } else {
-          setError(err instanceof Error ? err.message : 'Unknown error')
+          setError(parseFetchError(err))
           // Set empty arrays instead of mock data
           setDungeonsLeaderboard([])
           setSlayedHumansLeaderboard([])

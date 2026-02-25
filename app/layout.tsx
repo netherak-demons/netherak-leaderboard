@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BackgroundOverlay from "./components/BackgroundOverlay";
 import ObservationBanner from "./components/ObservationBanner";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,9 +18,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://leaderboard.netherak.com";
+
 export const metadata: Metadata = {
   title: "Netherak Leaderboard",
   description: "Season statistics and leaderboards for Netherak",
+  openGraph: {
+    title: "Netherak Leaderboard",
+    description: "Season statistics and leaderboards for Netherak",
+    url: siteUrl,
+    siteName: "Netherak Leaderboard",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Netherak Leaderboard",
+    description: "Season statistics and leaderboards for Netherak",
+  },
+  metadataBase: new URL(siteUrl),
 };
 
 export default function RootLayout({
@@ -37,7 +54,9 @@ export default function RootLayout({
           <ObservationBanner />
           <div className="relative z-10 flex min-h-screen flex-col max-w-[1200px] mx-auto w-full">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1">
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </main>
             <Footer />
           </div>
         </Providers>

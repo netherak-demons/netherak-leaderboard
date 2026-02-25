@@ -5,6 +5,7 @@ import { useAccount, useConnection, useDisconnect } from 'wagmi'
 import { LogOut, Save, X } from 'lucide-react'
 import { clearCachedPlayers } from '../hooks/playersCache'
 import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 import type { UserStats } from '../hooks/useUserStats'
 
@@ -155,6 +156,10 @@ export default function UserProfilePopup({
     (!address || (userStats?.wallet && userStats.wallet.toLowerCase() !== address.toLowerCase()))
   const canEdit = !isViewingOtherUser && !!address
 
+  const modalRef = useModalA11y(isOpen, onClose)
+
+  if (!isOpen) return null
+
   return (
     <>
       <div
@@ -163,11 +168,15 @@ export default function UserProfilePopup({
         aria-hidden="true"
       />
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-modal-title"
         className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-6 shadow-xl"
         style={{ fontFamily: 'var(--font-harmonique)' }}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-medium text-primary">Profile</h3>
+          <h3 id="profile-modal-title" className="text-lg font-medium text-primary">Profile</h3>
           {isViewingOtherUser && (
             <span className="text-xs text-amber-400/90 mr-2">View only (observation)</span>
           )}

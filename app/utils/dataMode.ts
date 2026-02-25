@@ -1,11 +1,15 @@
 /**
  * Data Mode Configuration
  * Controls how data is fetched and displayed
- * 
+ *
  * Modes:
- * - production: Real data from API
- * - observation: Data from a specific wallet address (from env)
- * - preview: Mock data for development
+ * - production: Real data from API, requires login
+ * - observation: Data from a specific wallet address (from env), login optional
+ * - preview: Mock data for development, login optional
+ *
+ * Observation + connect: When user connects while in observation mode,
+ * we still show the observation wallet's data (not the connected wallet).
+ * This ensures devs can test UI with a known wallet while logged in.
  */
 
 export type DataMode = 'production' | 'observation' | 'preview'
@@ -37,6 +41,15 @@ export function getObservationWallet(): string | undefined {
  */
 export function shouldUseMockData(): boolean {
   return getDataMode() === 'preview'
+}
+
+/**
+ * Whether we can show data without requiring wallet connection.
+ * In observation/preview mode, data is shown for a fixed wallet or mock data.
+ */
+export function getCanShowData(isConnected: boolean): boolean {
+  const mode = getDataMode()
+  return isConnected || mode === 'observation' || mode === 'preview'
 }
 
 /**

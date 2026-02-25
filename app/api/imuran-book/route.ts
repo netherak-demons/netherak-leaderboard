@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const PFP_CONTRACT =
-  process.env.NEXT_PUBLIC_PFP_CONTRACT?.toLowerCase() ||
-  '0x9559ff653d4c8cc3565dd639963597f1aaae6a6a'
+const IMURAN_BOOK_CONTRACT =
+  process.env.NEXT_PUBLIC_IMURAN_BOOK_CONTRACT?.toLowerCase() ||
+  '0x1727c70bfcc64df79cd084b7197517ebfd44b6e7'
 const SOMNIA_EXPLORER_API = 'https://explorer.somnia.network/api/v2'
 
 /**
- * Proxies PFP NFT fetch to Somnia Explorer API (avoids CORS from browser).
- * GET /api/pfp?wallet=0x...
+ * Proxies Imuran Book NFT ownership check to Somnia Explorer API (avoids CORS).
+ * Returns { hasBook: boolean } - true if wallet holds at least one token from the contract.
+ * GET /api/imuran-book?wallet=0x...
  */
 export async function GET(request: NextRequest) {
   const wallet = request.nextUrl.searchParams.get('wallet')
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${SOMNIA_EXPLORER_API}/tokens/${PFP_CONTRACT}/instances?holder_address_hash=${encodeURIComponent(wallet)}`
+    const url = `${SOMNIA_EXPLORER_API}/tokens/${IMURAN_BOOK_CONTRACT}/instances?holder_address_hash=${encodeURIComponent(wallet)}`
     const res = await fetch(url)
     if (!res.ok) {
       return NextResponse.json(
@@ -25,7 +26,8 @@ export async function GET(request: NextRequest) {
       )
     }
     const data = await res.json()
-    return NextResponse.json(data)
+    const hasBook = Array.isArray(data?.items) && data.items.length > 0
+    return NextResponse.json({ hasBook })
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Request failed' },

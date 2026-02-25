@@ -1,18 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { IMURAN_BOOK_CONTRACT } from '../config/contracts'
-
-const RPC_URL = 'https://rpc.ankr.com/somnia_mainnet'
-
-function padAddress(addr: string): string {
-  const clean = addr.startsWith('0x') ? addr.slice(2) : addr
-  return clean.toLowerCase().padStart(64, '0')
-}
 
 /**
  * Check if the given wallet owns the Imuran Book NFT.
- * Uses linked wallet from season stats (game wallet) - the book is checked on Somnia.
+ * Uses Somnia Explorer API (same as PFP) - checks linked wallet (game wallet).
  */
 export function useImuranBookOwnership(walletAddress: string | undefined): {
   hasBook: boolean
@@ -31,38 +23,24 @@ export function useImuranBookOwnership(walletAddress: string | undefined): {
     let cancelled = false
 
     async function check() {
-      if (!walletAddress) return
+      const wallet = walletAddress
+      if (!wallet) return
+
       setLoading(true)
       setHasBook(false)
 
       try {
-        const addr = padAddress(walletAddress)
-
-        const res = await fetch(RPC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: 'eth_call',
-            params: [
-              {
-                to: IMURAN_BOOK_CONTRACT.address,
-                data: '0x70a08231' + addr,
-              },
-              'latest',
-            ],
-            id: 1,
-          }),
-        })
-
-        const json = await res.json()
-        if (cancelled || json.error) {
+        const walletParam = wallet.startsWith('0x') ? wallet : `0x${wallet}`
+        const res = await fetch(
+          `/api/imuran-book?wallet=${encodeURIComponent(walletParam)}`
+        )
+        if (cancelled || !res.ok) {
           setLoading(false)
           return
         }
 
-        const balance = parseInt(json.result || '0', 16)
-        setHasBook(balance > 0)
+        const data = await res.json()
+        setHasBook(data?.hasBook === true)
       } catch {
         setHasBook(false)
       } finally {

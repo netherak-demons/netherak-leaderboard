@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { calculateEvilPoints } from '../utils/evilPoints'
 import { shouldUseMockData, getEffectiveWallet, getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
+import { parseApiError, parseFetchError } from '../utils/apiError'
 import {
   mockDungeonsLeaderboard,
   mockEnemiesLeaderboard,
@@ -182,7 +183,8 @@ export function useUserStats(
               })
 
               if (!response.ok) {
-                throw new Error(`API error: ${response.status}`)
+                const msg = await parseApiError(response)
+                throw new Error(msg)
               }
 
               const data: SeasonStatsResponse = await response.json()
@@ -258,7 +260,7 @@ export function useUserStats(
           },
         })
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error')
+        setError(parseFetchError(err))
       } finally {
         setLoading(false)
       }

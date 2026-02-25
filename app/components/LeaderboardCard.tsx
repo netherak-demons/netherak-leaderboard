@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { CircleCheck } from 'lucide-react'
 import Link from 'next/link'
+import { EMPTY_STATE } from '../utils/emptyStateCopy'
 
 const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
 
@@ -240,16 +241,16 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="overflow-x-hidden">
-          {showLoginMessage ? (
+          {  showLoginMessage ? (
             <div
               className="py-12 px-4 text-center"
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
               <p className="text-secondary text-base mb-2">
-                No data to display
+                {EMPTY_STATE.connectTitle}
               </p>
               <p className="text-primary/80 text-sm">
-                Please connect to view your profile
+                {EMPTY_STATE.connectSubtext}
               </p>
             </div>
           ) : error ? (
@@ -258,10 +259,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
               <p className="text-[#FF8C8A] text-base mb-2">
-                Temporary error
+                {EMPTY_STATE.errorTitle}
               </p>
               <p className="text-secondary/70 text-sm">
-                Please try again later.
+                {EMPTY_STATE.errorSubtext}
               </p>
             </div>
           ) : hasNoData ? (

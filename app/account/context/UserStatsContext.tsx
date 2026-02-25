@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react'
 import { useUserStats } from '../../hooks/useUserStats'
 import { useAccount } from 'wagmi'
-import { getDataMode, getEffectiveWallet } from '../../utils/dataMode'
+import { getCanShowData, getEffectiveWallet } from '../../utils/dataMode'
 import type { UserStats } from '../../hooks/useUserStats'
 
 interface UserStatsContextValue {
@@ -18,9 +18,8 @@ const UserStatsContext = createContext<UserStatsContextValue | null>(null)
 
 export function UserStatsProvider({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount()
-  const dataMode = getDataMode()
   const effectiveWallet = getEffectiveWallet(address)
-  const canShowData = isConnected || dataMode === 'observation' || dataMode === 'preview'
+  const canShowData = getCanShowData(isConnected)
 
   const { userStats, loading, hasNoData, error } = useUserStats(
     effectiveWallet,

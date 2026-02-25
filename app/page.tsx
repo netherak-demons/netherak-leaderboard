@@ -1,7 +1,12 @@
 'use client'
 
 import Leaderboard from './components/Leaderboard'
+import ErrorBoundary from './components/ErrorBoundary'
 
 export default function Home() {
-  return <Leaderboard />
+  return (
+    <ErrorBoundary>
+      <Leaderboard />
+    </ErrorBoundary>
+  )
 }

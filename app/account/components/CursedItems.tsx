@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import { useUserStatsContext } from '../context/UserStatsContext'
+import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 
 function CursedItemImage({
   src,
@@ -69,7 +70,7 @@ export default function CursedItems() {
         <div className="h-px w-full bg-white/10 rounded-full" />
         <div className="flex items-center justify-center py-8">
           <p className="text-secondary text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            No data to display. Please connect to view cursed items.
+            {EMPTY_STATE.connectTitle}. {EMPTY_STATE.connectSubtext}
           </p>
         </div>
       </div>

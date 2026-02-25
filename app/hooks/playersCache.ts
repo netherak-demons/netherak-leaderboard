@@ -1,6 +1,9 @@
 /**
  * Simple in-memory cache for season players data.
  * Shared between useSeasonStats and useUserStats to avoid duplicate fetches.
+ *
+ * TTL: 30 seconds. Balances freshness (leaderboard updates) with API load.
+ * Adjust if leaderboard updates more/less frequently in production.
  */
 
 const CACHE_TTL_MS = 30_000 // 30 seconds

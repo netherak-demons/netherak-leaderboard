@@ -5,6 +5,7 @@ import { useAccount, useConnection } from 'wagmi'
 import { CircleCheck, Info } from 'lucide-react'
 import { clearCachedPlayers } from '../hooks/playersCache'
 import { normalizeLinkedWallet } from '../utils/dataMode'
+import { useModalA11y } from '../hooks/useModalA11y'
 
 type ConnectorWithSequenceWaas = {
   sequenceWaas?: { getIdToken: (args?: { nonce?: string }) => Promise<{ idToken: string }> }
@@ -130,6 +131,8 @@ export default function SomniaQuesterPopUp({
     onClose()
   }, [onClose])
 
+  const modalRef = useModalA11y(isOpen, onClose)
+
   if (!isOpen) return null
 
   const glassStyle = {
@@ -148,10 +151,14 @@ export default function SomniaQuesterPopUp({
         aria-hidden="true"
       />
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="somnia-quester-modal-title"
         className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 flex flex-col items-center text-center"
         style={{ fontFamily: 'var(--font-harmonique)', ...glassStyle }}
       >
-        <h2 className="text-xl font-semibold text-white mb-1">Somnia Quester?</h2>
+        <h2 id="somnia-quester-modal-title" className="text-xl font-semibold text-white mb-1">Somnia Quester?</h2>
         <p className="text-white/90 text-sm mb-6">
           Add your Somnia quest-wallet address so we can connect it with your game wallet.
         </p>
