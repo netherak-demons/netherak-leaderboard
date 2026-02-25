@@ -37,8 +37,6 @@ export function useRealLeaderboards() {
       try {
         const players: PlayerStats[] = []
         const supply = Number(totalSupply)
-        console.log(`Total NFT supply: ${supply}`)
-        console.log('Starting to fetch token data...')
 
         // Limitar a los primeros 10 tokens para evitar rate limiting
         const maxTokens = Math.min(supply, 10)
@@ -54,20 +52,18 @@ export function useRealLeaderboards() {
             if (tokenId < maxTokens - 1) {
               await new Promise(resolve => setTimeout(resolve, 200))
             }
-          } catch (error) {
-            console.error(`Error fetching token ${tokenId}:`, error)
+          } catch {
+            // ignore
           }
         }
 
         if (players.length === 0) {
           setError('No valid player data found')
         } else {
-          console.log(`Loaded ${players.length} players from contract`)
           setPlayersData(players)
         }
-      } catch (err) {
+      } catch {
         setError('Error fetching leaderboard data from contract')
-        console.error('Error:', err)
       } finally {
         setLoading(false)
       }
@@ -166,9 +162,8 @@ export function useRealLeaderboards() {
                 tokenURI = tokenURI.slice(httpIndex)
               }
             }
-          } catch (error) {
-            console.error(`Error decoding tokenURI for token ${tokenId}:`, error)
-            console.log('Raw hex result:', tokenURIResult.result)
+          } catch {
+            // ignore
           }
         }
 
@@ -176,15 +171,11 @@ export function useRealLeaderboards() {
           throw new Error('Empty tokenURI')
         }
 
-        console.log(`Token ${tokenId} - tokenURI:`, tokenURI)
-
         // Obtener metadata
         const metadata = await fetchTokenMetadata(tokenURI)
         if (!metadata) {
           throw new Error('Failed to fetch metadata')
         }
-
-        console.log(`Token ${tokenId} - metadata:`, metadata)
 
         return {
           tokenId: tokenId.toString(),
@@ -197,8 +188,7 @@ export function useRealLeaderboards() {
           avatar: metadata.image || `/demons/avatar${(tokenId % 2) + 1}.svg`
         }
 
-      } catch (error) {
-        console.error(`Error fetching token ${tokenId}:`, error)
+      } catch {
         return null
       }
     }

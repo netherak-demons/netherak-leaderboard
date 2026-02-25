@@ -1,25 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
-const LOG_PREFIX = '[API /api/auth/backoffice]'
-
-function logError(context: string, error: unknown, extra?: Record<string, unknown>) {
-  const timestamp = new Date().toISOString()
-  console.error('\n' + '═'.repeat(60))
-  console.error(`❌ ${LOG_PREFIX} ${context}`)
-  console.error('─'.repeat(60))
-  console.error(`   Timestamp: ${timestamp}`)
-  if (extra) {
-    Object.entries(extra).forEach(([key, value]) => {
-      console.error(`   ${key}:`, value)
-    })
-  }
-  console.error('   Error:', error instanceof Error ? error.message : error)
-  if (error instanceof Error && error.stack) {
-    console.error('   Stack:', error.stack)
-  }
-  console.error('═'.repeat(60) + '\n')
-}
+function logError(_context: string, _error: unknown, _extra?: Record<string, unknown>) {}
 
 /**
  * Backoffice authentication endpoint

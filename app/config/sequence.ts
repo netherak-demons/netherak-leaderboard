@@ -6,26 +6,6 @@ import { somniaMainnet, somniaTestnet } from './chains'
 const projectAccessKey = process.env.NEXT_PUBLIC_SEQUENCE_PROJECT_ACCESS_KEY || ''
 const waasConfigKey = process.env.NEXT_PUBLIC_SEQUENCE_WAAS_CONFIG_KEY || ''
 
-// Debug: ambos deben ser del mismo proyecto (40611). El JWT aud viene del projectAccessKey.
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  const waasProject = (() => {
-    if (!waasConfigKey) return null
-    try {
-      return JSON.parse(atob(waasConfigKey)).projectId
-    } catch {
-      return null
-    }
-  })()
-  console.log('[sequence] Config cargada:', {
-    waasProjectId: waasProject,
-    esperado: 40611,
-    projectAccessKeyPrefix: projectAccessKey ? projectAccessKey.slice(0, 15) + '...' : '(vacío)',
-  })
-  if (waasProject && waasProject !== 40611) {
-    console.warn('[sequence] ⚠️ waasConfigKey tiene projectId', waasProject, '- debería ser 40611')
-  }
-}
-
 export const config = createConfig('waas', {
   projectAccessKey,
   position: 'center',

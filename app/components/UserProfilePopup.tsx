@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useAccount, useConnection, useDisconnect } from 'wagmi'
 import { LogOut, Save, X } from 'lucide-react'
 import { clearCachedPlayers } from '../hooks/playersCache'
-import { getDataMode } from '../utils/dataMode'
+import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 
 import type { UserStats } from '../hooks/useUserStats'
 
@@ -50,7 +50,7 @@ export default function UserProfilePopup({
 
     if (userStats) {
       setUsername(userStats.username ?? '')
-      setLinkedWallet(userStats.linkedWallet ?? '')
+      setLinkedWallet(normalizeLinkedWallet(userStats.linkedWallet))
       setEmail('') // season-stats strips email
       return
     }
@@ -73,10 +73,10 @@ export default function UserProfilePopup({
     }).then((res) => {
       if (!res || cancelled) return
       if (res.ok) {
-        return res.json().then((data: { wallet?: string; username?: string; email?: string; linkedWallet?: string; profile?: { username?: string; email?: string; linkedWallet?: string; LINKEDWALLET?: string } }) => {
+        return res.json().then((data: import('../types/user').GetUserResponse) => {
           if (cancelled) return
           setUsername(data.username ?? data.profile?.username ?? '')
-          setLinkedWallet(data.profile?.linkedWallet ?? data.profile?.LINKEDWALLET ?? data.linkedWallet ?? '')
+          setLinkedWallet(normalizeLinkedWallet(data.linkedWallet ?? data.profile?.linkedWallet ?? data.profile?.LINKEDWALLET))
           setEmail(data.email ?? data.profile?.email ?? '')
         })
       }
@@ -96,8 +96,8 @@ export default function UserProfilePopup({
       setError('Wallet connection does not support profile updates')
       return
     }
-    if (!username.trim() && !linkedWallet.trim()) {
-      setError('Provide at least a username or linked wallet')
+    if (!username.trim()) {
+      setError('Username is required to save')
       return
     }
     setSaving(true)
@@ -125,7 +125,7 @@ export default function UserProfilePopup({
       const savedLinkedWallet = profile.linkedWallet ?? profile.LINKEDWALLET ?? linkedWallet
       const savedEmail = profile.email ?? profile.values?.email ?? data.email ?? email
       setUsername(savedUsername)
-      setLinkedWallet(savedLinkedWallet)
+      setLinkedWallet(normalizeLinkedWallet(savedLinkedWallet))
       setEmail(savedEmail)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
@@ -249,7 +249,7 @@ export default function UserProfilePopup({
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleSave}
-            disabled={!canEdit || saving || (!username.trim() && !linkedWallet.trim())}
+            disabled={!canEdit || saving || !username.trim()}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 transition-colors disabled:opacity-50 ${
               saved
                 ? 'border-green-netherak bg-green-netherak/20 text-green-netherak'

@@ -36,15 +36,12 @@ export function useLeaderboards() {
       try {
         const players: PlayerStats[] = []
         const supply = Number(totalSupply)
-        console.log(`Total NFT supply: ${supply}`)
 
         // Limitar a los primeros 50 tokens para performance
         const maxTokens = Math.min(supply, 50)
 
         for (let tokenId = 0; tokenId < maxTokens; tokenId++) {
           try {
-            console.log(`Fetching token ${tokenId}...`)
-
             // TODO: Implementar llamadas reales al contrato para:
             // 1. ownerOf(tokenId)
             // 2. tokenURI(tokenId)
@@ -53,20 +50,18 @@ export function useLeaderboards() {
             // Por ahora mostrar error hasta que se implemente
             throw new Error('Real contract calls not implemented yet')
 
-          } catch (tokenError) {
-            console.error(`Error fetching token ${tokenId}:`, tokenError)
+          } catch {
+            // ignore
           }
         }
 
         if (players.length === 0) {
           setError('No valid player data found')
         } else {
-          console.log(`Loaded ${players.length} players`)
           setPlayersData(players)
         }
-      } catch (err) {
+      } catch {
         setError('Error fetching leaderboard data from contract')
-        console.error('Error:', err)
       } finally {
         setLoading(false)
       }

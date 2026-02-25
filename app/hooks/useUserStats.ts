@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { calculateEvilPoints } from '../utils/evilPoints'
-import { shouldUseMockData, getEffectiveWallet, getDataMode } from '../utils/dataMode'
+import { shouldUseMockData, getEffectiveWallet, getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 import {
   mockDungeonsLeaderboard,
   mockEnemiesLeaderboard,
@@ -14,7 +14,6 @@ const API_URL = '/api/season-stats'
 // Get data mode
 const DATA_MODE = getDataMode()
 const USE_MOCK_DATA = shouldUseMockData()
-const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
 
 interface EnemiesKilled {
   [enemyType: string]: number
@@ -30,6 +29,7 @@ interface PlayerSeasonStats {
   profile: {
     username?: string
     linkedWallet?: string
+    LINKEDWALLET?: string
     extraPoints?: number
   }
     stats: {
@@ -116,9 +116,6 @@ export function useUserStats(
       // (null is explicitly passed when leaderboard is loading)
       // undefined means no shared data is expected (e.g., on account page)
       if (allPlayersData === null) {
-        // Wait for shared data - don't fetch yet
-        if (isDev) console.log(`⏳ [${DATA_MODE.toUpperCase()}] useUserStats: Waiting for shared data from useSeasonStats...`)
-        // Keep loading state true while waiting
         return
       }
 
@@ -132,8 +129,6 @@ export function useUserStats(
 
       // Use mock data in preview mode
       if (USE_MOCK_DATA) {
-        if (isDev) console.log(`🔧 [${DATA_MODE.toUpperCase()}] Using mock user stats`)
-        
         // Find user in mock data (use first entry as example)
         const mockUser = mockDungeonsLeaderboard[0]
         if (mockUser) {
@@ -160,29 +155,16 @@ export function useUserStats(
       }
 
       try {
-        if (isDev) {
-          if (DATA_MODE === 'observation') {
-            console.log(`👁️ [OBSERVATION] Fetching user stats for wallet: ${effectiveWallet}`)
-          } else {
-            console.log(`🚀 [PRODUCTION] Fetching user stats for wallet: ${effectiveWallet}`)
-          }
-        }
-
         let players: PlayerSeasonStats[] = []
 
         // Reuse data from useSeasonStats if provided (avoids duplicate API calls)
         if (allPlayersData && Array.isArray(allPlayersData) && allPlayersData.length > 0) {
-          if (isDev) console.log(`♻️ [${DATA_MODE.toUpperCase()}] useUserStats: REUSING data from useSeasonStats (${allPlayersData.length} players) - NO API CALL`)
           players = allPlayersData
         } else if (allPlayersData === undefined) {
-          // Check cache first
           const cached = getCachedPlayers(seasonId)
           if (cached && cached.length > 0) {
-            if (isDev) console.log(`♻️ [${DATA_MODE.toUpperCase()}] useUserStats: Using cached data (${cached.length} players)`)
             players = cached
           } else {
-            // Fetch from API
-            if (isDev) console.log(`📡 [${DATA_MODE.toUpperCase()}] useUserStats: Fetching from API...`)
             let lastKey: string | null = null
             let requestCount = 0
             do {
@@ -208,7 +190,6 @@ export function useUserStats(
               lastKey = data.lastEvaluatedKey
             } while (lastKey)
             setCachedPlayers(seasonId, players)
-            if (isDev) console.log(`✅ [${DATA_MODE.toUpperCase()}] useUserStats: Fetched ${players.length} players (${requestCount} API call${requestCount > 1 ? 's' : ''})`)
           }
         }
 
@@ -263,7 +244,7 @@ export function useUserStats(
         setUserStats({
           wallet: userData.wallet,
           username: userData.username || userData.profile?.username || 'Unknown',
-          linkedWallet: userData.profile?.linkedWallet ?? undefined,
+          linkedWallet: normalizeLinkedWallet(userData.profile?.linkedWallet ?? userData.profile?.LINKEDWALLET) || undefined,
           dungeonsCompleted,
           slayedHumans,
           harvestedSouls,
@@ -277,7 +258,6 @@ export function useUserStats(
           },
         })
       } catch (err) {
-        if (isDev) console.error(`❌ [${DATA_MODE.toUpperCase()}] Error loading user stats:`, err)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setLoading(false)

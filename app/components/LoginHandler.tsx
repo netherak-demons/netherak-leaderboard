@@ -48,13 +48,8 @@ export default function LoginHandler() {
         })
 
         if (cancelled) return
-        if (!res.ok) {
-          console.warn('[LoginHandler] Failed to register user:', res.status, await res.text())
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.warn('[LoginHandler] Error registering user:', err)
-        }
+      } catch {
+        // ignore
       }
     })()
 

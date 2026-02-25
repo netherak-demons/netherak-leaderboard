@@ -2,32 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import https from 'https';
 import crypto from 'crypto';
 
-const LOG_PREFIX = '[API /api/season-stats]';
-const isDev = process.env.NODE_ENV === 'development';
-
-function logError(context: string, error: unknown, extra?: Record<string, unknown>) {
-  const timestamp = new Date().toISOString();
-  console.error('\n' + '═'.repeat(60));
-  console.error(`❌ ${LOG_PREFIX} ${context}`);
-  console.error('─'.repeat(60));
-  console.error(`   Timestamp: ${timestamp}`);
-  if (extra) {
-    Object.entries(extra).forEach(([key, value]) => {
-      console.error(`   ${key}:`, value);
-    });
-  }
-  console.error('   Error:', error instanceof Error ? error.message : error);
-  if (error instanceof Error && error.stack) {
-    console.error('   Stack:', error.stack);
-  }
-  console.error('═'.repeat(60) + '\n');
-}
-
-function logInfo(context: string, extra?: Record<string, unknown>) {
-  if (!isDev) return;
-  const timestamp = new Date().toISOString();
-  console.log(`✓ ${LOG_PREFIX} ${context} | ${timestamp}`, extra ?? '');
-}
+function logError(_context: string, _error: unknown, _extra?: Record<string, unknown>) {}
+function logInfo(_context: string, _extra?: Record<string, unknown>) {}
 
 export async function GET(request: NextRequest) {
   return NextResponse.json(

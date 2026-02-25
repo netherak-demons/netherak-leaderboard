@@ -52,8 +52,16 @@ export function getEffectiveWallet(walletAddress: string | undefined): string | 
     if (observationWallet) {
       return observationWallet
     }
-    console.warn('⚠️ Observation mode enabled but NEXT_PUBLIC_OBSERVATION_WALLET not set. Using provided wallet.')
   }
   
   return walletAddress
+}
+
+/**
+ * Normalize linkedWallet from API: backend may return string "null" to mean empty
+ */
+export function normalizeLinkedWallet(v: string | undefined | null): string {
+  if (v === undefined || v === null) return ''
+  const s = typeof v === 'string' ? v.trim() : ''
+  return s === 'null' ? '' : s
 }

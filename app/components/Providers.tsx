@@ -5,6 +5,7 @@ import { SequenceConnect } from '@0xsequence/connect'
 import { config } from '../config/sequence'
 import { useState } from 'react'
 import LoginHandler from './LoginHandler'
+import SomniaQuesterHandler from './SomniaQuesterHandler'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -13,6 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SequenceConnect config={config}>
       <QueryClientProvider client={queryClient}>
         <LoginHandler />
+        <SomniaQuesterHandler />
         {children}
       </QueryClientProvider>
     </SequenceConnect>
