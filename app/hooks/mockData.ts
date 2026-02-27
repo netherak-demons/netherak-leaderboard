@@ -152,3 +152,39 @@ export const mockSoulsLeaderboard: LeaderboardEntry[] = mockSoulsData.map(e =>
 export const mockWavesLeaderboard: LeaderboardEntry[] = mockWavesData.map(e =>
   toLeaderboardEntry(e, evilPointsByAddress[e.address] ?? 0, rewardsByAddress[e.address] ?? false)
 )
+
+/** Mock players for store (preview mode) - built from mock leaderboard data */
+export function getMockPlayers(): Array<{
+  wallet: string
+  username: string
+  profile: { extraPoints?: number }
+  stats: {
+    dungeonsCompleted?: Record<string, number>
+    enemiesKilled?: Record<string, number>
+    skillsUsed?: Record<string, number>
+    wavesCompleted?: number
+  }
+}> {
+  return mockDungeonsData.map((d) => {
+    const enemies = mockEnemiesData.find((e) => e.address === d.address)
+    const souls = mockSoulsData.find((e) => e.address === d.address)
+    const waves = mockWavesData.find((e) => e.address === d.address)
+    const baseFromStats =
+      Math.floor((enemies?.score ?? 0) / 20) +
+      d.score +
+      Math.floor((souls?.score ?? 0) / 10)
+    const evilTarget = evilPointsByAddress[d.address] ?? 0
+    const extraPoints = Math.max(0, evilTarget - baseFromStats)
+    return {
+      wallet: d.address,
+      username: d.username,
+      profile: { extraPoints },
+      stats: {
+        dungeonsCompleted: { [d.demon]: d.score },
+        enemiesKilled: enemies ? { [enemies.demon]: enemies.score } : {},
+        skillsUsed: (souls ? { DrainSoul: souls.score } : {}) as Record<string, number>,
+        wavesCompleted: waves?.score ?? 0,
+      },
+    }
+  })
+}

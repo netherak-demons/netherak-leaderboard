@@ -6,14 +6,9 @@
  * Adjust if leaderboard updates more/less frequently in production.
  */
 
-const CACHE_TTL_MS = 30_000 // 30 seconds
+import type { PlayerSeasonStats } from '../utils/leaderboardUtils'
 
-interface PlayerSeasonStats {
-  wallet: string
-  username: string
-  profile: { username?: string; linkedWallet?: string; extraPoints?: number }
-  stats: Record<string, unknown>
-}
+const CACHE_TTL_MS = 30_000 // 30 seconds
 
 interface CacheEntry {
   seasonId: string

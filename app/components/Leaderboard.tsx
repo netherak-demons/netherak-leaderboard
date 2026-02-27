@@ -19,20 +19,11 @@ const Leaderboard: React.FC = () => {
     slayedHumansLeaderboard,
     harvestedSoulsLeaderboard,
     wavesLeaderboard,
-    loading: leaderboardLoading,
+    loading,
     error,
-    allPlayers, // Get raw players data to reuse
   } = useSeasonStats(canShowData ? '0' : '')
   
-  // Check if user has data - reuse allPlayers data to avoid duplicate API calls
-  // Pass null initially (to signal we want to wait), then pass the array when ready
-  const { userStats, loading: userLoading, hasNoData } = useUserStats(
-    effectiveWallet, 
-    '0',
-    leaderboardLoading ? null : (allPlayers.length > 0 ? allPlayers : undefined)
-  )
-  
-  const loading = userLoading || leaderboardLoading
+  const { hasNoData } = useUserStats(effectiveWallet, '0')
 
   // Show all leaderboards with connect message when not connected (unless in observation/preview mode)
   if (!canShowData) {

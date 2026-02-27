@@ -68,6 +68,7 @@ export async function searchUser(
   const maxUsers = 500
 
   // Fetch users in batches until we find the user or reach max
+  // Early exit as soon as user is found (don't fetch remaining pages)
   let response: ApiResponse<SeasonStatsResponse>
   do {
     response = await apiPost<SeasonStatsResponse>('/stats/season', {
@@ -84,10 +85,11 @@ export async function searchUser(
       return { user: null, error: 'No data returned from API' }
     }
 
-    allUsers = [...allUsers, ...response.data.seasonStats]
+    const batch = response.data.seasonStats
+    allUsers = [...allUsers, ...batch]
     lastKey = response.data.lastEvaluatedKey
 
-    // Check if we found the user
+    // Check if we found the user - return immediately (don't fetch next page)
     const found = allUsers.find((user) => matchesSearch(user, params))
     if (found) {
       return { user: found, error: null }
