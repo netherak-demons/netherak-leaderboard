@@ -120,6 +120,26 @@ const mockWavesData = [
   { ranking: 10, demon: 'DeathKnight', avatar: '/demons/avatar2.svg', score: 21, address: '0x0123456789012345678901234567890123456789', username: 'DeathKnight' },
 ]
 
+// Evil Points leaderboard - sorted by evilPoints (includes extraPoints from backoffice)
+const mockEvilPointsData = Object.entries(evilPointsByAddress)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 10)
+  .map(([address], i) => {
+    const base = mockDungeonsData.find(e => e.address === address) ?? mockDungeonsData[0]
+    return {
+      ranking: i + 1,
+      demon: base.demon,
+      avatar: base.avatar,
+      score: evilPointsByAddress[address] ?? 0,
+      address,
+      username: base.username,
+    }
+  })
+
+export const mockEvilPointsLeaderboard: LeaderboardEntry[] = mockEvilPointsData.map(e =>
+  toLeaderboardEntry(e, e.score, rewardsByAddress[e.address] ?? false)
+)
+
 export const mockDungeonsLeaderboard: LeaderboardEntry[] = mockDungeonsData.map(e =>
   toLeaderboardEntry(e, evilPointsByAddress[e.address] ?? 0, rewardsByAddress[e.address] ?? false)
 )

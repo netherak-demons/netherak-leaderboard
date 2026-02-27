@@ -26,8 +26,10 @@ export default function Header() {
   const walletForPfp = effectiveWallet
   const { pfpUrl } = useUserPfp(walletForPfp)
   const { userStats } = useUserStats(effectiveWallet)
-  const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? effectiveWallet
-  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletForBook)
+  const walletsForBook = [userStats?.wallet, userStats?.linkedWallet, effectiveWallet].filter(
+    (w): w is string => !!w && typeof w === 'string'
+  )
+  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForBook)
   const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
   const evilPoints = userStats?.evilPoints ?? 0
 

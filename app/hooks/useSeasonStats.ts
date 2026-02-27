@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { calculateEvilPoints } from '../utils/evilPoints'
 import {
+  mockEvilPointsLeaderboard,
   mockDungeonsLeaderboard,
   mockEnemiesLeaderboard,
   mockSoulsLeaderboard,
@@ -78,6 +79,7 @@ const REFRESH_EVENT = 'netherak:refreshUser'
 export function useSeasonStats(seasonId: string = '0') {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [evilPointsLeaderboard, setEvilPointsLeaderboard] = useState<LeaderboardEntry[]>([])
   const [dungeonsLeaderboard, setDungeonsLeaderboard] = useState<LeaderboardEntry[]>([])
   const [slayedHumansLeaderboard, setSlayedHumansLeaderboard] = useState<LeaderboardEntry[]>([])
   const [harvestedSoulsLeaderboard, setHarvestedSoulsLeaderboard] = useState<LeaderboardEntry[]>([])
@@ -99,6 +101,7 @@ export function useSeasonStats(seasonId: string = '0') {
       // Don't fetch if seasonId is empty (user not connected)
       if (!seasonId) {
         setLoading(false)
+        setEvilPointsLeaderboard([])
         setDungeonsLeaderboard([])
         setSlayedHumansLeaderboard([])
         setHarvestedSoulsLeaderboard([])
@@ -144,6 +147,17 @@ export function useSeasonStats(seasonId: string = '0') {
           }
         }
 
+        setEvilPointsLeaderboard(
+          players
+            .map(p => {
+              const { evilPoints } = playerMap.get(p.wallet) ?? { evilPoints: 0, rewards: false }
+              return { p, score: evilPoints }
+            })
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
         setDungeonsLeaderboard(
           players
             .map(p => ({ p, score: sumObjectValues(p.stats?.dungeonsCompleted) }))
@@ -187,6 +201,7 @@ export function useSeasonStats(seasonId: string = '0') {
       // Use mock data if in preview mode
       if (USE_MOCK_DATA) {
         setTimeout(() => {
+          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
           setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
@@ -262,6 +277,18 @@ export function useSeasonStats(seasonId: string = '0') {
           }
         }
 
+        setEvilPointsLeaderboard(
+          players
+            .map(p => {
+              const { evilPoints } = playerMap.get(p.wallet) ?? { evilPoints: 0, rewards: false }
+              return { p, score: evilPoints }
+            })
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(({ p, score }, i) => toEntry(p, score, i))
+        )
+
         setDungeonsLeaderboard(
           players
             .map(p => ({ p, score: sumObjectValues(p.stats?.dungeonsCompleted) }))
@@ -300,6 +327,7 @@ export function useSeasonStats(seasonId: string = '0') {
       } catch (err) {
         // In preview mode, we shouldn't reach here, but handle it anyway
         if (USE_MOCK_DATA) {
+          setEvilPointsLeaderboard(mockEvilPointsLeaderboard)
           setDungeonsLeaderboard(mockDungeonsLeaderboard)
           setSlayedHumansLeaderboard(mockEnemiesLeaderboard)
           setHarvestedSoulsLeaderboard(mockSoulsLeaderboard)
@@ -309,6 +337,7 @@ export function useSeasonStats(seasonId: string = '0') {
         } else {
           setError(parseFetchError(err))
           // Set empty arrays instead of mock data
+          setEvilPointsLeaderboard([])
           setDungeonsLeaderboard([])
           setSlayedHumansLeaderboard([])
           setHarvestedSoulsLeaderboard([])
@@ -325,6 +354,7 @@ export function useSeasonStats(seasonId: string = '0') {
   }, [seasonId, refreshTrigger])
 
   return {
+    evilPointsLeaderboard,
     dungeonsLeaderboard,
     slayedHumansLeaderboard,
     harvestedSoulsLeaderboard,

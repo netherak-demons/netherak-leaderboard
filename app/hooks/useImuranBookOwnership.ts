@@ -17,70 +17,99 @@ function setCachedImuranBook(wallet: string, hasBook: boolean) {
   imuranBookCache.set(wallet.toLowerCase(), { hasBook, ts: Date.now() })
 }
 
+function uniqueWallets(wallets: (string | undefined)[]): string[] {
+  const seen = new Set<string>()
+  return wallets.filter((w): w is string => {
+    if (!w || typeof w !== 'string') return false
+    const key = w.toLowerCase().trim()
+    if (!key || key === '0x') return false
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 /**
- * Check if the given wallet owns the Imuran Book NFT.
- * Uses Somnia Explorer API (same as PFP) - checks linked wallet (game wallet).
- * Caches results so navigating away and back shows immediately.
+ * Check if any of the given wallets owns the Imuran Book NFT.
+ * The book can be held by either the main profile wallet or the linked (game) wallet.
+ * Uses Somnia Explorer API. Caches results so navigating away and back shows immediately.
  */
-export function useImuranBookOwnership(walletAddress: string | undefined): {
+export function useImuranBookOwnership(
+  walletAddresses: string | undefined | (string | undefined)[]
+): {
   hasBook: boolean
   loading: boolean
 } {
-  const normalizedWallet = walletAddress?.toLowerCase()
-  const cached = normalizedWallet ? getCachedImuranBook(normalizedWallet) : null
+  const wallets = Array.isArray(walletAddresses)
+    ? uniqueWallets(walletAddresses)
+    : walletAddresses
+      ? uniqueWallets([walletAddresses])
+      : []
 
-  const [hasBook, setHasBook] = useState(() => cached ?? false)
-  const [loading, setLoading] = useState(!!walletAddress && cached === null)
+  const allCached = wallets.length > 0 && wallets.every((w) => getCachedImuranBook(w) !== null)
+  const cachedHasBook = wallets.some((w) => getCachedImuranBook(w) === true)
+
+  const [hasBook, setHasBook] = useState(() => (allCached ? cachedHasBook : false))
+  const [loading, setLoading] = useState(wallets.length > 0 && !allCached)
 
   useEffect(() => {
-    if (!walletAddress) {
+    if (wallets.length === 0) {
       setHasBook(false)
       setLoading(false)
       return
     }
 
-    const wallet = walletAddress
-    const cachedResult = getCachedImuranBook(wallet)
-    if (cachedResult !== null) {
-      setHasBook(cachedResult)
+    const cached = wallets.map((w) => getCachedImuranBook(w))
+    if (cached.every((c) => c !== null)) {
+      setHasBook(cached.some((c) => c === true))
       setLoading(false)
       return
     }
 
     let cancelled = false
+    setLoading(true)
+    setHasBook(false)
 
     async function check() {
-      if (!wallet) return
+      for (const wallet of wallets) {
+        if (cancelled) return
 
-      setLoading(true)
-      setHasBook(false)
-
-      try {
-        const walletParam = wallet.startsWith('0x') ? wallet : `0x${wallet}`
-        const res = await fetch(
-          `/api/imuran-book?wallet=${encodeURIComponent(walletParam)}`
-        )
-        if (cancelled || !res.ok) {
-          setLoading(false)
-          return
+        const cachedResult = getCachedImuranBook(wallet)
+        if (cachedResult !== null) {
+          if (cachedResult) {
+            if (!cancelled) setHasBook(true)
+            break
+          }
+          continue
         }
 
-        const data = await res.json()
-        const hasBookResult = data?.hasBook === true
-        setCachedImuranBook(wallet, hasBookResult)
-        setHasBook(hasBookResult)
-      } catch {
-        setHasBook(false)
-      } finally {
-        if (!cancelled) setLoading(false)
+        try {
+          const walletParam = wallet.startsWith('0x') ? wallet : `0x${wallet}`
+          const res = await fetch(
+            `/api/imuran-book?wallet=${encodeURIComponent(walletParam)}`
+          )
+          if (cancelled) return
+          if (!res.ok) continue
+
+          const data = await res.json()
+          const hasBookResult = data?.hasBook === true
+          setCachedImuranBook(wallet, hasBookResult)
+          if (hasBookResult) {
+            if (!cancelled) setHasBook(true)
+            break
+          }
+        } catch {
+          // continue to next wallet
+        }
       }
+      if (!cancelled) setLoading(false)
     }
 
     check()
     return () => {
       cancelled = true
     }
-  }, [walletAddress])
+  }, [wallets.join(',')])
 
   return { hasBook, loading }
 }

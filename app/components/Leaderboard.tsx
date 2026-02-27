@@ -14,6 +14,7 @@ const Leaderboard: React.FC = () => {
   
   // Fetch leaderboard data when we can show data
   const {
+    evilPointsLeaderboard,
     dungeonsLeaderboard,
     slayedHumansLeaderboard,
     harvestedSoulsLeaderboard,
@@ -40,6 +41,7 @@ const Leaderboard: React.FC = () => {
       <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
+            <LeaderboardCard title="EVIL POINTS" icon="/evil.svg" subtitle="" scoreLabel="EVIL" {...emptyCardProps} />
             <LeaderboardCard title="DUNGEONS COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
             <LeaderboardCard title="SLAYED HUMANS" icon="/enemies.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
             <LeaderboardCard title="HARVESTED SOULS" icon="/harvested.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
@@ -60,7 +62,7 @@ const Leaderboard: React.FC = () => {
       >
         <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <LeaderboardCard
                 key={i}
                 title=""
@@ -83,6 +85,17 @@ const Leaderboard: React.FC = () => {
     <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
       <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
+          <LeaderboardCard
+            title="EVIL POINTS"
+            icon="/evil.svg"
+            subtitle=""
+            scoreLabel="EVIL"
+            entries={evilPointsLeaderboard}
+            userAddress={effectiveWallet || address}
+            hasNoData={hasNoData}
+            error={error}
+          />
+
           <LeaderboardCard
             title="DUNGEONS COMPLETED"
             icon="/dungeons.svg"

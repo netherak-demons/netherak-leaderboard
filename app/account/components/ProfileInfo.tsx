@@ -54,8 +54,12 @@ export default function ProfileInfo() {
   // Use effective wallet for PFP (observation wallet in observation mode, userStats or connected wallet otherwise)
   const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
   const { pfpUrl } = useUserPfp(walletForPfp)
-  const walletForBook = (userStats?.linkedWallet || userStats?.wallet) ?? getEffectiveWallet(address)
-  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletForBook)
+  const walletsForBook = [
+    userStats?.wallet,
+    userStats?.linkedWallet,
+    getEffectiveWallet(address),
+  ].filter((w): w is string => !!w && typeof w === 'string')
+  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletsForBook)
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
