@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
 
 function logError(_context: string, _error: unknown, _extra?: Record<string, unknown>) {}
 
@@ -95,12 +96,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate a simple session token (in production, use JWT or similar)
-    const token = crypto.randomBytes(32).toString('hex')
-    const expiresAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+    const jwtSecret = process.env.BACKOFFICE_JWT_SECRET
+    if (!jwtSecret) {
+      logError('Configuration error', new Error('BACKOFFICE_JWT_SECRET not set'), {
+        hint: 'Add BACKOFFICE_JWT_SECRET to .env.local (use a random 32+ char string)',
+      })
+      return NextResponse.json(
+        { success: false, error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
 
-    // In production, store this token in a database or Redis
-    // For now, we'll return it and the client will store it in sessionStorage
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+    const token = jwt.sign(
+      { purpose: 'backoffice', exp: Math.floor(expiresAt / 1000) },
+      jwtSecret,
+      { algorithm: 'HS256' }
+    )
+
     return NextResponse.json({
       success: true,
       token,

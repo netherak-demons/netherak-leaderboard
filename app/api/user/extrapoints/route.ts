@@ -1,8 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyBackofficeToken } from '../../../lib/verifyBackofficeToken'
 
 const EXTRAPOINTS_URL = 'https://yv97bn1mj3.execute-api.us-east-1.amazonaws.com/stage-1/user/extrapoints'
 
 export async function POST(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return NextResponse.json(
+      { error: 'Authorization required. Sign in to backoffice first.' },
+      { status: 401 }
+    )
+  }
+
+  try {
+    verifyBackofficeToken(authHeader.slice(7))
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid or expired session. Sign in to backoffice again.' },
+      { status: 401 }
+    )
+  }
+
   const apiKey = process.env.NETHERAK_API_KEY
 
   if (!apiKey) {
@@ -22,12 +40,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const wallet = typeof body.wallet === 'string' ? body.wallet.trim() : ''
+  const wallet = typeof body.wallet === 'string' ? body.wallet.trim().toLowerCase() : ''
   const amount = typeof body.amount === 'number' ? body.amount : Number(body.amount)
 
-  if (!wallet) {
+  if (!wallet || !/^0x[a-f0-9]{40}$/.test(wallet)) {
     return NextResponse.json(
-      { error: 'wallet is required' },
+      { error: 'Valid wallet address (0x + 40 hex chars) is required' },
       { status: 400 }
     )
   }
@@ -35,6 +53,13 @@ export async function POST(request: NextRequest) {
   if (isNaN(amount)) {
     return NextResponse.json(
       { error: 'amount must be a number' },
+      { status: 400 }
+    )
+  }
+
+  if (Math.abs(amount) > 10000) {
+    return NextResponse.json(
+      { error: 'amount must be between -10000 and 10000' },
       { status: 400 }
     )
   }
