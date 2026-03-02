@@ -29,4 +29,16 @@ export const config = createConfig('waas', {
     chains: [somniaMainnet, somniaTestnet],
   },
   enableConfirmationModal: true,
+  customCSS: `
+    :host, :root {
+      --seq-color-background-backdrop: rgba(0, 0, 0, 0.4);
+      --seq-color-background-overlay: rgba(0, 0, 0, 0.4);
+    }
+    .bg-background-backdrop,
+    .bg-background-overlay {
+      background-color: rgba(0, 0, 0, 0.1) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+    }
+  `,
 })

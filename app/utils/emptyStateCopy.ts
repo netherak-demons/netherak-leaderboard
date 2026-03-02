@@ -5,7 +5,7 @@
 export const EMPTY_STATE = {
   /** Shown when user must connect to see data */
   connectTitle: 'No data to display',
-  connectSubtext: 'Please connect to view your profile',
+  connectSubtext: 'Please Login to view your profile',
 
   /** Shown when connected but user has no stats yet */
   noStatsTitle: 'No data to display',

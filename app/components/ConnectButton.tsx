@@ -1,10 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 import { useAccount } from 'wagmi'
 import { useOpenConnectModal } from '@0xsequence/connect'
-import { Settings } from 'lucide-react'
+import { Settings, Wallet } from 'lucide-react'
 import UserProfilePopup from './UserProfilePopup'
 import { getDataMode } from '../utils/dataMode'
 import type { UserStats } from '../hooks/useUserStats'
@@ -36,12 +35,6 @@ function ConnectButtonAvatar({
   )
 }
 
-const BUTTON_IMAGES = {
-  normal: '/media/buttons/button_normal.png',
-  hover: '/media/buttons/button_hover.png',
-  disabled: '/media/buttons/button_disabled.png',
-}
-
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
 interface ConnectButtonProps {
@@ -61,7 +54,6 @@ export default function ConnectButton({
   pfpUrl,
   userStats,
 }: ConnectButtonProps) {
-  const [isHovered, setIsHovered] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const { address, isConnected } = useAccount()
@@ -111,40 +103,17 @@ export default function ConnectButton({
     )
   }
 
-  const getButtonImage = () => {
-    if (disabled) return BUTTON_IMAGES.disabled
-    if (isHovered) return BUTTON_IMAGES.hover
-    return BUTTON_IMAGES.normal
-  }
-
   const getButtonText = () => children ?? 'Sign in with Sequence'
 
   return (
     <button
-      className={`relative overflow-hidden min-w-[240px]  cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-      style={{ aspectRatio: '532/252' }}
-      onMouseEnter={() => !disabled && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      type="button"
+      className={`flex items-center justify-center gap-2 rounded-md bg-[#75D78C] text-black px-2 py-2.5 text-sm font-medium min-w-[200px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity ${className}`}
       onClick={disabled ? undefined : handleConnectClick}
       disabled={disabled}
     >
-      <Image
-        draggable={false}
-        className="absolute inset-0 w-full h-full object-contain"
-        src={getButtonImage()}
-        alt="Button Background"
-        width={532}
-        height={252}
-        unoptimized
-      />
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
-        <span
-          className="text-primary text-sm font-medium uppercase tracking-[0.02em] filter drop-shadow-[0_2px_4px_rgba(255,255,255,0.5)]"
-          style={{ fontFamily: 'var(--font-zachar-scratched)' }}
-        >
-          {getButtonText()}
-        </span>
-      </div>
+      <Wallet className="w-5 h-5 shrink-0" strokeWidth={2} />
+      <span>{getButtonText()}</span>
     </button>
   )
 }
