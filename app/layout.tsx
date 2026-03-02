@@ -22,19 +22,35 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://leaderboard.netherak.com";
 
 export const metadata: Metadata = {
-  title: "Netherak Leaderboard",
-  description: "Season statistics and leaderboards for Netherak",
+  title: {
+    default: "Netherak Leaderboard",
+    template: "%s | Netherak Leaderboard",
+  },
+  description:
+    "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats, rankings, and rewards.",
+  keywords: ["Netherak", "leaderboard", "Somnia", "gaming", "rankings", "stats"],
   openGraph: {
     title: "Netherak Leaderboard",
-    description: "Season statistics and leaderboards for Netherak",
+    description:
+      "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats.",
     url: siteUrl,
     siteName: "Netherak Leaderboard",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Netherak Leaderboard - Season statistics and rankings",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Netherak Leaderboard",
-    description: "Season statistics and leaderboards for Netherak",
+    description:
+      "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats.",
+    images: ["/opengraph-image"],
   },
   metadataBase: new URL(siteUrl),
 };
