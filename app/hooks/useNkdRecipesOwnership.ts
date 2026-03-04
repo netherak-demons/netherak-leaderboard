@@ -1,17 +1,18 @@
 'use client'
 
 import { useEffect, useMemo } from 'react'
-import { useImuranBookStore } from '../stores/useImuranBookStore'
+import { useNkdRecipesStore } from '../stores/useNkdRecipesStore'
 import { ASSET_CACHE_TTL_MS, uniqueWallets } from '../utils/walletCache'
 
 /**
- * Returns whether any of the given wallets owns the Imuran Book.
+ * Returns whether any of the given wallets owns NKD Recipes, and the image URL from the first owned token.
  * Data is fetched by DataLoader. Components can call this for reactive updates.
  */
-export function useImuranBookOwnership(
+export function useNkdRecipesOwnership(
   walletAddresses: string | undefined | (string | undefined)[]
 ): {
-  hasBook: boolean
+  hasRecipes: boolean
+  imageUrl: string | null
   loading: boolean
 } {
   const walletsKey = Array.isArray(walletAddresses)
@@ -23,28 +24,31 @@ export function useImuranBookOwnership(
     return []
   }, [walletsKey])
 
-  // Subscribe to cache so we re-render when fetch completes (getHasBook is a function ref - never changes)
-  const cache = useImuranBookStore((s) => s.cache)
-  const isLoading = useImuranBookStore((s) => s.isLoading)
-  const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
+  const cache = useNkdRecipesStore((s) => s.cache)
+  const isLoading = useNkdRecipesStore((s) => s.isLoading)
+  const fetchHasRecipesForWallets = useNkdRecipesStore((s) => s.fetchHasRecipesForWallets)
 
   const getCached = (w: string) => {
     const entry = cache.get(w.toLowerCase())
     if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
-    return entry.hasBook
+    return entry
   }
   const allCached = wallets.length > 0 && wallets.every((w) => getCached(w) !== null)
-  const hasBook = allCached ? wallets.some((w) => getCached(w) === true) : false
+  const hasRecipes = allCached ? wallets.some((w) => getCached(w)?.hasRecipes === true) : false
+  const imageUrl = allCached
+    ? wallets.reduce<string | null>((acc, w) => acc ?? getCached(w)?.imageUrl ?? null, null)
+    : null
   const loading = wallets.length > 0 && !allCached && isLoading(wallets)
 
   useEffect(() => {
     if (wallets.length > 0) {
-      fetchHasBookForWallets(wallets)
+      fetchHasRecipesForWallets(wallets)
     }
-  }, [walletsKey, wallets, fetchHasBookForWallets])
+  }, [walletsKey, wallets, fetchHasRecipesForWallets])
 
   return {
-    hasBook,
+    hasRecipes,
+    imageUrl,
     loading,
   }
 }

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
 import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
+import { useNkdRecipesOwnership } from '../../hooks/useNkdRecipesOwnership'
 import { useAccount } from 'wagmi'
 import { getEffectiveWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
@@ -122,6 +123,7 @@ export default function CursedItems() {
   ].filter((w): w is string => !!w && typeof w === 'string')
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
+  const { hasRecipes: hasNkdRecipes, imageUrl: nkdRecipesImageUrl } = useNkdRecipesOwnership(walletsForPfpAndBook)
 
   const cursedItems: Array<{ id: number; src: string | null; alt: string; mediaType?: CursedItemMedia }> = []
   if (pfpUrl) {
@@ -129,6 +131,14 @@ export default function CursedItems() {
   }
   if (hasImuranBook) {
     cursedItems.push({ id: 2, src: '/imuran-book.webm', alt: 'Imuran Book', mediaType: 'video' })
+  }
+  if (hasNkdRecipes) {
+    cursedItems.push({
+      id: 3,
+      src: nkdRecipesImageUrl ?? '/nkd-recipes.svg',
+      alt: 'NKD Recipes',
+      mediaType: 'image',
+    })
   }
 
   // Show skeleton when not connected (unless in observation/preview mode)

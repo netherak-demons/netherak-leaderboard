@@ -2,20 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePfpStore } from '../stores/usePfpStore'
-
-const PFP_CACHE_TTL_MS = 5 * 60 * 1000
-
-function uniqueWallets(wallets: (string | undefined)[]): string[] {
-  const seen = new Set<string>()
-  return wallets.filter((w): w is string => {
-    if (!w || typeof w !== 'string') return false
-    const key = w.toLowerCase().trim()
-    if (!key || key === '0x') return false
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
-}
+import { ASSET_CACHE_TTL_MS, uniqueWallets } from '../utils/walletCache'
 
 /**
  * Returns PFP URL for the wallet(s). When given multiple wallets, returns the first that has a PFP.
@@ -38,7 +25,7 @@ export function useUserPfp(
 
   const getCached = (w: string) => {
     const entry = cache.get(w.toLowerCase())
-    if (!entry || Date.now() - entry.ts > PFP_CACHE_TTL_MS) return null
+    if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
     return entry.url
   }
   const pfpUrl = wallets.reduce<string | null>(

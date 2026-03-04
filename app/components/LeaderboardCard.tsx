@@ -6,9 +6,9 @@ import { CircleCheck, CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
+import { ASSET_CACHE_TTL_MS } from '../utils/walletCache'
 
 const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
-const IMURAN_BOOK_CACHE_TTL_MS = 5 * 60 * 1000
 
 function EligibilityCell({ hasBook }: { hasBook: boolean }) {
   const [showOverlay, setShowOverlay] = useState(false)
@@ -156,7 +156,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   const getHasBook = (address: string | undefined): boolean | null => {
     if (!address) return null
     const entry = cache.get(address.toLowerCase())
-    if (!entry || Date.now() - entry.ts > IMURAN_BOOK_CACHE_TTL_MS) return null
+    if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
     return entry.hasBook
   }
 

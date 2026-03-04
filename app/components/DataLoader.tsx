@@ -1,17 +1,19 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useAccount } from 'wagmi'
 import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
 import { useAppStore, selectUserStats } from '../stores/useAppStore'
 import { usePfpStore } from '../stores/usePfpStore'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
+import { useNkdRecipesStore } from '../stores/useNkdRecipesStore'
+import { uniqueWallets } from '../utils/walletCache'
 
 const REFRESH_EVENT = 'netherak:refreshUser'
 
 /**
  * Bootstraps data fetching: fetches season stats when canShowData,
- * sets effective wallet, and ensures PFP/Imuran Book are loaded for the current user.
+ * sets effective wallet, and ensures PFP/Imuran Book/NKD Recipes are loaded for the current user.
  * Single source of truth - prevents duplicate fetches across Header, Leaderboard, Account.
  */
 export default function DataLoader() {
@@ -25,6 +27,17 @@ export default function DataLoader() {
 
   const fetchPfp = usePfpStore((s) => s.fetchPfp)
   const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
+  const fetchHasRecipesForWallets = useNkdRecipesStore((s) => s.fetchHasRecipesForWallets)
+
+  const wallets = useMemo(
+    () =>
+      uniqueWallets([
+        userStats?.wallet,
+        userStats?.linkedWallet,
+        effectiveWallet,
+      ]),
+    [effectiveWallet, userStats?.wallet, userStats?.linkedWallet]
+  )
 
   useEffect(() => {
     setEffectiveWallet(effectiveWallet)
@@ -47,23 +60,18 @@ export default function DataLoader() {
   }, [fetchSeason])
 
   useEffect(() => {
-    const wallets = [
-      userStats?.wallet,
-      userStats?.linkedWallet,
-      effectiveWallet,
-    ].filter((w): w is string => !!w && typeof w === 'string')
     wallets.forEach((w) => fetchPfp(w))
-  }, [effectiveWallet, userStats?.wallet, userStats?.linkedWallet, fetchPfp])
+  }, [wallets, fetchPfp])
 
   useEffect(() => {
-    const wallets = [
-      userStats?.wallet,
-      userStats?.linkedWallet,
-      effectiveWallet,
-    ].filter((w): w is string => !!w && typeof w === 'string')
     if (wallets.length === 0) return
     fetchHasBookForWallets(wallets)
-  }, [effectiveWallet, userStats?.wallet, userStats?.linkedWallet, fetchHasBookForWallets])
+  }, [wallets, fetchHasBookForWallets])
+
+  useEffect(() => {
+    if (wallets.length === 0) return
+    fetchHasRecipesForWallets(wallets)
+  }, [wallets, fetchHasRecipesForWallets])
 
   return null
 }
