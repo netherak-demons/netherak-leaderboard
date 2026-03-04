@@ -14,7 +14,7 @@ function toIpfsGateway(url: string): string {
 
 /**
  * Proxies NKD Recipes NFT ownership check to Somnia Explorer API (avoids CORS).
- * Returns { hasRecipes: boolean, imageUrl?: string } - image from first owned token when available.
+ * Returns { hasRecipes: boolean, imageUrls: string[] } - images from all owned tokens.
  * GET /api/nkd-recipes?wallet=0x...
  */
 export async function GET(request: NextRequest) {
@@ -33,16 +33,16 @@ export async function GET(request: NextRequest) {
       )
     }
     const data = await res.json()
-    const hasRecipes = Array.isArray(data?.items) && data.items.length > 0
-    let imageUrl: string | undefined
-    if (hasRecipes && data.items[0]) {
-      const first = data.items[0]
-      const raw = first.image_url ?? first.metadata?.image_url ?? first.metadata?.image ?? first.media_url
+    const items = Array.isArray(data?.items) ? data.items : []
+    const hasRecipes = items.length > 0
+    const imageUrls: string[] = []
+    for (const item of items) {
+      const raw = item.image_url ?? item.metadata?.image_url ?? item.metadata?.image ?? item.media_url
       if (raw && typeof raw === 'string') {
-        imageUrl = toIpfsGateway(raw)
+        imageUrls.push(toIpfsGateway(raw))
       }
     }
-    return NextResponse.json({ hasRecipes, imageUrl: imageUrl ?? null })
+    return NextResponse.json({ hasRecipes, imageUrls })
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Request failed' },

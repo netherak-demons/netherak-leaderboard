@@ -6,18 +6,18 @@ import { ASSET_CACHE_TTL_MS, uniqueWallets } from '../utils/walletCache'
 
 interface RecipesEntry {
   hasRecipes: boolean
-  imageUrl: string | null
+  imageUrls: string[]
   ts: number
 }
 
 interface NkdRecipesState {
   cache: Map<string, RecipesEntry>
   loadingWallets: Set<string>
-  pending: Map<string, Promise<{ hasRecipes: boolean; imageUrl: string | null }>>
-  fetchHasRecipes: (wallet: string) => Promise<{ hasRecipes: boolean; imageUrl: string | null }>
+  pending: Map<string, Promise<{ hasRecipes: boolean; imageUrls: string[] }>>
+  fetchHasRecipes: (wallet: string) => Promise<{ hasRecipes: boolean; imageUrls: string[] }>
   getHasRecipes: (wallet: string) => boolean | null
-  getImageUrl: (wallet: string) => string | null
-  fetchHasRecipesForWallets: (wallets: string[]) => Promise<{ hasRecipes: boolean; imageUrl: string | null }>
+  getImageUrls: (wallet: string) => string[] | null
+  fetchHasRecipesForWallets: (wallets: string[]) => Promise<{ hasRecipes: boolean; imageUrls: string[] }>
   isLoading: (wallets: string[]) => boolean
 }
 
@@ -33,11 +33,11 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
     return entry.hasRecipes
   },
 
-  getImageUrl: (wallet) => {
+  getImageUrls: (wallet) => {
     const key = wallet.toLowerCase()
     const entry = get().cache.get(key)
     if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
-    return entry.imageUrl
+    return entry.imageUrls
   },
 
   isLoading: (wallets) => {
@@ -50,13 +50,13 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
 
     const entry = cache.get(key)
     if (entry && Date.now() - entry.ts <= ASSET_CACHE_TTL_MS) {
-      return { hasRecipes: entry.hasRecipes, imageUrl: entry.imageUrl }
+      return { hasRecipes: entry.hasRecipes, imageUrls: entry.imageUrls }
     }
 
     const existing = pending?.get(key)
     if (existing) return existing
 
-    const doFetch = async (): Promise<{ hasRecipes: boolean; imageUrl: string | null }> => {
+    const doFetch = async (): Promise<{ hasRecipes: boolean; imageUrls: string[] }> => {
       set((s) => ({
         loadingWallets: new Set(s.loadingWallets).add(key),
       }))
@@ -66,18 +66,18 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
         const res = await fetchWithRetry(`/api/nkd-recipes?wallet=${encodeURIComponent(walletParam)}`)
         const data = res.ok ? await res.json().catch(() => ({})) : {}
         const hasRecipes = res.ok && data?.hasRecipes === true
-        const imageUrl = res.ok && data?.imageUrl ? data.imageUrl : null
+        const imageUrls = res.ok && Array.isArray(data?.imageUrls) ? data.imageUrls : []
 
         set((s) => {
           const newCache = new Map(s.cache)
-          newCache.set(key, { hasRecipes, imageUrl, ts: Date.now() })
+          newCache.set(key, { hasRecipes, imageUrls, ts: Date.now() })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
           newPending.delete(key)
           return { cache: newCache, loadingWallets: newLoading, pending: newPending }
         })
-        return { hasRecipes, imageUrl }
+        return { hasRecipes, imageUrls }
       } catch {
         set((s) => {
           const newLoading = new Set(s.loadingWallets)
@@ -86,7 +86,7 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
           newPending.delete(key)
           return { loadingWallets: newLoading, pending: newPending }
         })
-        return { hasRecipes: false, imageUrl: null }
+        return { hasRecipes: false, imageUrls: [] }
       }
     }
 
@@ -99,13 +99,13 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
 
   fetchHasRecipesForWallets: async (wallets) => {
     const unique = uniqueWallets(wallets)
-    let result: { hasRecipes: boolean; imageUrl: string | null } = { hasRecipes: false, imageUrl: null }
+    let result: { hasRecipes: boolean; imageUrls: string[] } = { hasRecipes: false, imageUrls: [] }
     for (const w of unique) {
       const cached = get().getHasRecipes(w)
-      if (cached === true) result = { hasRecipes: true, imageUrl: get().getImageUrl(w) }
+      if (cached === true) result = { hasRecipes: true, imageUrls: get().getImageUrls(w) ?? [] }
       if (cached !== null) continue
       const res = await get().fetchHasRecipes(w)
-      if (res.hasRecipes) result = { hasRecipes: true, imageUrl: res.imageUrl }
+      if (res.hasRecipes) result = { hasRecipes: true, imageUrls: res.imageUrls }
     }
     return result
   },

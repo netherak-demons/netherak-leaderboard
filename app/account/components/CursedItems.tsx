@@ -123,21 +123,25 @@ export default function CursedItems() {
   ].filter((w): w is string => !!w && typeof w === 'string')
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
-  const { hasRecipes: hasNkdRecipes, imageUrl: nkdRecipesImageUrl } = useNkdRecipesOwnership(walletsForPfpAndBook)
+  const { hasRecipes: hasNkdRecipes, imageUrls: nkdRecipesImageUrls } = useNkdRecipesOwnership(walletsForPfpAndBook)
 
   const cursedItems: Array<{ id: number; src: string | null; alt: string; mediaType?: CursedItemMedia }> = []
+  let nextId = 1
   if (pfpUrl) {
-    cursedItems.push({ id: 1, src: pfpUrl, alt: 'Netherak Demons PFP', mediaType: 'image' })
+    cursedItems.push({ id: nextId++, src: pfpUrl, alt: 'Netherak Demons PFP', mediaType: 'image' })
   }
   if (hasImuranBook) {
-    cursedItems.push({ id: 2, src: '/imuran-book.webm', alt: 'Imuran Book', mediaType: 'video' })
+    cursedItems.push({ id: nextId++, src: '/imuran-book.webm', alt: 'Imuran Book', mediaType: 'video' })
   }
   if (hasNkdRecipes) {
-    cursedItems.push({
-      id: 3,
-      src: nkdRecipesImageUrl ?? '/nkd-recipes.svg',
-      alt: 'NKD Recipes',
-      mediaType: 'image',
+    const urls = nkdRecipesImageUrls.length > 0 ? nkdRecipesImageUrls : ['/nkd-recipes.svg']
+    urls.forEach((url, i) => {
+      cursedItems.push({
+        id: nextId++,
+        src: url,
+        alt: urls.length > 1 ? `NKD Recipe ${i + 1}` : 'NKD Recipes',
+        mediaType: 'image',
+      })
     })
   }
 
