@@ -47,9 +47,13 @@ export default function DataLoader() {
   }, [fetchSeason])
 
   useEffect(() => {
-    if (!effectiveWallet) return
-    fetchPfp(effectiveWallet)
-  }, [effectiveWallet, fetchPfp])
+    const wallets = [
+      userStats?.wallet,
+      userStats?.linkedWallet,
+      effectiveWallet,
+    ].filter((w): w is string => !!w && typeof w === 'string')
+    wallets.forEach((w) => fetchPfp(w))
+  }, [effectiveWallet, userStats?.wallet, userStats?.linkedWallet, fetchPfp])
 
   useEffect(() => {
     const wallets = [

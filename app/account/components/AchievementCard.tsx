@@ -46,7 +46,7 @@ export default function AchievementCard({
 
   return (
     <div
-      className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl w-full text-white text-base"
+      className="flex items-center gap-3 md:gap-4 py-3 md:py-4 rounded-xl w-full text-white text-base"
     >
       {/* Left: Achievement icon */}
       <AchievementIcon iconUrl={iconUrl} />
@@ -59,7 +59,7 @@ export default function AchievementCard({
           {title}
         </h4>
         <p
-          className="text-sm"
+          className="text-base"
           style={{
             fontFamily: 'var(--font-harmonique)',
             opacity: 0.9,

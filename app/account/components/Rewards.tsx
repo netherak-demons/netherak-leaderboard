@@ -161,8 +161,8 @@ export default function Rewards() {
         <button
           type="button"
           onClick={() => setActiveTab('history')}
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            activeTab === 'history' ? 'text-primary' : 'text-secondary hover:text-primary'
+          className={`nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors ${
+            activeTab === 'history' ? 'text-primary nav-link-underline-active' : 'text-secondary hover:text-primary'
           }`}
           style={{ fontFamily: 'var(--font-harmonique)' }}
         >
@@ -171,8 +171,8 @@ export default function Rewards() {
         <button
           type="button"
           onClick={() => setActiveTab('claimables')}
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            activeTab === 'claimables' ? 'text-primary' : 'text-secondary hover:text-primary'
+          className={`nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors ${
+            activeTab === 'claimables' ? 'text-primary nav-link-underline-active' : 'text-secondary hover:text-primary'
           }`}
           style={{ fontFamily: 'var(--font-harmonique)' }}
         >

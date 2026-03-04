@@ -177,13 +177,19 @@ export function computeLeaderboardsAndRankings(
     waves: byWaves.slice(0, 10).map((s, i) => toEntry(s.p, s.waves, i, s.evilPoints)),
   }
 
-  // User stats for target wallet
+  // User stats for target wallet (match by main wallet OR linked wallet)
   let userStats: UserStats | null = null
   if (normalizedTarget) {
-    const userData = scored.find((s) => s.p.wallet.toLowerCase() === normalizedTarget)
+    const userData = scored.find((s) => {
+      const main = s.p.wallet.toLowerCase()
+      const rawLinked = s.p.profile?.linkedWallet ?? s.p.profile?.LINKEDWALLET
+      const linked = normalizeLinkedWallet(rawLinked).toLowerCase()
+      return main === normalizedTarget || (linked && linked === normalizedTarget)
+    })
     if (userData) {
       const rawLinked = userData.p.profile?.linkedWallet ?? userData.p.profile?.LINKEDWALLET
       const linkedWallet = normalizeLinkedWallet(rawLinked) || undefined
+      const mainWalletKey = userData.p.wallet.toLowerCase()
       userStats = {
         wallet: userData.p.wallet,
         username: userData.p.username || userData.p.profile?.username || 'Unknown',
@@ -194,10 +200,10 @@ export function computeLeaderboardsAndRankings(
         wavesCompleted: userData.waves,
         evilPoints: userData.evilPoints,
         ranking: {
-          dungeons: rankingMaps.dungeons.get(normalizedTarget) ?? null,
-          slayedHumans: rankingMaps.slayedHumans.get(normalizedTarget) ?? null,
-          harvestedSouls: rankingMaps.harvestedSouls.get(normalizedTarget) ?? null,
-          waves: rankingMaps.waves.get(normalizedTarget) ?? null,
+          dungeons: rankingMaps.dungeons.get(mainWalletKey) ?? null,
+          slayedHumans: rankingMaps.slayedHumans.get(mainWalletKey) ?? null,
+          harvestedSouls: rankingMaps.harvestedSouls.get(mainWalletKey) ?? null,
+          waves: rankingMaps.waves.get(mainWalletKey) ?? null,
         },
       }
     }

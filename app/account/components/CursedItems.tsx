@@ -21,36 +21,60 @@ function CursedItemMedia({
   mediaType?: CursedItemMedia
 }) {
   const [error, setError] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  const tooltip = (
+    <div
+      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 px-3 py-2 rounded-lg text-white text-xs whitespace-nowrap pointer-events-none"
+      style={{
+        backgroundColor: 'rgba(26, 26, 26, 0.95)',
+        border: '0.5px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+        fontFamily: 'var(--font-harmonique)',
+      }}
+    >
+      {alt}
+    </div>
+  )
+
+  const wrapperProps = {
+    className: 'relative',
+    onMouseEnter: () => setShowTooltip(true),
+    onMouseLeave: () => setShowTooltip(false),
+  }
 
   if (!src || error) {
     return (
-      <div
-        className="w-full aspect-square rounded-lg flex items-center justify-center"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.04)',
-          border: '0.5px solid rgba(255, 255, 255, 0.08)',
-        }}
-      >
-        <span className="text-xs text-white/40">{alt}</span>
+      <div {...wrapperProps}>
+        {showTooltip && tooltip}
+        <div
+          className="w-full aspect-square rounded-lg flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
+        >
+          <span className="text-xs text-white/40">{alt}</span>
+        </div>
       </div>
     )
   }
 
   const containerClass = 'w-full aspect-square rounded-lg overflow-hidden relative'
-  const containerStyle = { border: '0.5px solid rgba(255, 255, 255, 0.08)' }
+  const containerStyle = { backgroundColor: 'rgba(0, 0, 0, 0.4)' }
 
   if (mediaType === 'video') {
     return (
-      <div className={containerClass} style={containerStyle}>
-        <video
-          src={src}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-contain bg-transparent"
-          onError={() => setError(true)}
-        />
+      <div {...wrapperProps}>
+        {showTooltip && tooltip}
+        <div className={containerClass} style={containerStyle}>
+          <video
+            src={src}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-contain bg-transparent"
+            onError={() => setError(true)}
+          />
+        </div>
       </div>
     )
   }
@@ -58,26 +82,32 @@ function CursedItemMedia({
   const isExternal = src.startsWith('http://') || src.startsWith('https://')
   if (isExternal) {
     return (
-      <div className={containerClass} style={containerStyle}>
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-contain"
-          onError={() => setError(true)}
-        />
+      <div {...wrapperProps}>
+        {showTooltip && tooltip}
+        <div className={containerClass} style={containerStyle}>
+          <img
+            src={src}
+            alt={alt}
+            className="w-full h-full object-contain"
+            onError={() => setError(true)}
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className={containerClass} style={containerStyle}>
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className="object-contain"
-        onError={() => setError(true)}
-      />
+    <div {...wrapperProps}>
+      {showTooltip && tooltip}
+      <div className={containerClass} style={containerStyle}>
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-contain"
+          onError={() => setError(true)}
+        />
+      </div>
     </div>
   )
 }
@@ -85,14 +115,13 @@ function CursedItemMedia({
 export default function CursedItems() {
   const { address } = useAccount()
   const { userStats, loading, error, canShowData } = useUserStatsContext()
-  const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
-  const { pfpUrl } = useUserPfp(walletForPfp)
-  const walletsForBook = [
+  const walletsForPfpAndBook = [
     userStats?.wallet,
     userStats?.linkedWallet,
     getEffectiveWallet(address),
   ].filter((w): w is string => !!w && typeof w === 'string')
-  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForBook)
+  const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
+  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
 
   const cursedItems: Array<{ id: number; src: string | null; alt: string; mediaType?: CursedItemMedia }> = []
   if (pfpUrl) {

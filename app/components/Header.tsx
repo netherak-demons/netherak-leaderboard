@@ -22,10 +22,12 @@ export default function Header() {
   const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
   const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
-  // Use effective wallet for PFP (observation wallet in observation mode, connected wallet otherwise)
-  const walletForPfp = effectiveWallet
-  const { pfpUrl } = useUserPfp(walletForPfp)
   const { userStats } = useUserStats(effectiveWallet)
+  // Check main + linked + effective wallet (same as CursedItems) so PFP shows when in linked wallet
+  const walletsForPfp = [userStats?.wallet, userStats?.linkedWallet, effectiveWallet].filter(
+    (w): w is string => !!w && typeof w === 'string'
+  )
+  const { pfpUrl } = useUserPfp(walletsForPfp)
   const walletsForBook = [userStats?.wallet, userStats?.linkedWallet, effectiveWallet].filter(
     (w): w is string => !!w && typeof w === 'string'
   )

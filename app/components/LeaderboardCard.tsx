@@ -2,13 +2,15 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { CircleCheck } from 'lucide-react'
+import { CircleCheck, CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
+import { useImuranBookStore } from '../stores/useImuranBookStore'
 
 const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
+const IMURAN_BOOK_CACHE_TTL_MS = 5 * 60 * 1000
 
-function RewardsCell() {
+function EligibilityCell({ hasBook }: { hasBook: boolean }) {
   const [showOverlay, setShowOverlay] = useState(false)
   const [position, setPosition] = useState({ top: 0, left: 0 })
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -53,10 +55,19 @@ function RewardsCell() {
         }}
         onMouseLeave={handleTriggerLeave}
       >
-        <CircleCheck
-          className="w-5 h-5 shrink-0 text-white cursor-pointer"
-          strokeWidth={2.5}
-        />
+        {hasBook ? (
+          <CircleCheck
+            className="w-5 h-5 shrink-0 text-white cursor-pointer"
+            strokeWidth={2.5}
+          />
+        ) : (
+          <span title="Book Multiplier">
+            <CircleAlert
+              className="w-5 h-5 shrink-0 text-white/50 cursor-pointer"
+              strokeWidth={2.5}
+            />
+          </span>
+        )}
       </div>
       {showOverlay &&
         typeof document !== 'undefined' &&
@@ -74,10 +85,10 @@ function RewardsCell() {
             onMouseLeave={handleOverlayLeave}
           >
             <span
-              className="text-primary text-center"
-              style={{ fontFamily: 'var(--font-harmonique)' }}
+              className={hasBook ? 'text-primary' : 'text-white/60'}
+              style={{ fontFamily: 'var(--font-harmonique)', textAlign: 'center' }}
             >
-              Elegible for rewards
+              {hasBook ? 'Eligible for rewards' : 'Not eligible for rewards'}
             </span>
             <Link
               href={IMURAN_SHOP_URL}
@@ -131,6 +142,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   hasNoData = false,
   error = null
 }) => {
+  const cache = useImuranBookStore((s) => s.cache)
+
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
@@ -138,6 +151,13 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   const isCurrentUser = (entryAddress?: string) => {
     if (!userAddress || !entryAddress) return false
     return userAddress.toLowerCase() === entryAddress.toLowerCase()
+  }
+
+  const getHasBook = (address: string | undefined): boolean | null => {
+    if (!address) return null
+    const entry = cache.get(address.toLowerCase())
+    if (!entry || Date.now() - entry.ts > IMURAN_BOOK_CACHE_TTL_MS) return null
+    return entry.hasBook
   }
 
   // Skeleton state
@@ -338,10 +358,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     {entry.evilPoints.toLocaleString()}
                   </span>
                 </div>
-                {/* Rewards column */}
+                {/* Rewards column - eligible/not eligible based on Imuran Book ownership */}
                 <div className="flex justify-center">
-                  {entry.rewards ? (
-                    <RewardsCell />
+                  {getHasBook(entry.address) !== null ? (
+                    <EligibilityCell hasBook={getHasBook(entry.address)!} />
                   ) : null}
                 </div>
               </div>

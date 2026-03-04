@@ -1,17 +1,20 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import LeaderboardCard from './LeaderboardCard'
 import { useSeasonStats } from '../hooks/useSeasonStats'
 import { useUserStats } from '../hooks/useUserStats'
 import { useAccount } from 'wagmi'
 import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
+import { useImuranBookStore } from '../stores/useImuranBookStore'
 
 const Leaderboard: React.FC = () => {
   const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
   const canShowData = getCanShowData(isConnected)
-  
+
+  const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
+
   // Fetch leaderboard data when we can show data
   const {
     evilPointsLeaderboard,
@@ -22,15 +25,41 @@ const Leaderboard: React.FC = () => {
     loading,
     error,
   } = useSeasonStats(canShowData ? '0' : '')
-  
+
   const { hasNoData } = useUserStats(effectiveWallet, '0')
+
+  // Single fetch for all unique leaderboard addresses (avoids 5 separate fetches from each LeaderboardCard)
+  const allLeaderboardAddresses = useMemo(() => {
+    const addrs = new Set<string>()
+    for (const entries of [
+      evilPointsLeaderboard,
+      dungeonsLeaderboard,
+      slayedHumansLeaderboard,
+      harvestedSoulsLeaderboard,
+      wavesLeaderboard,
+    ]) {
+      for (const e of entries) {
+        if (e.address) addrs.add(e.address)
+      }
+    }
+    return [...addrs]
+  }, [
+    evilPointsLeaderboard,
+    dungeonsLeaderboard,
+    slayedHumansLeaderboard,
+    harvestedSoulsLeaderboard,
+    wavesLeaderboard,
+  ])
+  useEffect(() => {
+    if (allLeaderboardAddresses.length > 0) fetchHasBookForWallets(allLeaderboardAddresses)
+  }, [allLeaderboardAddresses, fetchHasBookForWallets])
 
   // Show all leaderboards with connect message when not connected (unless in observation/preview mode)
   if (!canShowData) {
     const emptyCardProps = { entries: [], userAddress: undefined, showLoginMessage: true }
     return (
       <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
-        <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
+        <div className="w-full max-w-[1440px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
             <div className="md:col-span-2">
               <LeaderboardCard title="EVIL POINTS" icon="/evil.svg" subtitle="" scoreLabel="EVIL" {...emptyCardProps} />
@@ -53,7 +82,7 @@ const Leaderboard: React.FC = () => {
         aria-busy="true"
         aria-live="polite"
       >
-        <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
+        <div className="w-full max-w-[1440px] mx-auto p-8 md:p-4 sm:p-2 box-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
             <div className="md:col-span-2">
               <LeaderboardCard
@@ -88,7 +117,7 @@ const Leaderboard: React.FC = () => {
   // Always show leaderboards when connected (even if there's an error or user has no data)
   return (
     <div className="relative w-full overflow-x-hidden flex justify-center items-center py-12">
-      <div className="w-full max-w-[1200px] mx-auto p-8 md:p-4 sm:p-2 box-border">
+      <div className="w-full max-w-[1440px] mx-auto p-8 md:p-4 sm:p-2 box-border">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-20 w-full">
           <div className="md:col-span-2">
             <LeaderboardCard

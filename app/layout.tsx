@@ -68,7 +68,7 @@ export default function RootLayout({
         <Providers>
           <BackgroundOverlay />
           <ObservationBanner />
-          <div className="relative z-10 flex min-h-screen flex-col max-w-[1200px] mx-auto w-full">
+          <div className="relative z-10 flex min-h-screen flex-col max-w-[1440px] mx-auto w-full">
             <Header />
             <main className="flex-1">
               <ErrorBoundary>{children}</ErrorBoundary>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Trophy, Flame, BookCheck, Sparkles, Minus, CircleAlert } from 'lucide-react'
+import { Trophy, Flame, BookCheck, Sparkles, CircleAlert, TicketCheck, Minus } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
@@ -11,6 +11,33 @@ import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { getMultiplier } from '../../config/multiplier'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
+
+function BookMultiplierTooltip({ children, multiplier }: { children: React.ReactNode; multiplier: number }) {
+  const [show, setShow] = useState(false)
+  return (
+    <span
+      className="relative inline-flex"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 z-20 px-2.5 py-1.5 rounded text-white text-xs whitespace-nowrap pointer-events-none"
+          style={{
+            backgroundColor: 'rgba(26, 26, 26, 0.95)',
+            border: '0.5px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+            fontFamily: 'var(--font-harmonique)',
+          }}
+        >
+          Book Multiplier:{' '}
+          <span style={{ color: '#FFD36C' }}>x{multiplier}</span>
+        </div>
+      )}
+    </span>
+  )
+}
 
 function ProfileAvatar({ pfpUrl }: { pfpUrl: string | null }) {
   const [useDefault, setUseDefault] = useState(false)
@@ -51,9 +78,14 @@ function ImuranBookImage() {
 export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
-  // Use effective wallet for PFP (observation wallet in observation mode, userStats or connected wallet otherwise)
-  const walletForPfp = userStats?.wallet ?? getEffectiveWallet(address)
-  const { pfpUrl } = useUserPfp(walletForPfp)
+  // Check main + linked + effective wallet (same as CursedItems) so PFP shows when in linked wallet
+  const walletsForPfp = [
+    userStats?.wallet,
+    userStats?.linkedWallet,
+    getEffectiveWallet(address),
+  ].filter((w): w is string => !!w && typeof w === 'string')
+  const { pfpUrl } = useUserPfp(walletsForPfp)
+  const displayWallet = userStats?.wallet ?? getEffectiveWallet(address)
   const walletsForBook = [
     userStats?.wallet,
     userStats?.linkedWallet,
@@ -74,7 +106,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between items-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -104,7 +136,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -153,7 +185,7 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between items-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
@@ -182,19 +214,19 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full items-center justify-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between items-center min-h-[400px]"
           style={{
             backgroundColor: '#00000090',
           }}
         >
-          {walletForPfp && (
+          {displayWallet && (
             <div className="flex flex-col items-center gap-3 mb-2">
               <ProfileAvatar pfpUrl={pfpUrl} />
               <span
                 className="text-white font-medium truncate max-w-full"
                 style={{ fontFamily: 'var(--font-zachar-scratched)' }}
               >
-                {walletForPfp.slice(0, 6)}...{walletForPfp.slice(-4)}
+                {displayWallet.slice(0, 6)}...{displayWallet.slice(-4)}
               </span>
             </div>
           )}
@@ -229,7 +261,7 @@ export default function ProfileInfo() {
       }}
     >
       <div
-        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full"
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between"
         style={{
           backgroundColor: '#00000090',
         }}
@@ -254,7 +286,7 @@ export default function ProfileInfo() {
                 #{rankingPosition}
               </span>
             </div>
-            {/* {isEligible ? (
+            {isEligible ? (
               <div className="flex items-center gap-1.5">
                 <Trophy className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
                 <span
@@ -275,9 +307,11 @@ export default function ProfileInfo() {
                 >
                   NOT ELIGIBLE
                 </span>
-                <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+                <BookMultiplierTooltip multiplier={multiplier}>
+                  <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+                </BookMultiplierTooltip>
               </div>
-            )} */}
+            )}
           </div>
         </div>
       </div>
@@ -311,7 +345,9 @@ export default function ProfileInfo() {
         <div className="flex flex-col gap-0.5 items-center">
           <div className="flex items-center gap-1">
             <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
-            <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+            <BookMultiplierTooltip multiplier={multiplier}>
+              <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+            </BookMultiplierTooltip>
           </div>
           <div className="flex items-center gap-1">
             <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
@@ -338,38 +374,38 @@ export default function ProfileInfo() {
 
       {/* 5) Imuran book text */}
       <span
-        className="text-white text-[18px] font-medium text-center uppercase"
-        style={{ fontFamily: 'var(--font-zachar-scratched)', letterSpacing: '0.16em' }}
+        className="text-white text-[20px] font-medium text-center uppercase"
+        style={{ fontFamily: 'var(--font-zachar-scratched)'}}
       >
         Imuran book
       </span>
 
       {/* 6) Competition rewards access */}
       <div
-        className="flex flex-col gap-2 text-sm"
+        className="flex flex-col gap-3 text-sm"
         style={{ fontFamily: 'var(--font-harmonique)' }}
       >
-        <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
+        <div className="flex items-center gap-3">
+          <Trophy className="w-5 h-5 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
           <span className="text-white uppercase tracking-wider">COMPETITION REWARDS&apos; ACCESS</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+        <div className="flex items-center gap-3">
+          <Flame className="w-5 h-5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
           <span className="text-white">x2 EVIL MULTIPLIER</span>
         </div>
-        <div className="flex items-center gap-2">
-          <BookCheck className="w-4 h-4 shrink-0" style={{ color: '#AAA2C1' }} strokeWidth={2} />
+        <div className="flex items-center gap-3">
+          <BookCheck className="w-5 h-5 shrink-0" style={{ color: '#FFFFFF' }} strokeWidth={2} />
           <span className="text-white">Auto WL for Demon Crow</span>
         </div>
-        <div className="flex items-center gap-2">
-          <BookCheck className="w-4 h-4 shrink-0" style={{ color: '#AAA2C1' }} strokeWidth={2} />
+        <div className="flex items-center gap-3">
+          <TicketCheck className="w-5 h-5 shrink-0" style={{ color: '#91CE9F' }} strokeWidth={2} />
           <span className="text-white">Free Cursed Pass for next season by completing the game</span>
         </div>
       </div>
 
       {/* 7) Get Book / Owned button */}
       <button
-        className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 ${
+        className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 drop-shadow-xl ${
           hasImuranBook || bookLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105 hover:brightness-110'
         }`}
         style={{
@@ -388,7 +424,7 @@ export default function ProfileInfo() {
         </span>
       </button>
 
-      {/* 8) Pay with $OMI - hide when owned */}
+      {/* 8) Pay with SOMI - hide when owned */}
       {!hasImuranBook && (
         <div className="flex items-center justify-center gap-2">
           <img src="/omi-logo.svg" alt="OMI" className="w-5 h-5" />
@@ -396,7 +432,7 @@ export default function ProfileInfo() {
             className="text-white text-sm"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
-            Pay with $OMI
+            Pay with SOMI
           </span>
         </div>
       )}

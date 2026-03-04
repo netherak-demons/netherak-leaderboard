@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { useAccount, useConnection, useDisconnect } from 'wagmi'
-import { LogOut, Save, X } from 'lucide-react'
+import { LogOut, Save, X, Copy, Check, CircleAlert } from 'lucide-react'
 import { clearCachedPlayers } from '../hooks/playersCache'
 import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 import { useModalA11y } from '../hooks/useModalA11y'
@@ -10,11 +10,6 @@ import { useModalA11y } from '../hooks/useModalA11y'
 import type { UserStats } from '../hooks/useUserStats'
 
 type ConnectorWithSequenceWaas = { sequenceWaas?: { getIdToken: (args?: { nonce?: string }) => Promise<{ idToken: string }> } }
-
-function shortenAddress(addr: string) {
-  if (!addr || addr.length < 10) return addr
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-}
 
 interface UserProfilePopupProps {
   isOpen: boolean
@@ -24,6 +19,35 @@ interface UserProfilePopupProps {
 }
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
+
+function LabelWithTooltip({ label, tooltip }: { label: string; tooltip: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <label className="mb-1 flex items-center gap-1.5 text-xs tracking-wider text-secondary">
+      <span>{label}</span>
+      <span
+        className="relative inline-flex"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        <CircleAlert className="h-3.5 w-3.5 shrink-0 text-[#808080] cursor-help" strokeWidth={2} />
+        {show && (
+          <div
+            className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20 px-2.5 py-1.5 rounded text-white text-xs whitespace-nowrap pointer-events-none max-w-[200px] text-center"
+            style={{
+              backgroundColor: 'rgba(26, 26, 26, 0.95)',
+              border: '0.5px solid rgba(255, 255, 255, 0.15)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+              fontFamily: 'var(--font-harmonique)',
+            }}
+          >
+            {tooltip}
+          </div>
+        )}
+      </span>
+    </label>
+  )
+}
 
 export default function UserProfilePopup({
   isOpen,
@@ -43,6 +67,16 @@ export default function UserProfilePopup({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyGameWallet = useCallback(() => {
+    const gameWallet = userStats?.wallet ?? address ?? ''
+    if (!gameWallet) return
+    navigator.clipboard.writeText(gameWallet).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [userStats?.wallet, address])
 
   // Data: prefer userStats (season-stats). If null (user not in leaderboard), fetch GET /api/user with JWT
   useEffect(() => {
@@ -169,7 +203,7 @@ export default function UserProfilePopup({
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-modal-title"
-        className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-6 shadow-xl"
+        className="fixed left-1/2 top-1/2 z-101 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black p-4 sm:p-6 shadow-xl"
         style={{ fontFamily: 'var(--font-harmonique)' }}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -200,9 +234,7 @@ export default function UserProfilePopup({
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-secondary">
-              Username
-            </label>
+            <LabelWithTooltip label="Username" tooltip="Your demon's name" />
             <input
               type="text"
               value={username}
@@ -225,18 +257,31 @@ export default function UserProfilePopup({
           )}
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-secondary">
-              Game wallet
-            </label>
-            <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-secondary">
-              {gameWallet ? shortenAddress(gameWallet) : '—'}
-            </p>
+            <LabelWithTooltip label="Game wallet" tooltip="Your in-game wallet" />
+            <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <p className="flex-1 min-w-0 text-sm text-secondary font-mono overflow-x-auto whitespace-nowrap">
+                {gameWallet || '—'}
+              </p>
+              {gameWallet && (
+                <button
+                  type="button"
+                  onClick={handleCopyGameWallet}
+                  className="shrink-0 rounded p-1.5 text-secondary hover:bg-white/10 hover:text-primary transition-colors"
+                  aria-label="Copy address"
+                  title={copied ? 'Copied!' : 'Copy'}
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-netherak" strokeWidth={2} />
+                  ) : (
+                    <Copy className="h-4 w-4" strokeWidth={2} />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-secondary">
-              Secondary wallet
-            </label>
+            <LabelWithTooltip label="Somnia Quest Wallet" tooltip="Your metamask, rabby, etc." />
             <input
               type="text"
               value={linkedWallet}
@@ -265,7 +310,7 @@ export default function UserProfilePopup({
             }`}
           >
             <Save className="h-4 w-4" strokeWidth={2} />
-            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
+            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
           </button>
           <button
             onClick={handleLogout}

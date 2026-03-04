@@ -3,6 +3,8 @@
 import { useEffect, useMemo } from 'react'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
 
+const IMURAN_BOOK_CACHE_TTL_MS = 5 * 60 * 1000
+
 function uniqueWallets(wallets: (string | undefined)[]): string[] {
   const seen = new Set<string>()
   return wallets.filter((w): w is string => {
@@ -34,12 +36,18 @@ export function useImuranBookOwnership(
     return []
   }, [walletsKey])
 
-  const getHasBook = useImuranBookStore((s) => s.getHasBook)
+  // Subscribe to cache so we re-render when fetch completes (getHasBook is a function ref - never changes)
+  const cache = useImuranBookStore((s) => s.cache)
   const isLoading = useImuranBookStore((s) => s.isLoading)
   const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
 
-  const allCached = wallets.length > 0 && wallets.every((w) => getHasBook(w) !== null)
-  const hasBook = allCached ? wallets.some((w) => getHasBook(w) === true) : false
+  const getCached = (w: string) => {
+    const entry = cache.get(w.toLowerCase())
+    if (!entry || Date.now() - entry.ts > IMURAN_BOOK_CACHE_TTL_MS) return null
+    return entry.hasBook
+  }
+  const allCached = wallets.length > 0 && wallets.every((w) => getCached(w) !== null)
+  const hasBook = allCached ? wallets.some((w) => getCached(w) === true) : false
   const loading = wallets.length > 0 && !allCached && isLoading(wallets)
 
   useEffect(() => {

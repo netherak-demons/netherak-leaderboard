@@ -54,7 +54,7 @@ export default function Achievements() {
   if (!canShowData) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[400px] md:max-w-[520px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -80,7 +80,7 @@ export default function Achievements() {
   if (loading) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] shrink-0 rounded-xl p-4 md:p-6 h-fit animate-pulse"
+        className="flex flex-col gap-5 w-full md:min-w-[400px] shrink-0 rounded-xl p-4 md:p-6 h-fit animate-pulse"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -118,7 +118,7 @@ export default function Achievements() {
   if (error) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[400px] md:max-w-[520px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -149,7 +149,7 @@ export default function Achievements() {
   if (hasNoData || !userStats) {
     return (
       <div
-        className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+        className="flex flex-col gap-5 w-full md:min-w-[400px] md:max-w-[520px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
         style={{
           backgroundColor: 'transparent',
           backdropFilter: 'blur(16px)',
@@ -173,7 +173,7 @@ export default function Achievements() {
 
   return (
     <div
-      className="flex flex-col gap-5 w-full md:min-w-[460px] md:max-w-[560px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
+      className="flex flex-col gap-5 w-full md:min-w-[400px] md:max-w-[520px] shrink-0 rounded-xl p-4 md:p-6 h-fit"
       style={{
         backgroundColor: 'transparent',
         backdropFilter: 'blur(16px)',
@@ -202,8 +202,8 @@ export default function Achievements() {
         <button
           type="button"
           onClick={() => setActiveTab('ongoing')}
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            activeTab === 'ongoing' ? 'text-primary' : 'text-secondary hover:text-primary'
+          className={`nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors ${
+            activeTab === 'ongoing' ? 'text-primary nav-link-underline-active' : 'text-secondary hover:text-primary'
           }`}
           style={{ fontFamily: 'var(--font-harmonique)' }}
         >
@@ -212,8 +212,8 @@ export default function Achievements() {
         <button
           type="button"
           onClick={() => setActiveTab('completed')}
-          className={`text-base font-medium uppercase tracking-wider transition-colors ${
-            activeTab === 'completed' ? 'text-primary' : 'text-secondary hover:text-primary'
+          className={`nav-link-underline relative inline-block text-base font-medium uppercase tracking-wider transition-colors ${
+            activeTab === 'completed' ? 'text-primary nav-link-underline-active' : 'text-secondary hover:text-primary'
           }`}
           style={{ fontFamily: 'var(--font-harmonique)' }}
         >
