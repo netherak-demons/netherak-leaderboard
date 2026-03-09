@@ -9,6 +9,7 @@ import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { getMultiplier } from '../../config/multiplier'
+import { applyEvilPointsMultiplier } from '../../utils/evilPoints'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -245,7 +246,9 @@ export default function ProfileInfo() {
   const displayName = userStats.username || (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
   const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
   const isEligible = hasImuranBook
-  const evilPoints = userStats.evilPoints
+  const baseEvilPoints = userStats.baseEvilPoints ?? 0
+  const extraEvilPoints = userStats.extraEvilPoints ?? 0
+  const evilPoints = applyEvilPointsMultiplier(baseEvilPoints, extraEvilPoints, hasImuranBook, !!pfpUrl)
   const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
 
   return (

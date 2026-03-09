@@ -11,6 +11,7 @@ import { useUserStats } from '../hooks/useUserStats'
 import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
 import { getEffectiveWallet } from '../utils/dataMode'
 import { getMultiplier } from '../config/multiplier'
+import { applyEvilPointsMultiplier } from '../utils/evilPoints'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -33,7 +34,9 @@ export default function Header() {
   )
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForBook)
   const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
-  const evilPoints = userStats?.evilPoints ?? 0
+  const baseEvilPoints = userStats?.baseEvilPoints ?? 0
+  const extraEvilPoints = userStats?.extraEvilPoints ?? 0
+  const evilPoints = applyEvilPointsMultiplier(baseEvilPoints, extraEvilPoints, hasImuranBook, !!pfpUrl)
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)

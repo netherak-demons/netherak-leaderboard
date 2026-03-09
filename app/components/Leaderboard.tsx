@@ -7,6 +7,8 @@ import { useUserStats } from '../hooks/useUserStats'
 import { useAccount } from 'wagmi'
 import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
+import { usePfpStore } from '../stores/usePfpStore'
+import { getMultiplier } from '../config/multiplier'
 
 const Leaderboard: React.FC = () => {
   const { address, isConnected } = useAccount()
@@ -14,6 +16,7 @@ const Leaderboard: React.FC = () => {
   const canShowData = getCanShowData(isConnected)
 
   const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
+  const fetchPfp = usePfpStore((s) => s.fetchPfp)
 
   // Fetch leaderboard data when we can show data
   const {
@@ -51,8 +54,30 @@ const Leaderboard: React.FC = () => {
     wavesLeaderboard,
   ])
   useEffect(() => {
-    if (allLeaderboardAddresses.length > 0) fetchHasBookForWallets(allLeaderboardAddresses)
-  }, [allLeaderboardAddresses, fetchHasBookForWallets])
+    if (allLeaderboardAddresses.length > 0) {
+      fetchHasBookForWallets(allLeaderboardAddresses)
+      allLeaderboardAddresses.forEach((w) => fetchPfp(w))
+    }
+  }, [allLeaderboardAddresses, fetchHasBookForWallets, fetchPfp])
+
+  const imuranCache = useImuranBookStore((s) => s.cache)
+  const getPfp = usePfpStore((s) => s.getPfp)
+
+  // Re-sort evil points leaderboard by multiplied value when we have book/PFP data
+  const sortedEvilPointsLeaderboard = useMemo(() => {
+    if (evilPointsLeaderboard.length === 0) return []
+    const getMultipliedEvil = (e: (typeof evilPointsLeaderboard)[0]) => {
+      const base = e.baseEvilPoints ?? e.evilPoints
+      const extra = e.extraEvilPoints ?? 0
+      const hasBook = imuranCache.get(e.address?.toLowerCase() ?? '')?.hasBook ?? false
+      const hasPfp = !!getPfp(e.address)
+      const mult = getMultiplier(hasBook, hasPfp)
+      return Math.floor(base * mult + extra)
+    }
+    return [...evilPointsLeaderboard]
+      .sort((a, b) => getMultipliedEvil(b) - getMultipliedEvil(a))
+      .map((e, i) => ({ ...e, ranking: i + 1 }))
+  }, [evilPointsLeaderboard, imuranCache, getPfp])
 
   // Show all leaderboards with connect message when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -125,7 +150,7 @@ const Leaderboard: React.FC = () => {
               icon="/evil.svg"
               subtitle=""
               scoreLabel="EVIL"
-              entries={evilPointsLeaderboard}
+              entries={sortedEvilPointsLeaderboard}
               userAddress={effectiveWallet || address}
               hasNoData={hasNoData}
               error={error}

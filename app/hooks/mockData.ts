@@ -11,6 +11,8 @@ export interface LeaderboardEntry {
   address: string
   username: string
   evilPoints: number
+  baseEvilPoints: number
+  extraEvilPoints: number
   rewards: boolean
 }
 
@@ -35,6 +37,8 @@ function toLeaderboardEntry(
     address: entry.address,
     username: entry.username || entry.demon,
     evilPoints,
+    baseEvilPoints: evilPoints,
+    extraEvilPoints: 0,
     rewards,
   }
 }

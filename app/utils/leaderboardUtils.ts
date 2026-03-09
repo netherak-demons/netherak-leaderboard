@@ -31,6 +31,8 @@ export interface LeaderboardEntry {
   address: string
   username: string
   evilPoints: number
+  baseEvilPoints: number
+  extraEvilPoints: number
   rewards: boolean
 }
 
@@ -51,6 +53,8 @@ export interface UserStats {
   harvestedSouls: number
   wavesCompleted: number
   evilPoints: number
+  baseEvilPoints: number
+  extraEvilPoints: number
   ranking: {
     dungeons: number | null
     slayedHumans: number | null
@@ -79,7 +83,9 @@ function toEntry(
   p: PlayerSeasonStats,
   score: number,
   index: number,
-  evilPoints: number
+  evilPoints: number,
+  baseEvilPoints: number,
+  extraEvilPoints: number
 ): LeaderboardEntry {
   return {
     ranking: index + 1,
@@ -89,6 +95,8 @@ function toEntry(
     address: p.wallet,
     username: p.username || p.profile?.username || 'Unknown',
     evilPoints,
+    baseEvilPoints,
+    extraEvilPoints,
     rewards: false,
   }
 }
@@ -111,10 +119,12 @@ export function computeLeaderboardsAndRankings(
 } {
   const normalizedTarget = targetWallet?.toLowerCase()
 
-  // Single pass: compute all scores per player
+  // Single pass: compute all scores per player (base points, no multiplier)
   type PlayerScores = {
     p: PlayerSeasonStats
     evilPoints: number
+    baseEvilPoints: number
+    extraEvilPoints: number
     dungeons: number
     slayedHumans: number
     harvestedSouls: number
@@ -125,11 +135,14 @@ export function computeLeaderboardsAndRankings(
   const scored: PlayerScores[] = []
 
   for (const p of players) {
-    const pfpCount = 0
     const extraPoints = p.profile?.extraPoints ?? 0
-    const evilPointsCalc = calculateEvilPoints(p.stats || {}, pfpCount, extraPoints)
+    const evilPointsCalc = calculateEvilPoints(p.stats || {}, 0, extraPoints)
+    const baseEvilPoints = evilPointsCalc.basePoints
+    const extraEvilPoints = evilPointsCalc.extraPoints
+    const evilPoints = evilPointsCalc.totalPoints
+
     playerMap.set(p.wallet, {
-      evilPoints: evilPointsCalc.totalPoints,
+      evilPoints,
       rewards: false,
     })
 
@@ -137,11 +150,12 @@ export function computeLeaderboardsAndRankings(
     const slayedHumans = sumObjectValues(p.stats?.enemiesKilled)
     const souls = getHarvestedSouls(p.stats)
     const waves = getWavesCompleted(p.stats)
-    const evilPoints = evilPointsCalc.totalPoints
 
     scored.push({
       p,
       evilPoints,
+      baseEvilPoints,
+      extraEvilPoints,
       dungeons,
       slayedHumans,
       harvestedSouls: souls,
@@ -170,11 +184,11 @@ export function computeLeaderboardsAndRankings(
 
   // Build leaderboard entries (top 10 each)
   const leaderboards: Leaderboards = {
-    evilPoints: byEvil.slice(0, 10).map((s, i) => toEntry(s.p, s.evilPoints, i, s.evilPoints)),
-    dungeons: byDungeons.slice(0, 10).map((s, i) => toEntry(s.p, s.dungeons, i, s.evilPoints)),
-    slayedHumans: bySlayed.slice(0, 10).map((s, i) => toEntry(s.p, s.slayedHumans, i, s.evilPoints)),
-    harvestedSouls: bySouls.slice(0, 10).map((s, i) => toEntry(s.p, s.harvestedSouls, i, s.evilPoints)),
-    waves: byWaves.slice(0, 10).map((s, i) => toEntry(s.p, s.waves, i, s.evilPoints)),
+    evilPoints: byEvil.slice(0, 10).map((s, i) => toEntry(s.p, s.evilPoints, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
+    dungeons: byDungeons.slice(0, 10).map((s, i) => toEntry(s.p, s.dungeons, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
+    slayedHumans: bySlayed.slice(0, 10).map((s, i) => toEntry(s.p, s.slayedHumans, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
+    harvestedSouls: bySouls.slice(0, 10).map((s, i) => toEntry(s.p, s.harvestedSouls, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
+    waves: byWaves.slice(0, 10).map((s, i) => toEntry(s.p, s.waves, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
   }
 
   // User stats for target wallet (match by main wallet OR linked wallet)
@@ -199,6 +213,8 @@ export function computeLeaderboardsAndRankings(
         harvestedSouls: userData.harvestedSouls,
         wavesCompleted: userData.waves,
         evilPoints: userData.evilPoints,
+        baseEvilPoints: userData.baseEvilPoints,
+        extraEvilPoints: userData.extraEvilPoints,
         ranking: {
           dungeons: rankingMaps.dungeons.get(mainWalletKey) ?? null,
           slayedHumans: rankingMaps.slayedHumans.get(mainWalletKey) ?? null,

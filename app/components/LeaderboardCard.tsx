@@ -6,7 +6,9 @@ import { CircleCheck, CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
+import { usePfpStore } from '../stores/usePfpStore'
 import { ASSET_CACHE_TTL_MS } from '../utils/walletCache'
+import { applyEvilPointsMultiplier } from '../utils/evilPoints'
 
 const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
 
@@ -115,6 +117,8 @@ interface LeaderboardEntry {
   tokenId?: string
   username?: string
   evilPoints: number
+  baseEvilPoints?: number
+  extraEvilPoints?: number
   rewards: boolean
 }
 
@@ -143,6 +147,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   error = null
 }) => {
   const cache = useImuranBookStore((s) => s.cache)
+  const getPfp = usePfpStore((s) => s.getPfp)
 
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -337,14 +342,22 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     {entry.username || (entry.address ? shortenAddress(entry.address) : entry.demon)}
                   </span>
                 </div>
-                {/* Stats column */}
+                {/* Stats column (for EVIL POINTS leaderboard, apply multiplier) */}
                 <span
                   className="text-sm font-bold text-center text-white"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
-                  {entry.score.toLocaleString()}
+                  {(scoreLabel === 'EVIL' && entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
+                    ? applyEvilPointsMultiplier(
+                        entry.baseEvilPoints,
+                        entry.extraEvilPoints,
+                        getHasBook(entry.address) === true,
+                        !!getPfp(entry.address)
+                      )
+                    : entry.score
+                  ).toLocaleString()}
                 </span>
-                {/* Evil column: logo + number */}
+                {/* Evil column: logo + number (with book + PFP multiplier applied) */}
                 <div className="flex items-center justify-center gap-1.5">
                   <img
                     src="/evil.svg"
@@ -355,7 +368,15 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     className="text-sm font-bold text-white"
                     style={{ fontFamily: 'var(--font-harmonique)' }}
                   >
-                    {entry.evilPoints.toLocaleString()}
+                    {(entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
+                      ? applyEvilPointsMultiplier(
+                          entry.baseEvilPoints,
+                          entry.extraEvilPoints,
+                          getHasBook(entry.address) === true,
+                          !!getPfp(entry.address)
+                        )
+                      : entry.evilPoints
+                    ).toLocaleString()}
                   </span>
                 </div>
                 {/* Rewards column - eligible/not eligible based on Imuran Book ownership */}
