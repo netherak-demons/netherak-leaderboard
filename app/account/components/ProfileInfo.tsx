@@ -202,8 +202,12 @@ export default function ProfileInfo() {
     )
   }
 
-  // Show no data message (still show PFP when we have a wallet, e.g. observation mode)
+  // No season stats but we have wallet - show profile with book/multiplier from existing NFT data (no extra requests)
   if (hasNoData || !userStats) {
+    const displayName = displayWallet ? `${displayWallet.slice(0, 6)}...${displayWallet.slice(-4)}` : 'Guest'
+    const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
+    const isEligible = hasImuranBook
+
     return (
       <div
         className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
@@ -215,28 +219,172 @@ export default function ProfileInfo() {
         }}
       >
         <div
-          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between items-center min-h-[400px]"
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between"
           style={{
             backgroundColor: '#00000090',
           }}
         >
-          {displayWallet && (
-            <div className="flex flex-col items-center gap-3 mb-2">
-              <ProfileAvatar pfpUrl={pfpUrl} />
+          {/* 1) PFP + name, eligible */}
+          <div className="flex items-center gap-3">
+            <ProfileAvatar pfpUrl={pfpUrl} />
+            <div className="flex flex-col gap-0.5 min-w-0">
               <span
-                className="text-white font-medium truncate max-w-full"
+                className="text-white font-medium truncate"
                 style={{ fontFamily: 'var(--font-zachar-scratched)' }}
               >
-                {displayWallet.slice(0, 6)}...{displayWallet.slice(-4)}
+                {displayName}
+              </span>
+              <div className="flex items-center gap-2.5">
+                {isEligible ? (
+                  <div className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
+                    <span
+                      className="text-sm font-medium uppercase"
+                      style={{ fontFamily: 'var(--font-harmonique)' }}
+                    >
+                      ELIGIBLE
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full border border-white/40 flex items-center justify-center shrink-0">
+                      <Minus className="w-2 h-2 text-white" strokeWidth={2.5} />
+                    </div>
+                    <span
+                      className="text-sm font-medium uppercase text-white"
+                      style={{ fontFamily: 'var(--font-harmonique)' }}
+                    >
+                      NOT ELIGIBLE
+                    </span>
+                    <BookMultiplierTooltip multiplier={multiplier}>
+                      <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+                    </BookMultiplierTooltip>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 2) Divider */}
+          <div
+            className="h-px w-full rounded-full"
+            style={{
+              background: 'linear-gradient(90deg, transparent, #796359, #DFB7A4, #796359, transparent)',
+            }}
+          />
+
+          {/* 3) EvilPoints (0) | Multiplier */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <img src="/evil.svg" alt="Evil points" className="w-5 h-6 shrink-0" />
+              <span
+                className="text-green-netherak font-bold text-lg"
+                style={{ fontFamily: 'var(--font-harmonique)' }}
+              >
+                0
+              </span>
+              <span
+                className="text-white text-lg"
+                style={{ fontFamily: 'var(--font-harmonique)' }}
+              >
+                EVIL Points
+              </span>
+            </div>
+            <div className="h-4 w-px bg-white/30 shrink-0" />
+            <div className="flex flex-col gap-0.5 items-center">
+              <div className="flex items-center gap-1">
+                <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
+                <BookMultiplierTooltip multiplier={multiplier}>
+                  <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
+                </BookMultiplierTooltip>
+              </div>
+              <div className="flex items-center gap-1">
+                <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+                <span
+                  className="text-white"
+                  style={{ fontFamily: 'var(--font-harmonique)' }}
+                >
+                  x{multiplier}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4) Divider */}
+          <div
+            className="h-px w-full rounded-full"
+            style={{
+              background: 'linear-gradient(90deg, transparent, #796359, #DFB7A4, #796359, transparent)',
+            }}
+          />
+
+          {/* 5) Imuran book image */}
+          <ImuranBookImage />
+
+          {/* 6) Imuran book text */}
+          <span
+            className="text-white text-[20px] font-medium text-center uppercase"
+            style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+          >
+            Imuran book
+          </span>
+
+          {/* 7) Competition rewards access */}
+          <div
+            className="flex flex-col gap-3 text-sm"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            <div className="flex items-center gap-3">
+              <Trophy className="w-5 h-5 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
+              <span className="text-white uppercase tracking-wider">COMPETITION REWARDS&apos; ACCESS</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Flame className="w-5 h-5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+              <span className="text-white">x2 EVIL MULTIPLIER</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <BookCheck className="w-5 h-5 shrink-0" style={{ color: '#FFFFFF' }} strokeWidth={2} />
+              <span className="text-white">Auto WL for Demon Crow</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <TicketCheck className="w-5 h-5 shrink-0" style={{ color: '#91CE9F' }} strokeWidth={2} />
+              <span className="text-white">Free Cursed Pass for next season by completing the game</span>
+            </div>
+          </div>
+
+          {/* 8) Get Book / Owned button */}
+          <button
+            className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 drop-shadow-xl ${
+              hasImuranBook || bookLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105 hover:brightness-110'
+            }`}
+            style={{
+              backgroundImage: hasImuranBook ? 'url(/media/buttons/button_disabled.png)' : 'url(/media/buttons/button_normal.png)',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              fontFamily: 'var(--font-zachar-scratched)',
+            }}
+            disabled={hasImuranBook || bookLoading}
+          >
+            <span
+              className="relative z-10 flex items-center justify-center w-full h-full min-h-[48px] py-3 text-primary text-base font-medium uppercase tracking-wider"
+              style={{ fontFamily: 'var(--font-zachar-scratched)' }}
+            >
+              {bookLoading ? '...' : hasImuranBook ? 'Owned' : 'Get Book'}
+            </span>
+          </button>
+
+          {/* 9) Pay with SOMI - hide when owned */}
+          {!hasImuranBook && (
+            <div className="flex items-center justify-center gap-2">
+              <img src="/omi-logo.svg" alt="OMI" className="w-5 h-5" />
+              <span
+                className="text-white text-sm"
+                style={{ fontFamily: 'var(--font-harmonique)' }}
+              >
+                Pay with SOMI
               </span>
             </div>
           )}
-          <p className="text-secondary text-base text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            {EMPTY_STATE.noStatsTitle}
-          </p>
-          <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            {EMPTY_STATE.noStatsSubtext}
-          </p>
         </div>
       </div>
     )
