@@ -1,6 +1,6 @@
-# Netherak Leaderboard
+# Netherak Portal
 
-Leaderboard for Netherak Demons (Somnia). Shows rankings by evil points, dungeons, souls, waves, and slayed humans. Connect wallet to view your stats.
+Portal for Netherak Demons (Somnia). Shows rankings by evil points, dungeons, souls, waves, and slayed humans. Connect wallet to view your stats.
 
 ## Install
 

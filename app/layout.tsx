@@ -19,22 +19,22 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://leaderboard.netherak.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://portal.netherak.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "Netherak Leaderboard",
-    template: "%s | Netherak Leaderboard",
+    default: "Netherak Portal",
+    template: "%s | Netherak Portal",
   },
   description:
     "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats, rankings, and rewards.",
   keywords: ["Netherak", "leaderboard", "Somnia", "gaming", "rankings", "stats"],
   openGraph: {
-    title: "Netherak Leaderboard",
+    title: "Netherak Portal",
     description:
       "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats.",
     url: siteUrl,
-    siteName: "Netherak Leaderboard",
+    siteName: "Netherak Portal",
     type: "website",
     images: [
       {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Netherak Leaderboard",
+    title: "Netherak Portal",
     description:
       "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats.",
     images: ["/og-image.jpg"],
