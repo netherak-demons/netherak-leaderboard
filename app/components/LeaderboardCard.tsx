@@ -194,7 +194,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="pt-4 overflow-x-auto">
-          <div className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px]">
+          <div className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[400px]">
             <div className="h-4 bg-white/10 rounded w-20" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
@@ -205,7 +205,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div
                 key={i}
-                className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[340px]"
+                className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[400px]"
               >
                 <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
                   <div className="w-6 h-4 bg-white/10 rounded shrink-0" />
@@ -249,7 +249,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
 
       <div className="pt-4 overflow-x-auto">
         {/* Column headers: Demon, Stats, Evil, Rewards */}
-        <div className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px]">
+        <div className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[400px]">
           <span
             className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
@@ -320,7 +320,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[340px] ${
+                className={`grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[400px] ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
@@ -345,7 +345,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     }}
                   />
                   <span
-                    className={`text-sm xl:text-base font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap lowercase ${
+                    className={`text-sm xl:text-base font-semibold overflow-hidden text-ellipsis whitespace-nowrap min-w-0 lowercase ${
                       isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-primary'
                     }`}
                     style={{ fontFamily: 'var(--font-zachar-scratched)' }}
