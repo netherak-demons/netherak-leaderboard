@@ -58,7 +58,7 @@ function ImuranBookImage() {
   const [error, setError] = useState(false)
 
   return (
-    <div className="w-full aspect-3/4 max-h-[200px] rounded-lg flex items-center justify-center overflow-hidden relative">
+    <div className="w-full aspect-3/4 max-h-[240px] rounded-lg flex items-center justify-center overflow-hidden relative">
       <video
         src="/imuran-book.webm"
         autoPlay
@@ -152,7 +152,7 @@ export default function ProfileInfo() {
             <div className="h-12 bg-white/10 rounded w-16" />
           </div>
           <div className="h-px w-full bg-white/10 rounded-full" />
-          <div className="w-full aspect-3/4 max-h-[200px] rounded-lg bg-white/10" />
+          <div className="w-full aspect-3/4 max-h-[240px] rounded-lg bg-white/10" />
           <div className="h-5 bg-white/10 rounded w-32 mx-auto" />
           <div className="flex flex-col gap-2">
             <div className="h-4 bg-white/10 rounded w-full" />
@@ -350,7 +350,7 @@ export default function ProfileInfo() {
 
           {/* 8) Get Book / Owned button */}
           <button
-            className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 drop-shadow-xl ${
+            className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 ${
               hasImuranBook || bookLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105 hover:brightness-110'
             }`}
             style={{
@@ -358,6 +358,7 @@ export default function ProfileInfo() {
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
               fontFamily: 'var(--font-zachar-scratched)',
+              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
             }}
             disabled={hasImuranBook || bookLoading}
           >
@@ -552,7 +553,7 @@ export default function ProfileInfo() {
 
       {/* 7) Get Book / Owned button */}
       <button
-        className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 drop-shadow-xl ${
+        className={`relative min-h-[80px] overflow-hidden rounded-lg transition-all duration-300 ${
           hasImuranBook || bookLoading ? 'cursor-default pointer-events-none' : 'cursor-pointer hover:scale-105 hover:brightness-110'
         }`}
         style={{
@@ -560,6 +561,7 @@ export default function ProfileInfo() {
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           fontFamily: 'var(--font-zachar-scratched)',
+          filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
         }}
         disabled={hasImuranBook || bookLoading}
       >

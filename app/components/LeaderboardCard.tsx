@@ -193,19 +193,19 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           <div className="h-5 bg-white/10 rounded w-3/4 mx-auto" />
         </div>
 
-        <div className="pt-4">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5">
+        <div className="pt-4 overflow-x-auto">
+          <div className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px]">
             <div className="h-4 bg-white/10 rounded w-20" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
           </div>
 
-          <div className="overflow-x-hidden">
+          <div>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div
                 key={i}
-                className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center"
+                className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[340px]"
               >
                 <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
                   <div className="w-6 h-4 bg-white/10 rounded shrink-0" />
@@ -240,52 +240,52 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       />
       <div className="pb-4 border-b-2 border-white/5 text-center">
         <h2
-          className="text-base font-medium m-0 tracking-[4px] md:tracking-[3px] sm:tracking-[1px] uppercase text-primary"
+          className="text-base xl:text-lg font-medium m-0 tracking-[4px] md:tracking-[3px] sm:tracking-[1px] uppercase text-primary"
           style={{ fontFamily: 'var(--font-zachar-scratched)' }}
         >
           {title}
         </h2>
       </div>
 
-      <div className="pt-4">
+      <div className="pt-4 overflow-x-auto">
         {/* Column headers: Demon, Stats, Evil, Rewards */}
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5">
+        <div className="grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px]">
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             Demon
           </span>
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             {scoreLabel}
           </span>
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             Evil
           </span>
           <span
-            className="text-base font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
+            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             Rewards
           </span>
         </div>
 
-        <div className="overflow-x-hidden">
+        <div>
           {  showLoginMessage ? (
             <div
               className="py-12 px-4 text-center"
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
-              <p className="text-secondary text-base mb-2">
+              <p className="text-secondary text-base xl:text-lg mb-2">
                 {EMPTY_STATE.connectTitle}
               </p>
-              <p className="text-primary/80 text-sm">
+              <p className="text-primary/80 text-sm xl:text-base">
                 {EMPTY_STATE.connectSubtext}
               </p>
             </div>
@@ -294,10 +294,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               className="py-12 px-4 text-center"
               style={{ fontFamily: 'var(--font-harmonique)' }}
             >
-              <p className="text-[#FF8C8A] text-base mb-2">
+              <p className="text-[#FF8C8A] text-base xl:text-lg mb-2">
                 {EMPTY_STATE.errorTitle}
               </p>
-              <p className="text-secondary/70 text-sm">
+              <p className="text-secondary/70 text-sm xl:text-base">
                 {EMPTY_STATE.errorSubtext}
               </p>
             </div>
@@ -320,7 +320,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid grid-cols-[minmax(0,1fr)_minmax(70px,auto)_minmax(90px,auto)_minmax(50px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 ${
+                className={`grid grid-cols-[minmax(100px,1fr)_minmax(60px,auto)_minmax(70px,auto)_minmax(44px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[340px] ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
@@ -329,7 +329,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 {/* Demon column: number + avatar + name */}
                 <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
                   <span
-                    className={`text-sm font-bold shrink-0 ${
+                    className={`text-sm xl:text-base font-bold shrink-0 ${
                       isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)]' : 'text-white'
                     }`}
                     style={{ fontFamily: 'var(--font-harmonique)' }}
@@ -345,7 +345,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     }}
                   />
                   <span
-                    className={`text-sm font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap lowercase ${
+                    className={`text-sm xl:text-base font-semibold md:overflow-hidden md:text-ellipsis md:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap lowercase ${
                       isUser ? 'text-green-netherak drop-shadow-[0_0_8px_rgba(131,233,150,0.5)] font-bold' : 'text-primary'
                     }`}
                     style={{ fontFamily: 'var(--font-zachar-scratched)' }}
@@ -355,7 +355,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 </div>
                 {/* Stats column (for EVIL POINTS leaderboard, apply multiplier) */}
                 <span
-                  className="text-sm font-bold text-center text-white"
+                  className="text-sm xl:text-base font-bold text-center text-white"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
                   {(scoreLabel === 'EVIL' && entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
@@ -376,7 +376,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     className="w-5 h-6 shrink-0"
                   />
                   <span
-                    className="text-sm font-bold text-white"
+                    className="text-sm xl:text-base font-bold text-white"
                     style={{ fontFamily: 'var(--font-harmonique)' }}
                   >
                     {(entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
