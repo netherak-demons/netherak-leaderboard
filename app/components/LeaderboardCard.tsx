@@ -236,7 +236,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       <img
         src={icon}
         alt={title}
-        className="absolute -top-8 md:-top-14 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-22 md:h-22 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10"
+        className="absolute -top-8 md:-top-16 sm:-top-6 left-1/2 -translate-x-1/2 w-16 h-16 md:w-28 md:h-28 sm:w-10 sm:h-10 brightness-[1.3] contrast-[1.2] z-10"
       />
       <div className="pb-4 border-b-2 border-white/5 text-center">
         <h2

@@ -38,10 +38,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Netherak Leaderboard - Season statistics and rankings",
+        alt: "Netherak Portal - Leaderboard and season statistics",
       },
     ],
   },
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: "Netherak Leaderboard",
     description:
       "Season statistics and leaderboards for Netherak Demons. Connect your wallet to view your stats.",
-    images: ["/opengraph-image"],
+    images: ["/og-image.jpg"],
   },
   metadataBase: new URL(siteUrl),
 };

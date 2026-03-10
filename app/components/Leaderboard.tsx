@@ -157,7 +157,7 @@ const Leaderboard: React.FC = () => {
           <div className="md:col-span-2">
             <LeaderboardCard
               title="EVIL POINTS"
-              icon="/evil.svg"
+              icon="/evilpoints.png"
               subtitle=""
               scoreLabel="EVIL"
               entries={sortedEvilPointsLeaderboard}
