@@ -3,7 +3,7 @@
  *
  * Calculates Evil Points for players based on their game statistics.
  * Evil Points = (basePoints * multiplier) + extraPoints
- * Multiplier = book (x2) + PFP (x1.5) from config/multiplier
+ * Multiplier: none x1, book x2, PFP x1.5, both x3 (config/multiplier)
  */
 
 import { getMultiplier } from '../config/multiplier'

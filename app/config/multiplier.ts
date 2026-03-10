@@ -1,13 +1,13 @@
 /**
- * Multiplier configuration
- * - Imuran Book: x2 (+1)
- * - PFP NFT: x1.5 (+0.5)
- * - None: x1
- * - Both stack: x2.5
+ * Multiplier configuration (confirmed values)
+ * - Nothing: x1
+ * - Book only: x2
+ * - PFP only: x1.5
+ * - Book + PFP: x3
  */
 export function getMultiplier(hasImuranBook: boolean, hasPfp: boolean): number {
-  let multiplier = 1
-  if (hasImuranBook) multiplier += 1
-  if (hasPfp) multiplier += 0.5
-  return multiplier
+  if (hasImuranBook && hasPfp) return 3
+  if (hasImuranBook) return 2
+  if (hasPfp) return 1.5
+  return 1
 }

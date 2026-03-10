@@ -13,6 +13,7 @@ import { useAppStore } from '../stores/useAppStore'
 import { getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
 import { getMultiplier } from '../config/multiplier'
 import { applyEvilPointsMultiplier } from '../utils/evilPoints'
+import MultiplierTooltip from './MultiplierTooltip'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -115,10 +116,12 @@ export default function Header() {
             <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
             <span className="text-white text-lg">EVIL</span>
           </div>
-          <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
-            <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
-            <span className="text-white text-lg">x{multiplier}</span>
-          </div>
+          <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+            <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1 cursor-help">
+              <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+              <span className="text-white text-lg">x{multiplier}</span>
+            </div>
+          </MultiplierTooltip>
         </div>
 
         {/* Desktop: center nav (lg+) */}
@@ -162,10 +165,12 @@ export default function Header() {
                   <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
                   <span className="text-white">EVIL</span>
                 </div>
-                <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
-                  <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
-                  <span className="text-white">x{multiplier}</span>
-                </div>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+                  <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1 cursor-help">
+                    <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
+                    <span className="text-white">x{multiplier}</span>
+                  </div>
+                </MultiplierTooltip>
               </div>
               <div className="h-px bg-white/10" />
               <nav className="flex flex-col gap-4">

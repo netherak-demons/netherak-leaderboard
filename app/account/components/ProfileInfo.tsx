@@ -11,35 +11,9 @@ import { getEffectiveWallet, normalizeLinkedWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { getMultiplier } from '../../config/multiplier'
 import { applyEvilPointsMultiplier } from '../../utils/evilPoints'
+import MultiplierTooltip from '../../components/MultiplierTooltip'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
-
-function BookMultiplierTooltip({ children, multiplier }: { children: React.ReactNode; multiplier: number }) {
-  const [show, setShow] = useState(false)
-  return (
-    <span
-      className="relative inline-flex"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-    >
-      {children}
-      {show && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 z-20 px-2.5 py-1.5 rounded text-white text-xs whitespace-nowrap pointer-events-none"
-          style={{
-            backgroundColor: 'rgba(26, 26, 26, 0.95)',
-            border: '0.5px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
-            fontFamily: 'var(--font-harmonique)',
-          }}
-        >
-          Book Multiplier:{' '}
-          <span style={{ color: '#FFD36C' }}>x{multiplier}</span>
-        </div>
-      )}
-    </span>
-  )
-}
 
 function ProfileAvatar({ pfpUrl }: { pfpUrl: string | null }) {
   const [useDefault, setUseDefault] = useState(false)
@@ -252,9 +226,9 @@ export default function ProfileInfo() {
                     >
                       NOT ELIGIBLE
                     </span>
-                    <BookMultiplierTooltip multiplier={multiplier}>
+                    <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
                       <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
-                    </BookMultiplierTooltip>
+                    </MultiplierTooltip>
                   </div>
                 )}
               </div>
@@ -290,9 +264,9 @@ export default function ProfileInfo() {
             <div className="flex flex-col gap-0.5 items-center">
               <div className="flex items-center gap-1">
                 <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
-                <BookMultiplierTooltip multiplier={multiplier}>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
                   <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
-                </BookMultiplierTooltip>
+                </MultiplierTooltip>
               </div>
               <div className="flex items-center gap-1">
                 <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
@@ -455,9 +429,9 @@ export default function ProfileInfo() {
                 >
                   NOT ELIGIBLE
                 </span>
-                <BookMultiplierTooltip multiplier={multiplier}>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
                   <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
-                </BookMultiplierTooltip>
+                </MultiplierTooltip>
               </div>
             )}
           </div>
@@ -493,9 +467,9 @@ export default function ProfileInfo() {
         <div className="flex flex-col gap-0.5 items-center">
           <div className="flex items-center gap-1">
             <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
-            <BookMultiplierTooltip multiplier={multiplier}>
+            <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
               <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
-            </BookMultiplierTooltip>
+            </MultiplierTooltip>
           </div>
           <div className="flex items-center gap-1">
             <Flame className="w-3.5 h-3.5 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
