@@ -80,6 +80,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   effectiveWallet: undefined,
   userStats: null,
   hasNoData: false,
+  linkedWalletFromApi: null,
 
   setEffectiveWallet: (wallet) =>
     set((state) => {
