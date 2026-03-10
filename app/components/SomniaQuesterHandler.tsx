@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAccount, useConnection } from 'wagmi'
 import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
+import { useAppStore } from '../stores/useAppStore'
 import SomniaQuesterPopUp from './SomniaQuesterPopUp'
 
 type ConnectorWithSequenceWaas = {
@@ -34,10 +35,13 @@ export default function SomniaQuesterHandler() {
     }
   }, [])
 
+  const setLinkedWalletFromApi = useAppStore((s) => s.setLinkedWalletFromApi)
+
   useEffect(() => {
     if (!isConnected || !address || !sequenceWaas) {
       setShowPopup(false)
       setLoading(false)
+      setLinkedWalletFromApi(null)
       return
     }
 
@@ -46,6 +50,7 @@ export default function SomniaQuesterHandler() {
     if (getDataMode() === 'observation') {
       setShowPopup(false)
       setLoading(false)
+      setLinkedWalletFromApi(null)
       return
     }
 
@@ -76,6 +81,7 @@ export default function SomniaQuesterHandler() {
                 data.profile?.linkedWallet ?? data.profile?.LINKEDWALLET ?? data.linkedWallet
               )
               setLinkedWallet(w)
+              setLinkedWalletFromApi(w || null)
               setShowPopup(!w.trim())
             }
           )
@@ -83,13 +89,18 @@ export default function SomniaQuesterHandler() {
         // 404 or error: user may not exist yet (just logged in) - show popup to add linked wallet
         if (res.status === 404) {
           setLinkedWallet('')
+          setLinkedWalletFromApi(null)
           setShowPopup(true)
         } else {
+          setLinkedWalletFromApi(null)
           setShowPopup(false)
         }
       })
       .catch(() => {
-        if (!cancelled) setShowPopup(false)
+        if (!cancelled) {
+          setLinkedWalletFromApi(null)
+          setShowPopup(false)
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false)

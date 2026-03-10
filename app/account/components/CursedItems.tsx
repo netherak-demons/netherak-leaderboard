@@ -6,8 +6,9 @@ import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
 import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { useNkdRecipesOwnership } from '../../hooks/useNkdRecipesOwnership'
+import { useAppStore } from '../../stores/useAppStore'
 import { useAccount } from 'wagmi'
-import { getEffectiveWallet } from '../../utils/dataMode'
+import { getEffectiveWallet, normalizeLinkedWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 
 type CursedItemMedia = 'image' | 'video'
@@ -116,9 +117,11 @@ function CursedItemMedia({
 export default function CursedItems() {
   const { address } = useAccount()
   const { userStats, loading, error, canShowData } = useUserStatsContext()
+  const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
+  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const walletsForPfpAndBook = [
     userStats?.wallet,
-    userStats?.linkedWallet,
+    linkedWallet,
     getEffectiveWallet(address),
   ].filter((w): w is string => !!w && typeof w === 'string')
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)

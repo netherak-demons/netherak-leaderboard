@@ -6,7 +6,8 @@ import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
 import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
-import { getEffectiveWallet } from '../../utils/dataMode'
+import { useAppStore } from '../../stores/useAppStore'
+import { getEffectiveWallet, normalizeLinkedWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import { getMultiplier } from '../../config/multiplier'
 import { applyEvilPointsMultiplier } from '../../utils/evilPoints'
@@ -79,20 +80,15 @@ function ImuranBookImage() {
 export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
-  // Check main + linked + effective wallet (same as CursedItems) so PFP shows when in linked wallet
-  const walletsForPfp = [
-    userStats?.wallet,
-    userStats?.linkedWallet,
-    getEffectiveWallet(address),
-  ].filter((w): w is string => !!w && typeof w === 'string')
-  const { pfpUrl } = useUserPfp(walletsForPfp)
-  const displayWallet = userStats?.wallet ?? getEffectiveWallet(address)
-  const walletsForBook = [
-    userStats?.wallet,
-    userStats?.linkedWallet,
-    getEffectiveWallet(address),
-  ].filter((w): w is string => !!w && typeof w === 'string')
-  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletsForBook)
+  const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
+  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
+  const effectiveWallet = getEffectiveWallet(address)
+  const walletsForPfpAndBook = [userStats?.wallet, linkedWallet, effectiveWallet].filter(
+    (w): w is string => !!w && typeof w === 'string'
+  )
+  const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
+  const displayWallet = userStats?.wallet ?? effectiveWallet
+  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletsForPfpAndBook)
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {

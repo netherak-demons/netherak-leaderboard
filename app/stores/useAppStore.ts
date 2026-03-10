@@ -44,8 +44,10 @@ interface AppState extends SeasonState {
   effectiveWallet: string | undefined
   userStats: UserStats | null
   hasNoData: boolean
+  linkedWalletFromApi: string | null
   fetchSeason: (seasonId: string) => Promise<void>
   setEffectiveWallet: (wallet: string | undefined) => void
+  setLinkedWalletFromApi: (wallet: string | null) => void
   refresh: () => void
 }
 
@@ -84,6 +86,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       const { userStats, hasNoData } = deriveUserStats(state.allPlayers, wallet)
       return { effectiveWallet: wallet, userStats, hasNoData }
     }),
+
+  setLinkedWalletFromApi: (wallet) => set({ linkedWalletFromApi: wallet }),
 
   refresh: () => {
     if (typeof window !== 'undefined') {

@@ -5,7 +5,7 @@ import LeaderboardCard from './LeaderboardCard'
 import { useSeasonStats } from '../hooks/useSeasonStats'
 import { useUserStats } from '../hooks/useUserStats'
 import { useAccount } from 'wagmi'
-import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
+import { getCanShowData, getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
 import { usePfpStore } from '../stores/usePfpStore'
 import { useAppStore, selectUserStats } from '../stores/useAppStore'
@@ -33,9 +33,11 @@ const Leaderboard: React.FC = () => {
 
   const { hasNoData } = useUserStats(effectiveWallet, '0')
   const userStats = useAppStore(selectUserStats)
+  const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
+  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const { hasBook: currentUserHasBook } = useImuranBookOwnership([
     userStats?.wallet,
-    userStats?.linkedWallet,
+    linkedWallet,
     effectiveWallet,
   ])
 

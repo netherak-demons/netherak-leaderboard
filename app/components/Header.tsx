@@ -9,7 +9,8 @@ import { Flame, Menu, X } from 'lucide-react'
 import { useUserPfp } from '../hooks/useUserPfp'
 import { useUserStats } from '../hooks/useUserStats'
 import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
-import { getEffectiveWallet } from '../utils/dataMode'
+import { useAppStore } from '../stores/useAppStore'
+import { getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
 import { getMultiplier } from '../config/multiplier'
 import { applyEvilPointsMultiplier } from '../utils/evilPoints'
 
@@ -24,15 +25,13 @@ export default function Header() {
   const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
   const { userStats } = useUserStats(effectiveWallet)
-  // Check main + linked + effective wallet (same as CursedItems) so PFP shows when in linked wallet
-  const walletsForPfp = [userStats?.wallet, userStats?.linkedWallet, effectiveWallet].filter(
+  const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
+  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
+  const walletsForPfpAndBook = [userStats?.wallet, linkedWallet, effectiveWallet].filter(
     (w): w is string => !!w && typeof w === 'string'
   )
-  const { pfpUrl } = useUserPfp(walletsForPfp)
-  const walletsForBook = [userStats?.wallet, userStats?.linkedWallet, effectiveWallet].filter(
-    (w): w is string => !!w && typeof w === 'string'
-  )
-  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForBook)
+  const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
+  const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
   const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
   const baseEvilPoints = userStats?.baseEvilPoints ?? 0
   const extraEvilPoints = userStats?.extraEvilPoints ?? 0
