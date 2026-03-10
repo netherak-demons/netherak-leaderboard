@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Trophy, Flame, BookCheck, Sparkles, CircleAlert, TicketCheck, Minus } from 'lucide-react'
+import { Trophy, Flame, BookCheck, CircleAlert, TicketCheck, Minus } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
@@ -280,8 +280,8 @@ export default function ProfileInfo() {
             {displayName}
           </span>
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: '#DFB7A4' }} strokeWidth={2} />
+            <div className="flex items-center gap-1">
+              <img src="/stars.svg" alt="" className="w-3.5 h-3.5 shrink-0" aria-hidden />
               <span
                 className="text-base font-medium"
                 style={{ fontFamily: 'var(--font-harmonique)', color: '#DFB7A4' }}

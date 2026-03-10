@@ -8,6 +8,8 @@ import { useAccount } from 'wagmi'
 import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
 import { usePfpStore } from '../stores/usePfpStore'
+import { useAppStore, selectUserStats } from '../stores/useAppStore'
+import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
 import { getMultiplier } from '../config/multiplier'
 
 const Leaderboard: React.FC = () => {
@@ -30,6 +32,12 @@ const Leaderboard: React.FC = () => {
   } = useSeasonStats(canShowData ? '0' : '')
 
   const { hasNoData } = useUserStats(effectiveWallet, '0')
+  const userStats = useAppStore(selectUserStats)
+  const { hasBook: currentUserHasBook } = useImuranBookOwnership([
+    userStats?.wallet,
+    userStats?.linkedWallet,
+    effectiveWallet,
+  ])
 
   // Single fetch for all unique leaderboard addresses (avoids 5 separate fetches from each LeaderboardCard)
   const allLeaderboardAddresses = useMemo(() => {
@@ -154,6 +162,7 @@ const Leaderboard: React.FC = () => {
               userAddress={effectiveWallet || address}
               hasNoData={hasNoData}
               error={error}
+              currentUserHasBook={currentUserHasBook}
             />
           </div>
 
@@ -166,6 +175,7 @@ const Leaderboard: React.FC = () => {
             userAddress={effectiveWallet || address}
             hasNoData={hasNoData}
             error={error}
+            currentUserHasBook={currentUserHasBook}
           />
 
           <LeaderboardCard
@@ -177,6 +187,7 @@ const Leaderboard: React.FC = () => {
             userAddress={effectiveWallet || address}
             hasNoData={hasNoData}
             error={error}
+            currentUserHasBook={currentUserHasBook}
           />
 
           <LeaderboardCard
@@ -188,6 +199,7 @@ const Leaderboard: React.FC = () => {
             userAddress={effectiveWallet || address}
             hasNoData={hasNoData}
             error={error}
+            currentUserHasBook={currentUserHasBook}
           />
 
           <LeaderboardCard
@@ -199,6 +211,7 @@ const Leaderboard: React.FC = () => {
             userAddress={effectiveWallet || address}
             hasNoData={hasNoData}
             error={error}
+            currentUserHasBook={currentUserHasBook}
           />
         </div>
       </div>

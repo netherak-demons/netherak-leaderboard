@@ -12,7 +12,7 @@ import { applyEvilPointsMultiplier } from '../utils/evilPoints'
 
 const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
 
-function EligibilityCell({ hasBook }: { hasBook: boolean }) {
+function EligibilityCell({ hasBook, currentUserHasBook }: { hasBook: boolean; currentUserHasBook: boolean }) {
   const [showOverlay, setShowOverlay] = useState(false)
   const [position, setPosition] = useState({ top: 0, left: 0 })
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -92,15 +92,24 @@ function EligibilityCell({ hasBook }: { hasBook: boolean }) {
             >
               {hasBook ? 'Eligible for rewards' : 'Not eligible for rewards'}
             </span>
-            <Link
-              href={IMURAN_SHOP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 border border-secondary text-white py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary text-sm font-medium bg-white/5 hover:bg-white/10"
-              style={{ fontFamily: 'var(--font-zachar)' }}
-            >
-              Mint book
-            </Link>
+            {currentUserHasBook ? (
+              <span
+                className="flex items-center justify-center gap-2 border border-white/20 text-white/50 py-2 px-4 rounded-lg text-sm font-medium bg-white/5 cursor-not-allowed"
+                style={{ fontFamily: 'var(--font-zachar)' }}
+              >
+                You have the book
+              </span>
+            ) : (
+              <Link
+                href={IMURAN_SHOP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 border border-secondary text-white py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary text-sm font-medium bg-white/5 hover:bg-white/10"
+                style={{ fontFamily: 'var(--font-zachar)' }}
+              >
+                Mint book
+              </Link>
+            )}
           </div>,
           document.body
         )}
@@ -133,6 +142,7 @@ interface LeaderboardCardProps {
   showLoginMessage?: boolean
   hasNoData?: boolean
   error?: string | null
+  currentUserHasBook?: boolean
 }
 
 const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
@@ -144,7 +154,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   skeleton = false,
   showLoginMessage = false,
   hasNoData = false,
-  error = null
+  error = null,
+  currentUserHasBook = false,
 }) => {
   const cache = useImuranBookStore((s) => s.cache)
   const getPfp = usePfpStore((s) => s.getPfp)
@@ -382,7 +393,10 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 {/* Rewards column - eligible/not eligible based on Imuran Book ownership */}
                 <div className="flex justify-center">
                   {getHasBook(entry.address) !== null ? (
-                    <EligibilityCell hasBook={getHasBook(entry.address)!} />
+                    <EligibilityCell
+                      hasBook={getHasBook(entry.address)!}
+                      currentUserHasBook={currentUserHasBook}
+                    />
                   ) : null}
                 </div>
               </div>
