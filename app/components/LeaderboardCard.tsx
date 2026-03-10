@@ -92,14 +92,7 @@ function EligibilityCell({ hasBook, currentUserHasBook }: { hasBook: boolean; cu
             >
               {hasBook ? 'Eligible for rewards' : 'Not eligible for rewards'}
             </span>
-            {currentUserHasBook ? (
-              <span
-                className="flex items-center justify-center gap-2 border border-white/20 text-white/50 py-2 px-4 rounded-lg text-sm font-medium bg-white/5 cursor-not-allowed"
-                style={{ fontFamily: 'var(--font-zachar)' }}
-              >
-                You have the book
-              </span>
-            ) : (
+            {!currentUserHasBook && (
               <Link
                 href={IMURAN_SHOP_URL}
                 target="_blank"
