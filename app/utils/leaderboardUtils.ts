@@ -182,21 +182,21 @@ export function computeLeaderboardsAndRankings(
   bySouls.forEach((s, i) => rankingMaps.harvestedSouls.set(s.p.wallet.toLowerCase(), i + 1))
   byWaves.forEach((s, i) => rankingMaps.waves.set(s.p.wallet.toLowerCase(), i + 1))
 
-  // Build leaderboard entries (top 20 each)
+  // Build leaderboard entries (all players, no cap - API already limited)
   const leaderboards: Leaderboards = {
-    evilPoints: byEvil.slice(0, 20).map((s, i) =>
+    evilPoints: byEvil.map((s, i) =>
       toEntry(s.p, s.evilPoints, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
     ),
-    dungeons: byDungeons.slice(0, 20).map((s, i) =>
+    dungeons: byDungeons.map((s, i) =>
       toEntry(s.p, s.dungeons, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
     ),
-    slayedHumans: bySlayed.slice(0, 20).map((s, i) =>
+    slayedHumans: bySlayed.map((s, i) =>
       toEntry(s.p, s.slayedHumans, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
     ),
-    harvestedSouls: bySouls.slice(0, 20).map((s, i) =>
+    harvestedSouls: bySouls.map((s, i) =>
       toEntry(s.p, s.harvestedSouls, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
     ),
-    waves: byWaves.slice(0, 20).map((s, i) =>
+    waves: byWaves.map((s, i) =>
       toEntry(s.p, s.waves, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
     ),
   }

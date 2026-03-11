@@ -168,7 +168,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             seasonId,
-            limit: 50,
+            limit: 300,
             ...(lastKey ? { lastKey } : {}),
           }),
         })
