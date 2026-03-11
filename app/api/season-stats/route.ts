@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       requestBody.lastKey = body.lastKey;
     }
 
-    // AWS API expects GET with body (non-standard)
+    // AWS API expects POST with JSON body
     const apiUrl = 'https://yv97bn1mj3.execute-api.us-east-1.amazonaws.com/stage-1/stats/season';
     const apiKey = process.env.NETHERAK_API_KEY;
     
@@ -95,15 +95,15 @@ export async function POST(request: NextRequest) {
       ...(lastKey && /^[a-zA-Z0-9_-]+$/.test(lastKey) ? { lastKey } : {})
     });
     
-    // AWS API expects GET with body (non-standard HTTP)
-    // Use Node.js https module to make GET request with body
+    // AWS API expects POST with JSON body
+    // Use Node.js https module to make POST request
     const url = new URL(apiUrl);
     const responseText = await new Promise<string>((resolve, reject) => {
       const options = {
         hostname: url.hostname,
         port: 443,
         path: url.pathname,
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         reject(error);
       });
 
-      // Write body to request (GET with body)
+      // Write JSON body to request
       req.write(bodyData);
       req.end();
     });
