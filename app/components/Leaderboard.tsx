@@ -104,7 +104,7 @@ const Leaderboard: React.FC = () => {
             <LeaderboardCard title="DUNGEONS COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
             <LeaderboardCard title="SLAYED HUMANS" icon="/enemies.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
             <LeaderboardCard title="HARVESTED SOULS" icon="/harvested.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
-            <LeaderboardCard title="WAVES COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} />
+          {/* <LeaderboardCard title="WAVES COMPLETED" icon="/dungeons.svg" subtitle="" scoreLabel="Stats" {...emptyCardProps} /> */}
           </div>
         </div>
       </div>
