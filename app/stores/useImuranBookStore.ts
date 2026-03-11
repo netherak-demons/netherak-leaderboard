@@ -60,7 +60,7 @@ export const useImuranBookStore = create<ImuranBookState>((set, get) => ({
 
         set((s) => {
           const newCache = new Map(s.cache)
-          newCache.set(key, { hasBook, ts: Date.now() })
+          newCache.set(key, { hasBook: res.ok ? hasBook : false, ts: Date.now() })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
@@ -70,11 +70,13 @@ export const useImuranBookStore = create<ImuranBookState>((set, get) => ({
         return hasBook
       } catch {
         set((s) => {
+          const newCache = new Map(s.cache)
+          newCache.set(key, { hasBook: false, ts: Date.now() })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
           newPending.delete(key)
-          return { loadingWallets: newLoading, pending: newPending }
+          return { cache: newCache, loadingWallets: newLoading, pending: newPending }
         })
         return false
       }

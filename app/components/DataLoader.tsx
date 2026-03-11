@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useAccount } from 'wagmi'
 import { getCanShowData, getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
 import { useAppStore, selectUserStats } from '../stores/useAppStore'
@@ -43,6 +43,7 @@ export default function DataLoader() {
     [effectiveWallet, userStats?.wallet, linkedWallet]
   )
   const walletsKey = wallets.map((w) => w.toLowerCase()).sort().join(',')
+  const nftFetchStartedForRef = useRef<string | null>(null)
 
   useEffect(() => {
     setEffectiveWallet(effectiveWallet)
@@ -64,19 +65,25 @@ export default function DataLoader() {
     }
   }, [fetchSeason])
 
-  // Stagger PFP → Book → NKD so we don't hit all three endpoints at once (avoids 429 rate limit)
+  // Stagger PFP → Book → NKD so we don't hit all three endpoints at once (avoids 429 rate limit).
+  // Only run once per walletsKey so React Strict Mode double-mount doesn't double-fire requests.
   useEffect(() => {
-    if (wallets.length === 0 || !canShowData) return
-    const list = wallets
+    if (wallets.length === 0 || !canShowData) {
+      nftFetchStartedForRef.current = null
+      return
+    }
+    if (nftFetchStartedForRef.current === walletsKey) return
+    nftFetchStartedForRef.current = walletsKey
+    const list = [...wallets]
     const t1 = setTimeout(() => {
       list.forEach((w) => fetchPfp(w))
     }, 0)
     const t2 = setTimeout(() => {
       fetchHasBookForWallets(list)
-    }, 350)
+    }, 600)
     const t3 = setTimeout(() => {
       fetchHasRecipesForWallets(list)
-    }, 700)
+    }, 1200)
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)

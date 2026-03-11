@@ -70,7 +70,11 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
 
         set((s) => {
           const newCache = new Map(s.cache)
-          newCache.set(key, { hasRecipes, imageUrls, ts: Date.now() })
+          newCache.set(key, {
+            hasRecipes: res.ok ? hasRecipes : false,
+            imageUrls: res.ok ? imageUrls : [],
+            ts: Date.now(),
+          })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
@@ -80,11 +84,13 @@ export const useNkdRecipesStore = create<NkdRecipesState>((set, get) => ({
         return { hasRecipes, imageUrls }
       } catch {
         set((s) => {
+          const newCache = new Map(s.cache)
+          newCache.set(key, { hasRecipes: false, imageUrls: [], ts: Date.now() })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
           newPending.delete(key)
-          return { loadingWallets: newLoading, pending: newPending }
+          return { cache: newCache, loadingWallets: newLoading, pending: newPending }
         })
         return { hasRecipes: false, imageUrls: [] }
       }

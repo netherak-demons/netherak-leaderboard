@@ -13,7 +13,7 @@ function toIpfsGateway(url: string): string {
 }
 
 interface PfpEntry {
-  url: string
+  url: string | null
   ts: number
 }
 
@@ -65,7 +65,18 @@ export const usePfpStore = create<PfpState>((set, get) => ({
       try {
         const walletParam = wallet.startsWith('0x') ? wallet : `0x${wallet}`
         const res = await fetchWithRetry(`/api/pfp?wallet=${encodeURIComponent(walletParam)}`)
-        if (!res.ok) return null
+        if (!res.ok) {
+          set((s) => {
+            const newCache = new Map(s.cache)
+            newCache.set(key, { url: null, ts: Date.now() })
+            const newLoading = new Set(s.loadingWallets)
+            newLoading.delete(key)
+            const newPending = new Map(s.pending)
+            newPending.delete(key)
+            return { cache: newCache, loadingWallets: newLoading, pending: newPending }
+          })
+          return null
+        }
 
         const data: PfpApiResponse = await res.json()
         if (!data?.items?.length) return null
@@ -91,11 +102,13 @@ export const usePfpStore = create<PfpState>((set, get) => ({
         return url
       } catch {
         set((s) => {
+          const newCache = new Map(s.cache)
+          newCache.set(key, { url: null, ts: Date.now() })
           const newLoading = new Set(s.loadingWallets)
           newLoading.delete(key)
           const newPending = new Map(s.pending)
           newPending.delete(key)
-          return { loadingWallets: newLoading, pending: newPending }
+          return { cache: newCache, loadingWallets: newLoading, pending: newPending }
         })
         return null
       }
