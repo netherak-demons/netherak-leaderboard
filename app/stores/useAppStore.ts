@@ -70,7 +70,7 @@ const emptyLeaderboards = {
   waves: [] as LeaderboardEntry[],
 }
 
-const LEADERBOARD_TOP_N = 10
+const LEADERBOARD_TOP_N = 100
 
 function sliceLeaderboards(leaderboards: {
   evilPoints: LeaderboardEntry[]

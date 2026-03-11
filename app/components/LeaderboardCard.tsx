@@ -154,7 +154,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           </span>
         </div>
 
-        <div>
+        {/* Scrollable rows container so long leaderboards don't grow the page height */}
+        <div className="max-h-[420px] md:max-h-[460px] overflow-y-auto">
           {  showLoginMessage ? (
             <div
               className="py-12 px-4 text-center"
