@@ -160,28 +160,22 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     try {
       const players: PlayerSeasonStats[] = []
-      let lastKey: string | null = null
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          seasonId,
+          limit: 300,
+        }),
+      })
 
-      do {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            seasonId,
-            limit: 300,
-            ...(lastKey ? { lastKey } : {}),
-          }),
-        })
+      if (!res.ok) {
+        const msg = await parseApiError(res)
+        throw new Error(msg)
+      }
 
-        if (!res.ok) {
-          const msg = await parseApiError(res)
-          throw new Error(msg)
-        }
-
-        const data: SeasonStatsResponse = await res.json()
-        players.push(...data.seasonStats)
-        lastKey = data.lastEvaluatedKey
-      } while (lastKey)
+      const data: SeasonStatsResponse = await res.json()
+      players.push(...data.seasonStats)
 
       setCachedPlayers(seasonId, players)
       const { leaderboards } = computeLeaderboardsAndRankings(players)
