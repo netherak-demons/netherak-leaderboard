@@ -182,13 +182,23 @@ export function computeLeaderboardsAndRankings(
   bySouls.forEach((s, i) => rankingMaps.harvestedSouls.set(s.p.wallet.toLowerCase(), i + 1))
   byWaves.forEach((s, i) => rankingMaps.waves.set(s.p.wallet.toLowerCase(), i + 1))
 
-  // Build leaderboard entries (top 10 each)
+  // Build leaderboard entries (all players, no cap)
   const leaderboards: Leaderboards = {
-    evilPoints: byEvil.slice(0, 10).map((s, i) => toEntry(s.p, s.evilPoints, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
-    dungeons: byDungeons.slice(0, 10).map((s, i) => toEntry(s.p, s.dungeons, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
-    slayedHumans: bySlayed.slice(0, 10).map((s, i) => toEntry(s.p, s.slayedHumans, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
-    harvestedSouls: bySouls.slice(0, 10).map((s, i) => toEntry(s.p, s.harvestedSouls, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
-    waves: byWaves.slice(0, 10).map((s, i) => toEntry(s.p, s.waves, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)),
+    evilPoints: byEvil.map((s, i) =>
+      toEntry(s.p, s.evilPoints, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
+    ),
+    dungeons: byDungeons.map((s, i) =>
+      toEntry(s.p, s.dungeons, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
+    ),
+    slayedHumans: bySlayed.map((s, i) =>
+      toEntry(s.p, s.slayedHumans, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
+    ),
+    harvestedSouls: bySouls.map((s, i) =>
+      toEntry(s.p, s.harvestedSouls, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
+    ),
+    waves: byWaves.map((s, i) =>
+      toEntry(s.p, s.waves, i, s.evilPoints, s.baseEvilPoints, s.extraEvilPoints)
+    ),
   }
 
   // User stats for target wallet (match by main wallet OR linked wallet)

@@ -12,6 +12,8 @@ import { useAppStore, selectUserStats } from '../stores/useAppStore'
 import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
 import { getMultiplier } from '../config/multiplier'
 
+const SHOW_WAVES_LEADERBOARD = false
+
 const Leaderboard: React.FC = () => {
   const { address, isConnected } = useAccount()
   const effectiveWallet = getEffectiveWallet(address)
@@ -204,17 +206,19 @@ const Leaderboard: React.FC = () => {
             currentUserHasBook={currentUserHasBook}
           />
 
-          <LeaderboardCard
-            title="WAVES COMPLETED"
-            icon="/dungeons.svg"
-            subtitle=""
-            scoreLabel="Stats"
-            entries={wavesLeaderboard}
-            userAddress={effectiveWallet || address}
-            hasNoData={hasNoData}
-            error={error}
-            currentUserHasBook={currentUserHasBook}
-          />
+          {SHOW_WAVES_LEADERBOARD && (
+            <LeaderboardCard
+              title="WAVES COMPLETED"
+              icon="/dungeons.svg"
+              subtitle=""
+              scoreLabel="Stats"
+              entries={wavesLeaderboard}
+              userAddress={effectiveWallet || address}
+              hasNoData={hasNoData}
+              error={error}
+              currentUserHasBook={currentUserHasBook}
+            />
+          )}
         </div>
       </div>
     </div>
