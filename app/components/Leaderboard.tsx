@@ -164,7 +164,6 @@ const Leaderboard: React.FC = () => {
               scoreLabel="EVIL"
               entries={sortedEvilPointsLeaderboard}
               userAddress={effectiveWallet || address}
-              hasNoData={hasNoData}
               error={error}
               currentUserHasBook={currentUserHasBook}
             />
@@ -177,7 +176,6 @@ const Leaderboard: React.FC = () => {
             scoreLabel="Stats"
             entries={dungeonsLeaderboard}
             userAddress={effectiveWallet || address}
-            hasNoData={hasNoData}
             error={error}
             currentUserHasBook={currentUserHasBook}
           />
@@ -189,7 +187,6 @@ const Leaderboard: React.FC = () => {
             scoreLabel="Stats"
             entries={slayedHumansLeaderboard}
             userAddress={effectiveWallet || address}
-            hasNoData={hasNoData}
             error={error}
             currentUserHasBook={currentUserHasBook}
           />
@@ -201,7 +198,6 @@ const Leaderboard: React.FC = () => {
             scoreLabel="Stats"
             entries={harvestedSoulsLeaderboard}
             userAddress={effectiveWallet || address}
-            hasNoData={hasNoData}
             error={error}
             currentUserHasBook={currentUserHasBook}
           />
