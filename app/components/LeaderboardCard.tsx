@@ -1,114 +1,7 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { CircleCheck, CircleAlert } from 'lucide-react'
-import Link from 'next/link'
+import React from 'react'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
-import { useImuranBookStore } from '../stores/useImuranBookStore'
-import { usePfpStore } from '../stores/usePfpStore'
-import { ASSET_CACHE_TTL_MS } from '../utils/walletCache'
-import { applyEvilPointsMultiplier } from '../utils/evilPoints'
-
-const IMURAN_SHOP_URL = 'https://fascinating-alpaca-40611.sequence.market/shop'
-
-function EligibilityCell({ hasBook, currentUserHasBook }: { hasBook: boolean; currentUserHasBook: boolean }) {
-  const [showOverlay, setShowOverlay] = useState(false)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    if (!showOverlay || !triggerRef.current) return
-    const rect = triggerRef.current.getBoundingClientRect()
-    setPosition({
-      top: rect.top - 8,
-      left: rect.left + rect.width / 2,
-    })
-  }, [showOverlay])
-
-  const handleTriggerLeave = () => {
-    leaveTimeoutRef.current = setTimeout(() => setShowOverlay(false), 100)
-  }
-
-  const handleOverlayEnter = () => {
-    if (leaveTimeoutRef.current) {
-      clearTimeout(leaveTimeoutRef.current)
-      leaveTimeoutRef.current = null
-    }
-    setShowOverlay(true)
-  }
-
-  const handleOverlayLeave = () => {
-    setShowOverlay(false)
-  }
-
-  return (
-    <>
-      <div
-        ref={triggerRef}
-        className="relative flex justify-center pt-8 -mt-8"
-        onMouseEnter={() => {
-          if (leaveTimeoutRef.current) {
-            clearTimeout(leaveTimeoutRef.current)
-            leaveTimeoutRef.current = null
-          }
-          setShowOverlay(true)
-        }}
-        onMouseLeave={handleTriggerLeave}
-      >
-        {hasBook ? (
-          <CircleCheck
-            className="w-5 h-5 shrink-0 text-white cursor-pointer"
-            strokeWidth={2.5}
-          />
-        ) : (
-          <span title="Book Multiplier">
-            <CircleAlert
-              className="w-5 h-5 shrink-0 text-white/50 cursor-pointer"
-              strokeWidth={2.5}
-            />
-          </span>
-        )}
-      </div>
-      {showOverlay &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className="fixed flex flex-col gap-2 p-4 rounded-md min-w-[160px] z-50 -translate-x-1/2 -translate-y-full"
-            style={{
-              top: position.top,
-              left: position.left,
-              backgroundColor: 'rgba(26, 26, 26, 0.98)',
-              border: '0.5px solid rgba(255, 255, 255, 0.15)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-            }}
-            onMouseEnter={handleOverlayEnter}
-            onMouseLeave={handleOverlayLeave}
-          >
-            <span
-              className={hasBook ? 'text-primary' : 'text-white/60'}
-              style={{ fontFamily: 'var(--font-harmonique)', textAlign: 'center' }}
-            >
-              {hasBook ? 'Eligible for rewards' : 'Not eligible for rewards'}
-            </span>
-            {!currentUserHasBook && (
-              <Link
-                href={IMURAN_SHOP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 border border-secondary text-white py-2 px-4 rounded-lg cursor-pointer transition-all duration-300 ease-in-out tracking-[1px] hover:border-primary hover:text-primary text-sm font-medium bg-white/5 hover:bg-white/10"
-                style={{ fontFamily: 'var(--font-zachar)' }}
-              >
-                Mint book
-              </Link>
-            )}
-          </div>,
-          document.body
-        )}
-    </>
-  )
-}
 
 interface LeaderboardEntry {
   ranking: number
@@ -135,7 +28,6 @@ interface LeaderboardCardProps {
   showLoginMessage?: boolean
   hasNoData?: boolean
   error?: string | null
-  currentUserHasBook?: boolean
 }
 
 const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
@@ -148,11 +40,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   showLoginMessage = false,
   hasNoData = false,
   error = null,
-  currentUserHasBook = false,
 }) => {
-  const cache = useImuranBookStore((s) => s.cache)
-  const getPfp = usePfpStore((s) => s.getPfp)
-
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
@@ -162,12 +50,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
     return userAddress.toLowerCase() === entryAddress.toLowerCase()
   }
 
-  const getHasBook = (address: string | undefined): boolean | null => {
-    if (!address) return null
-    const entry = cache.get(address.toLowerCase())
-    if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
-    return entry.hasBook
-  }
+  // Base evil points only (no book/PFP multiplier on leaderboard)
+  const displayEvilPoints = (entry: LeaderboardEntry) =>
+    (entry.baseEvilPoints ?? entry.evilPoints) + (entry.extraEvilPoints ?? 0)
 
   // Skeleton state
   if (skeleton) {
@@ -346,22 +231,14 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     {entry.username || (entry.address ? shortenAddress(entry.address) : entry.demon)}
                   </span>
                 </div>
-                {/* Stats column (for EVIL POINTS leaderboard, apply multiplier) */}
+                {/* Stats column: score or base evil (no multiplier) */}
                 <span
                   className="text-sm xl:text-base font-bold text-center text-white"
                   style={{ fontFamily: 'var(--font-harmonique)' }}
                 >
-                  {(scoreLabel === 'EVIL' && entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
-                    ? applyEvilPointsMultiplier(
-                        entry.baseEvilPoints,
-                        entry.extraEvilPoints,
-                        getHasBook(entry.address) === true,
-                        !!getPfp(entry.address)
-                      )
-                    : entry.score
-                  ).toLocaleString()}
+                  {(scoreLabel === 'EVIL' ? displayEvilPoints(entry) : entry.score).toLocaleString()}
                 </span>
-                {/* Evil column: logo + number (with book + PFP multiplier applied) */}
+                {/* Evil column: base + extra only (no multiplier) */}
                 <div className="flex items-center justify-center gap-1.5">
                   <img
                     src="/evil.svg"
@@ -372,25 +249,12 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     className="text-sm xl:text-base font-bold text-white"
                     style={{ fontFamily: 'var(--font-harmonique)' }}
                   >
-                    {(entry.baseEvilPoints !== undefined && entry.extraEvilPoints !== undefined
-                      ? applyEvilPointsMultiplier(
-                          entry.baseEvilPoints,
-                          entry.extraEvilPoints,
-                          getHasBook(entry.address) === true,
-                          !!getPfp(entry.address)
-                        )
-                      : entry.evilPoints
-                    ).toLocaleString()}
+                    {displayEvilPoints(entry).toLocaleString()}
                   </span>
                 </div>
-                {/* Rewards column - eligible/not eligible based on Imuran Book ownership */}
-                <div className="flex justify-center">
-                  {getHasBook(entry.address) !== null ? (
-                    <EligibilityCell
-                      hasBook={getHasBook(entry.address)!}
-                      currentUserHasBook={currentUserHasBook}
-                    />
-                  ) : null}
+                {/* Rewards column: static (no per-row book check) */}
+                <div className="flex justify-center pt-8 -mt-8 text-secondary text-sm">
+                  —
                 </div>
               </div>
             )

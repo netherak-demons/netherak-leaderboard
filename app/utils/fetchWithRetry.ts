@@ -1,6 +1,6 @@
 /**
  * Fetches with retry on transient failures. Retries only on network errors
- * and 5xx responses (not 4xx, which indicate client errors).
+ * and 5xx responses. Never retries 4xx (e.g. 429 Too Many Requests).
  */
 export async function fetchWithRetry(
   input: RequestInfo | URL,
@@ -11,6 +11,7 @@ export async function fetchWithRetry(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(input, init)
+      // Do not retry on 4xx (client/rate limit); only retry on 5xx
       const isRetryable = !res.ok && res.status >= 500
       if (res.ok || !isRetryable || attempt === maxRetries) return res
       lastError = new Error(`HTTP ${res.status}`)

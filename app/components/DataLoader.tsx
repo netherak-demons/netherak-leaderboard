@@ -42,6 +42,7 @@ export default function DataLoader() {
       ]),
     [effectiveWallet, userStats?.wallet, linkedWallet]
   )
+  const walletsKey = wallets.map((w) => w.toLowerCase()).sort().join(',')
 
   useEffect(() => {
     setEffectiveWallet(effectiveWallet)
@@ -63,19 +64,25 @@ export default function DataLoader() {
     }
   }, [fetchSeason])
 
+  // Stagger PFP → Book → NKD so we don't hit all three endpoints at once (avoids 429 rate limit)
   useEffect(() => {
-    wallets.forEach((w) => fetchPfp(w))
-  }, [wallets, fetchPfp])
-
-  useEffect(() => {
-    if (wallets.length === 0) return
-    fetchHasBookForWallets(wallets)
-  }, [wallets, fetchHasBookForWallets])
-
-  useEffect(() => {
-    if (wallets.length === 0) return
-    fetchHasRecipesForWallets(wallets)
-  }, [wallets, fetchHasRecipesForWallets])
+    if (wallets.length === 0 || !canShowData) return
+    const list = wallets
+    const t1 = setTimeout(() => {
+      list.forEach((w) => fetchPfp(w))
+    }, 0)
+    const t2 = setTimeout(() => {
+      fetchHasBookForWallets(list)
+    }, 350)
+    const t3 = setTimeout(() => {
+      fetchHasRecipesForWallets(list)
+    }, 700)
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+    }
+  }, [walletsKey, canShowData, fetchPfp, fetchHasBookForWallets, fetchHasRecipesForWallets])
 
   return null
 }

@@ -70,6 +70,24 @@ const emptyLeaderboards = {
   waves: [] as LeaderboardEntry[],
 }
 
+const LEADERBOARD_TOP_N = 10
+
+function sliceLeaderboards(leaderboards: {
+  evilPoints: LeaderboardEntry[]
+  dungeons: LeaderboardEntry[]
+  slayedHumans: LeaderboardEntry[]
+  harvestedSouls: LeaderboardEntry[]
+  waves: LeaderboardEntry[]
+}) {
+  return {
+    evilPoints: leaderboards.evilPoints.slice(0, LEADERBOARD_TOP_N),
+    dungeons: leaderboards.dungeons.slice(0, LEADERBOARD_TOP_N),
+    slayedHumans: leaderboards.slayedHumans.slice(0, LEADERBOARD_TOP_N),
+    harvestedSouls: leaderboards.harvestedSouls.slice(0, LEADERBOARD_TOP_N),
+    waves: leaderboards.waves.slice(0, LEADERBOARD_TOP_N),
+  }
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   seasonId: '',
   allPlayers: [],
@@ -118,13 +136,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({
         seasonId,
         allPlayers: cached,
-        leaderboards: {
-          evilPoints: leaderboards.evilPoints,
-          dungeons: leaderboards.dungeons,
-          slayedHumans: leaderboards.slayedHumans,
-          harvestedSouls: leaderboards.harvestedSouls,
-          waves: leaderboards.waves,
-        },
+        leaderboards: sliceLeaderboards(leaderboards),
         totalPlayers: cached.length,
         loading: false,
         error: null,
@@ -140,13 +152,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({
         seasonId,
         allPlayers: mockPlayers,
-        leaderboards: {
+        leaderboards: sliceLeaderboards({
           evilPoints: mockEvilPointsLeaderboard,
           dungeons: mockDungeonsLeaderboard,
           slayedHumans: mockEnemiesLeaderboard,
           harvestedSouls: mockSoulsLeaderboard,
           waves: mockWavesLeaderboard,
-        },
+        }),
         totalPlayers: 20,
         loading: false,
         error: null,
@@ -165,7 +177,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           seasonId,
-          limit: 300,
+          limit: 100,
         }),
       })
 
@@ -184,13 +196,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({
         seasonId,
         allPlayers: players,
-        leaderboards: {
-          evilPoints: leaderboards.evilPoints,
-          dungeons: leaderboards.dungeons,
-          slayedHumans: leaderboards.slayedHumans,
-          harvestedSouls: leaderboards.harvestedSouls,
-          waves: leaderboards.waves,
-        },
+        leaderboards: sliceLeaderboards(leaderboards),
         totalPlayers: players.length,
         loading: false,
         error: null,
@@ -204,13 +210,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         set({
           seasonId,
           allPlayers: mockPlayers,
-          leaderboards: {
+          leaderboards: sliceLeaderboards({
             evilPoints: mockEvilPointsLeaderboard,
             dungeons: mockDungeonsLeaderboard,
             slayedHumans: mockEnemiesLeaderboard,
             harvestedSouls: mockSoulsLeaderboard,
             waves: mockWavesLeaderboard,
-          },
+          }),
           totalPlayers: 20,
           loading: false,
           error: null,

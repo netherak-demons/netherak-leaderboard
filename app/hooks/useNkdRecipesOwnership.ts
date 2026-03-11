@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useNkdRecipesStore } from '../stores/useNkdRecipesStore'
 import { ASSET_CACHE_TTL_MS, uniqueWallets } from '../utils/walletCache'
 
 /**
  * Returns whether any of the given wallets owns NKD Recipes, and image URLs from all owned tokens.
- * Data is fetched by DataLoader. Components can call this for reactive updates.
+ * Data is fetched only by DataLoader. This hook only reads from the store.
  */
 export function useNkdRecipesOwnership(
   walletAddresses: string | undefined | (string | undefined)[]
@@ -26,7 +26,6 @@ export function useNkdRecipesOwnership(
 
   const cache = useNkdRecipesStore((s) => s.cache)
   const isLoading = useNkdRecipesStore((s) => s.isLoading)
-  const fetchHasRecipesForWallets = useNkdRecipesStore((s) => s.fetchHasRecipesForWallets)
 
   const getCached = (w: string) => {
     const entry = cache.get(w.toLowerCase())
@@ -42,12 +41,6 @@ export function useNkdRecipesOwnership(
       )
     : []
   const loading = wallets.length > 0 && !allCached && isLoading(wallets)
-
-  useEffect(() => {
-    if (wallets.length > 0) {
-      fetchHasRecipesForWallets(wallets)
-    }
-  }, [walletsKey, wallets, fetchHasRecipesForWallets])
 
   return {
     hasRecipes,

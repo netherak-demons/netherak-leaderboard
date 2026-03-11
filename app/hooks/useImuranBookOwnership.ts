@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useImuranBookStore } from '../stores/useImuranBookStore'
 import { ASSET_CACHE_TTL_MS, uniqueWallets } from '../utils/walletCache'
 
 /**
  * Returns whether any of the given wallets owns the Imuran Book.
- * Data is fetched by DataLoader. Components can call this for reactive updates.
+ * Data is fetched only by DataLoader. This hook only reads from the store.
  */
 export function useImuranBookOwnership(
   walletAddresses: string | undefined | (string | undefined)[]
@@ -23,10 +23,8 @@ export function useImuranBookOwnership(
     return []
   }, [walletsKey])
 
-  // Subscribe to cache so we re-render when fetch completes (getHasBook is a function ref - never changes)
   const cache = useImuranBookStore((s) => s.cache)
   const isLoading = useImuranBookStore((s) => s.isLoading)
-  const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
 
   const getCached = (w: string) => {
     const entry = cache.get(w.toLowerCase())
@@ -36,12 +34,6 @@ export function useImuranBookOwnership(
   const allCached = wallets.length > 0 && wallets.every((w) => getCached(w) !== null)
   const hasBook = allCached ? wallets.some((w) => getCached(w) === true) : false
   const loading = wallets.length > 0 && !allCached && isLoading(wallets)
-
-  useEffect(() => {
-    if (wallets.length > 0) {
-      fetchHasBookForWallets(wallets)
-    }
-  }, [walletsKey, wallets, fetchHasBookForWallets])
 
   return {
     hasBook,

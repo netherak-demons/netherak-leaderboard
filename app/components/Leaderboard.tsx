@@ -1,16 +1,11 @@
 'use client'
 
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import LeaderboardCard from './LeaderboardCard'
 import { useSeasonStats } from '../hooks/useSeasonStats'
 import { useUserStats } from '../hooks/useUserStats'
 import { useAccount } from 'wagmi'
-import { getCanShowData, getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
-import { useImuranBookStore } from '../stores/useImuranBookStore'
-import { usePfpStore } from '../stores/usePfpStore'
-import { useAppStore, selectUserStats } from '../stores/useAppStore'
-import { useImuranBookOwnership } from '../hooks/useImuranBookOwnership'
-import { getMultiplier } from '../config/multiplier'
+import { getCanShowData, getEffectiveWallet } from '../utils/dataMode'
 
 const SHOW_WAVES_LEADERBOARD = false
 
@@ -19,10 +14,7 @@ const Leaderboard: React.FC = () => {
   const effectiveWallet = getEffectiveWallet(address)
   const canShowData = getCanShowData(isConnected)
 
-  const fetchHasBookForWallets = useImuranBookStore((s) => s.fetchHasBookForWallets)
-  const fetchPfp = usePfpStore((s) => s.fetchPfp)
-
-  // Fetch leaderboard data when we can show data
+  // Fetch leaderboard data when we can show data (store already returns top 10, base evil only)
   const {
     evilPointsLeaderboard,
     dungeonsLeaderboard,
@@ -34,62 +26,6 @@ const Leaderboard: React.FC = () => {
   } = useSeasonStats(canShowData ? '0' : '')
 
   const { hasNoData } = useUserStats(effectiveWallet, '0')
-  const userStats = useAppStore(selectUserStats)
-  const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
-  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
-  const { hasBook: currentUserHasBook } = useImuranBookOwnership([
-    userStats?.wallet,
-    linkedWallet,
-    effectiveWallet,
-  ])
-
-  // Single fetch for all unique leaderboard addresses (avoids 5 separate fetches from each LeaderboardCard)
-  const allLeaderboardAddresses = useMemo(() => {
-    const addrs = new Set<string>()
-    for (const entries of [
-      evilPointsLeaderboard,
-      dungeonsLeaderboard,
-      slayedHumansLeaderboard,
-      harvestedSoulsLeaderboard,
-      wavesLeaderboard,
-    ]) {
-      for (const e of entries) {
-        if (e.address) addrs.add(e.address)
-      }
-    }
-    return [...addrs]
-  }, [
-    evilPointsLeaderboard,
-    dungeonsLeaderboard,
-    slayedHumansLeaderboard,
-    harvestedSoulsLeaderboard,
-    wavesLeaderboard,
-  ])
-  useEffect(() => {
-    if (allLeaderboardAddresses.length > 0) {
-      fetchHasBookForWallets(allLeaderboardAddresses)
-      allLeaderboardAddresses.forEach((w) => fetchPfp(w))
-    }
-  }, [allLeaderboardAddresses, fetchHasBookForWallets, fetchPfp])
-
-  const imuranCache = useImuranBookStore((s) => s.cache)
-  const getPfp = usePfpStore((s) => s.getPfp)
-
-  // Re-sort evil points leaderboard by multiplied value when we have book/PFP data
-  const sortedEvilPointsLeaderboard = useMemo(() => {
-    if (evilPointsLeaderboard.length === 0) return []
-    const getMultipliedEvil = (e: (typeof evilPointsLeaderboard)[0]) => {
-      const base = e.baseEvilPoints ?? e.evilPoints
-      const extra = e.extraEvilPoints ?? 0
-      const hasBook = imuranCache.get(e.address?.toLowerCase() ?? '')?.hasBook ?? false
-      const hasPfp = !!getPfp(e.address)
-      const mult = getMultiplier(hasBook, hasPfp)
-      return Math.floor(base * mult + extra)
-    }
-    return [...evilPointsLeaderboard]
-      .sort((a, b) => getMultipliedEvil(b) - getMultipliedEvil(a))
-      .map((e, i) => ({ ...e, ranking: i + 1 }))
-  }, [evilPointsLeaderboard, imuranCache, getPfp])
 
   // Show all leaderboards with connect message when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -162,10 +98,9 @@ const Leaderboard: React.FC = () => {
               icon="/evilpoints.png"
               subtitle=""
               scoreLabel="EVIL"
-              entries={sortedEvilPointsLeaderboard}
+              entries={evilPointsLeaderboard}
               userAddress={effectiveWallet || address}
               error={error}
-              currentUserHasBook={currentUserHasBook}
             />
           </div>
 
@@ -177,7 +112,6 @@ const Leaderboard: React.FC = () => {
             entries={dungeonsLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
-            currentUserHasBook={currentUserHasBook}
           />
 
           <LeaderboardCard
@@ -188,7 +122,6 @@ const Leaderboard: React.FC = () => {
             entries={slayedHumansLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
-            currentUserHasBook={currentUserHasBook}
           />
 
           <LeaderboardCard
@@ -199,7 +132,6 @@ const Leaderboard: React.FC = () => {
             entries={harvestedSoulsLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
-            currentUserHasBook={currentUserHasBook}
           />
 
           {SHOW_WAVES_LEADERBOARD && (
@@ -212,7 +144,6 @@ const Leaderboard: React.FC = () => {
               userAddress={effectiveWallet || address}
               hasNoData={hasNoData}
               error={error}
-              currentUserHasBook={currentUserHasBook}
             />
           )}
         </div>
