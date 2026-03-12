@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     // Validate and sanitize input
     const seasonId = String(requestBody.seasonId || '0').trim();
     const limit = Math.min(Math.max(parseInt(String(requestBody.limit || 50)), 1), 100);
-    const lastKey = requestBody.lastKey ? String(requestBody.lastKey).trim() : null;
+    const lastKey = requestBody.lastKey ?? null;
     
     // Validate seasonId format
     if (!/^[a-zA-Z0-9_-]+$/.test(seasonId)) {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     const bodyData = JSON.stringify({
       seasonId,
       limit,
-      ...(lastKey && /^[a-zA-Z0-9_-]+$/.test(lastKey) ? { lastKey } : {})
+      ...(lastKey ? { lastKey } : {})
     });
     
     // AWS API expects POST with JSON body

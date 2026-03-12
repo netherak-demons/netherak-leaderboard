@@ -38,6 +38,8 @@ interface SeasonState {
   totalPlayers: number
   loading: boolean
   error: string | null
+  nextKey: string | null
+  hasMore: boolean
 }
 
 interface AppState extends SeasonState {
@@ -46,6 +48,7 @@ interface AppState extends SeasonState {
   hasNoData: boolean
   linkedWalletFromApi: string | null
   fetchSeason: (seasonId: string) => Promise<void>
+  fetchMoreSeason: () => Promise<void>
   setEffectiveWallet: (wallet: string | undefined) => void
   setLinkedWalletFromApi: (wallet: string | null) => void
   refresh: () => void
@@ -70,8 +73,6 @@ const emptyLeaderboards = {
   waves: [] as LeaderboardEntry[],
 }
 
-const LEADERBOARD_TOP_N = 100
-
 function sliceLeaderboards(leaderboards: {
   evilPoints: LeaderboardEntry[]
   dungeons: LeaderboardEntry[]
@@ -79,13 +80,8 @@ function sliceLeaderboards(leaderboards: {
   harvestedSouls: LeaderboardEntry[]
   waves: LeaderboardEntry[]
 }) {
-  return {
-    evilPoints: leaderboards.evilPoints.slice(0, LEADERBOARD_TOP_N),
-    dungeons: leaderboards.dungeons.slice(0, LEADERBOARD_TOP_N),
-    slayedHumans: leaderboards.slayedHumans.slice(0, LEADERBOARD_TOP_N),
-    harvestedSouls: leaderboards.harvestedSouls.slice(0, LEADERBOARD_TOP_N),
-    waves: leaderboards.waves.slice(0, LEADERBOARD_TOP_N),
-  }
+  // No UI cap: return all entries as-is
+  return leaderboards
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -95,6 +91,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   totalPlayers: 0,
   loading: true,
   error: null,
+   nextKey: null,
+   hasMore: false,
   effectiveWallet: undefined,
   userStats: null,
   hasNoData: false,
@@ -123,6 +121,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         totalPlayers: 0,
         loading: false,
         error: null,
+        nextKey: null,
+        hasMore: false,
         userStats: null,
         hasNoData: false,
       })
@@ -140,6 +140,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         totalPlayers: cached.length,
         loading: false,
         error: null,
+        nextKey: null,
+        hasMore: false,
         userStats,
         hasNoData,
       })
@@ -162,6 +164,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         totalPlayers: 20,
         loading: false,
         error: null,
+        nextKey: null,
+        hasMore: false,
         userStats,
         hasNoData,
       })
@@ -177,7 +181,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           seasonId,
-          limit: 100,
+          limit: 50,
         }),
       })
 
@@ -192,6 +196,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       setCachedPlayers(seasonId, players)
       const { leaderboards } = computeLeaderboardsAndRankings(players)
       const { userStats, hasNoData } = deriveUserStats(players, get().effectiveWallet)
+      const nextKey = data.lastEvaluatedKey || null
 
       set({
         seasonId,
@@ -200,6 +205,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         totalPlayers: players.length,
         loading: false,
         error: null,
+        nextKey,
+        hasMore: !!nextKey,
         userStats,
         hasNoData,
       })
@@ -220,6 +227,8 @@ export const useAppStore = create<AppState>((set, get) => ({
           totalPlayers: 20,
           loading: false,
           error: null,
+          nextKey: null,
+          hasMore: false,
           userStats,
           hasNoData,
         })
@@ -230,10 +239,68 @@ export const useAppStore = create<AppState>((set, get) => ({
           allPlayers: [],
           leaderboards: emptyLeaderboards,
           totalPlayers: 0,
+          nextKey: null,
+          hasMore: false,
           userStats: null,
           hasNoData: false,
         })
       }
+    }
+  },
+
+  fetchMoreSeason: async () => {
+    const state = get()
+    const seasonId = state.seasonId
+    const lastKey = state.nextKey
+
+    if (!seasonId || !lastKey) {
+      return
+    }
+
+    set({ loading: true, error: null })
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          seasonId,
+          limit: 50,
+          lastKey,
+        }),
+      })
+
+      if (!res.ok) {
+        const msg = await parseApiError(res)
+        throw new Error(msg)
+      }
+
+      const data: SeasonStatsResponse = await res.json()
+      const newPlayers = data.seasonStats || []
+      const combinedPlayers = [...state.allPlayers, ...newPlayers]
+
+      setCachedPlayers(seasonId, combinedPlayers)
+      const { leaderboards } = computeLeaderboardsAndRankings(combinedPlayers)
+      const { userStats, hasNoData } = deriveUserStats(combinedPlayers, get().effectiveWallet)
+      const nextKey = data.lastEvaluatedKey || null
+
+      set({
+        seasonId,
+        allPlayers: combinedPlayers,
+        leaderboards: sliceLeaderboards(leaderboards),
+        totalPlayers: combinedPlayers.length,
+        loading: false,
+        error: null,
+        nextKey,
+        hasMore: !!nextKey,
+        userStats,
+        hasNoData,
+      })
+    } catch (err) {
+      set({
+        loading: false,
+        error: parseFetchError(err),
+      })
     }
   },
 
