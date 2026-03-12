@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAccount, useConnection } from 'wagmi'
 import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 import { useAppStore } from '../stores/useAppStore'
+import type { GetUserResponse } from '../types/user'
 import SomniaQuesterPopUp from './SomniaQuesterPopUp'
 
 type ConnectorWithSequenceWaas = {
@@ -36,12 +37,14 @@ export default function SomniaQuesterHandler() {
   }, [])
 
   const setLinkedWalletFromApi = useAppStore((s) => s.setLinkedWalletFromApi)
+  const setUserFromApi = useAppStore((s) => s.setUserFromApi)
 
   useEffect(() => {
     if (!isConnected || !address || !sequenceWaas) {
       setShowPopup(false)
       setLoading(false)
       setLinkedWalletFromApi(null)
+      setUserFromApi(null)
       return
     }
 
@@ -51,6 +54,7 @@ export default function SomniaQuesterHandler() {
       setShowPopup(false)
       setLoading(false)
       setLinkedWalletFromApi(null)
+      setUserFromApi(null)
       return
     }
 
@@ -71,34 +75,44 @@ export default function SomniaQuesterHandler() {
       .then((res) => {
         if (!res || cancelled) return
         if (res.ok) {
-          return res.json().then(
-            (data: {
-              profile?: { linkedWallet?: string; LINKEDWALLET?: string }
-              linkedWallet?: string
-            }) => {
-              if (cancelled) return
-              const w = normalizeLinkedWallet(
-                data.profile?.linkedWallet ?? data.profile?.LINKEDWALLET ?? data.linkedWallet
-              )
-              setLinkedWallet(w)
-              setLinkedWalletFromApi(w || null)
-              setShowPopup(!w.trim())
+          return res.json().then((data: GetUserResponse) => {
+            if (cancelled) return
+            const linked = normalizeLinkedWallet(
+              data.profile?.linkedWallet ?? data.profile?.LINKEDWALLET ?? data.linkedWallet
+            )
+            setLinkedWallet(linked)
+            setLinkedWalletFromApi(linked || null)
+
+            const walletFromApi = data.wallet
+            const usernameFromApi = data.username || data.profile?.username || ''
+            if (walletFromApi) {
+              setUserFromApi({
+                wallet: walletFromApi,
+                username: usernameFromApi || walletFromApi,
+              })
+            } else {
+              setUserFromApi(null)
             }
-          )
+
+            setShowPopup(!linked.trim())
+          })
         }
         // 404 or error: user may not exist yet (just logged in) - show popup to add linked wallet
         if (res.status === 404) {
           setLinkedWallet('')
           setLinkedWalletFromApi(null)
+        setUserFromApi(null)
           setShowPopup(true)
         } else {
           setLinkedWalletFromApi(null)
+        setUserFromApi(null)
           setShowPopup(false)
         }
       })
       .catch(() => {
         if (!cancelled) {
           setLinkedWalletFromApi(null)
+        setUserFromApi(null)
           setShowPopup(false)
         }
       })

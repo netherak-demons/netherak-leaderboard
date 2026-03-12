@@ -47,10 +47,12 @@ interface AppState extends SeasonState {
   userStats: UserStats | null
   hasNoData: boolean
   linkedWalletFromApi: string | null
+  userFromApi: { wallet: string; username: string } | null
   fetchSeason: (seasonId: string) => Promise<void>
   fetchMoreSeason: () => Promise<void>
   setEffectiveWallet: (wallet: string | undefined) => void
   setLinkedWalletFromApi: (wallet: string | null) => void
+  setUserFromApi: (user: { wallet: string; username: string } | null) => void
   refresh: () => void
 }
 
@@ -97,6 +99,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   userStats: null,
   hasNoData: false,
   linkedWalletFromApi: null,
+  userFromApi: null,
 
   setEffectiveWallet: (wallet) =>
     set((state) => {
@@ -105,6 +108,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     }),
 
   setLinkedWalletFromApi: (wallet) => set({ linkedWalletFromApi: wallet }),
+
+  setUserFromApi: (user) => set({ userFromApi: user }),
 
   refresh: () => {
     if (typeof window !== 'undefined') {

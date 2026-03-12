@@ -55,13 +55,14 @@ export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
   const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
+  const userFromApi = useAppStore((s) => s.userFromApi)
   const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const effectiveWallet = getEffectiveWallet(address)
   const walletsForPfpAndBook = [userStats?.wallet, linkedWallet, effectiveWallet].filter(
     (w): w is string => !!w && typeof w === 'string'
   )
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
-  const displayWallet = userStats?.wallet ?? effectiveWallet
+  const displayWallet = userFromApi?.wallet ?? userStats?.wallet ?? effectiveWallet
   const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletsForPfpAndBook)
 
   // Show skeleton when not connected (unless in observation/preview mode)
@@ -174,7 +175,9 @@ export default function ProfileInfo() {
 
   // No season stats but we have wallet - show profile with book/multiplier from existing NFT data (no extra requests)
   if (hasNoData || !userStats) {
-    const displayName = displayWallet ? `${displayWallet.slice(0, 6)}...${displayWallet.slice(-4)}` : 'Guest'
+    const displayName =
+      userFromApi?.username ||
+      (displayWallet ? `${displayWallet.slice(0, 6)}...${displayWallet.slice(-4)}` : 'Guest')
     const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
     const isEligible = hasImuranBook
 
@@ -362,7 +365,10 @@ export default function ProfileInfo() {
   }
 
   // Use actual data from API
-  const displayName = userStats.username || (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
+  const displayName =
+    userFromApi?.username ||
+    userStats.username ||
+    (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
   const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
   const isEligible = hasImuranBook
   const baseEvilPoints = userStats.baseEvilPoints ?? 0
