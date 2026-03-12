@@ -23,6 +23,9 @@ const Leaderboard: React.FC = () => {
     wavesLeaderboard,
     loading,
     error,
+    totalPlayers,
+    hasMore,
+    loadMore,
   } = useSeasonStats(canShowData ? '0' : '')
 
   const { hasNoData } = useUserStats(effectiveWallet, '0')
@@ -47,8 +50,8 @@ const Leaderboard: React.FC = () => {
     )
   }
 
-  // Show loading skeleton
-  if (loading) {
+  // Show loading skeleton only on first load (no players yet)
+  if (loading && totalPlayers === 0) {
     return (
       <div
         className="relative w-full overflow-x-hidden flex justify-center items-center py-12"
@@ -101,6 +104,9 @@ const Leaderboard: React.FC = () => {
               entries={evilPointsLeaderboard}
               userAddress={effectiveWallet || address}
               error={error}
+              canLoadMore={hasMore}
+              onLoadMore={hasMore ? loadMore : undefined}
+              loadingMore={loading}
             />
           </div>
 
@@ -112,6 +118,9 @@ const Leaderboard: React.FC = () => {
             entries={dungeonsLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
+            canLoadMore={hasMore}
+            onLoadMore={hasMore ? loadMore : undefined}
+            loadingMore={loading}
           />
 
           <LeaderboardCard
@@ -122,6 +131,9 @@ const Leaderboard: React.FC = () => {
             entries={slayedHumansLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
+            canLoadMore={hasMore}
+            onLoadMore={hasMore ? loadMore : undefined}
+            loadingMore={loading}
           />
 
           <LeaderboardCard
@@ -132,6 +144,9 @@ const Leaderboard: React.FC = () => {
             entries={harvestedSoulsLeaderboard}
             userAddress={effectiveWallet || address}
             error={error}
+            canLoadMore={hasMore}
+            onLoadMore={hasMore ? loadMore : undefined}
+            loadingMore={loading}
           />
 
           {SHOW_WAVES_LEADERBOARD && (
@@ -144,6 +159,9 @@ const Leaderboard: React.FC = () => {
               userAddress={effectiveWallet || address}
               hasNoData={hasNoData}
               error={error}
+              canLoadMore={hasMore}
+              onLoadMore={hasMore ? loadMore : undefined}
+              loadingMore={loading}
             />
           )}
         </div>

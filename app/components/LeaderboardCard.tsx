@@ -28,6 +28,9 @@ interface LeaderboardCardProps {
   showLoginMessage?: boolean
   hasNoData?: boolean
   error?: string | null
+  canLoadMore?: boolean
+  onLoadMore?: () => void
+  loadingMore?: boolean
 }
 
 const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
@@ -40,6 +43,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   showLoginMessage = false,
   hasNoData = false,
   error = null,
+  canLoadMore = false,
+  onLoadMore,
+  loadingMore = false,
 }) => {
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -261,6 +267,20 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             )
           })}
         </div>
+
+        {canLoadMore && onLoadMore && !showLoginMessage && !error && (
+          <div className="flex justify-center mt-4">
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={onLoadMore}
+              className="px-4 py-1.5 rounded-full border border-white/20 text-xs uppercase tracking-[2px] text-secondary hover:text-white hover:border-white/40 hover:bg-white/5 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              style={{ fontFamily: 'var(--font-harmonique)' }}
+            >
+              {loadingMore ? 'Loading…' : 'Load more demons'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

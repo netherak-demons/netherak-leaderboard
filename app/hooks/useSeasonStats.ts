@@ -18,6 +18,8 @@ export function useSeasonStats(seasonId: string = '0') {
   const wavesLeaderboard = useAppStore((s) => s.leaderboards.waves)
   const totalPlayers = useAppStore((s) => s.totalPlayers)
   const allPlayers = useAppStore((s) => s.allPlayers)
+  const hasMore = useAppStore((s) => s.hasMore)
+  const fetchMoreSeason = useAppStore((s) => s.fetchMoreSeason)
 
   return {
     evilPointsLeaderboard,
@@ -29,5 +31,7 @@ export function useSeasonStats(seasonId: string = '0') {
     error,
     totalPlayers,
     allPlayers,
+    hasMore,
+    loadMore: fetchMoreSeason,
   }
 }
