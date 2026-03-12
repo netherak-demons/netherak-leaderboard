@@ -60,6 +60,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   const displayEvilPoints = (entry: LeaderboardEntry) =>
     (entry.baseEvilPoints ?? entry.evilPoints) + (entry.extraEvilPoints ?? 0)
 
+  const isEvilLeaderboard = scoreLabel === 'EVIL'
+
   // Skeleton state
   if (skeleton) {
     return (
@@ -78,10 +80,12 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="pt-4 overflow-x-auto">
-          <div className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[400px]">
+          <div className={`grid gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px] ${
+            isEvilLeaderboard
+              ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+              : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+          }`}>
             <div className="h-4 bg-white/10 rounded w-20" />
-            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
-            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
           </div>
 
@@ -89,16 +93,18 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div
                 key={i}
-                className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[400px]"
+                className={`grid gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[340px] ${
+                  isEvilLeaderboard
+                    ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+                    : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+                }`}
               >
                 <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
                   <div className="w-6 h-4 bg-white/10 rounded shrink-0" />
                   <div className="w-10 h-10 md:w-8 md:h-8 sm:w-6.5 sm:h-6.5 rounded-full bg-white/10 shrink-0" />
                   <div className="h-4 bg-white/10 rounded flex-1 max-w-[120px]" />
                 </div>
-                <div className="h-4 bg-white/10 rounded w-12 mx-auto" />
                 <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
-                <div className="h-5 w-5 bg-white/10 rounded mx-auto" />
               </div>
             ))}
           </div>
@@ -132,8 +138,14 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       </div>
 
       <div className="pt-4 overflow-x-auto">
-        {/* Column headers: Demon, Stats, Evil, Rewards */}
-        <div className="grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[400px]">
+        {/* Column headers: Demon + Stats or Demon + Evil (no Rewards) */}
+        <div
+          className={`grid gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px] ${
+            isEvilLeaderboard
+              ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+              : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+          }`}
+        >
           <span
             className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
@@ -144,19 +156,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
-            {scoreLabel}
-          </span>
-          <span
-            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
-            style={{ fontFamily: 'var(--font-harmonique)' }}
-          >
-            Evil
-          </span>
-          <span
-            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
-            style={{ fontFamily: 'var(--font-harmonique)' }}
-          >
-            Rewards
+            {isEvilLeaderboard ? 'EVIL' : scoreLabel}
           </span>
         </div>
 
@@ -205,7 +205,11 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid grid-cols-[minmax(130px,1fr)_minmax(72px,auto)_minmax(80px,auto)_minmax(48px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[400px] ${
+                className={`grid gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[340px] ${
+                  isEvilLeaderboard
+                    ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+                    : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
+                } ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
@@ -238,31 +242,29 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     {entry.username || (entry.address ? shortenAddress(entry.address) : entry.demon)}
                   </span>
                 </div>
-                {/* Stats column: score or base evil (no multiplier) */}
-                <span
-                  className="text-sm xl:text-base font-bold text-center text-white"
-                  style={{ fontFamily: 'var(--font-harmonique)' }}
-                >
-                  {(scoreLabel === 'EVIL' ? displayEvilPoints(entry) : entry.score).toLocaleString()}
-                </span>
-                {/* Evil column: base + extra only (no multiplier) */}
-                <div className="flex items-center justify-center gap-1.5">
-                  <img
-                    src="/evil.svg"
-                    alt="Evil points"
-                    className="w-5 h-6 shrink-0"
-                  />
+                {/* Stats / Evil column */}
+                {isEvilLeaderboard ? (
+                  <div className="flex items-center justify-center gap-1.5">
+                    <img
+                      src="/evil.svg"
+                      alt="Evil points"
+                      className="w-5 h-6 shrink-0"
+                    />
+                    <span
+                      className="text-sm xl:text-base font-bold text-white"
+                      style={{ fontFamily: 'var(--font-harmonique)' }}
+                    >
+                      {displayEvilPoints(entry).toLocaleString()}
+                    </span>
+                  </div>
+                ) : (
                   <span
-                    className="text-sm xl:text-base font-bold text-white"
+                    className="text-sm xl:text-base font-bold text-center text-white"
                     style={{ fontFamily: 'var(--font-harmonique)' }}
                   >
-                    {displayEvilPoints(entry).toLocaleString()}
+                    {entry.score.toLocaleString()}
                   </span>
-                </div>
-                {/* Rewards column: static (no per-row book check) */}
-                <div className="flex justify-center pt-8 -mt-8 text-secondary text-sm">
-                  —
-                </div>
+                )}
               </div>
             )
           })}
