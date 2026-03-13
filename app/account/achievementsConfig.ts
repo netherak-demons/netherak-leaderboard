@@ -75,10 +75,15 @@ export function getCurrentLevel(
     }
   }
   const last = levels[levels.length - 1]
+  // For all categories, extend the visual progress bar beyond the last tier
+  // so that players who go far beyond the final target don't see a permanently full bar.
+  // Once the player exceeds the last defined target, we use 20,000 as the new max.
+  const extendedTarget = progress > last.target ? 20000 : last.target
+
   return {
     level: last,
     progress,
-    target: last.target,
+    target: extendedTarget,
     isCompleted: true,
   }
 }
