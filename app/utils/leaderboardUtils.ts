@@ -3,16 +3,22 @@
  * Avoids multiple iterations over the players array.
  */
 
-import { calculateEvilPoints } from './evilPoints'
 import { normalizeLinkedWallet } from './dataMode'
 
 export interface PlayerSeasonStats {
   wallet: string
   username: string
+  score?: number
+  evilPoints?: number
+  baseEvilPoints?: number
+  extraEvilPoints?: number
   profile?: {
     username?: string
     linkedWallet?: string
     LINKEDWALLET?: string
+    ownsPFP?: boolean | null
+    ownsImmuranBook?: boolean | null
+    PFPImage?: string | null
     extraPoints?: number
   }
   stats?: {
@@ -33,6 +39,7 @@ export interface LeaderboardEntry {
   evilPoints: number
   baseEvilPoints: number
   extraEvilPoints: number
+  ownsImmuranBook?: boolean | null
   rewards: boolean
 }
 
@@ -79,6 +86,15 @@ function getWavesCompleted(stats?: PlayerSeasonStats['stats']): number {
   return 0
 }
 
+function toNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string') {
+    const n = Number(value)
+    if (Number.isFinite(n)) return n
+  }
+  return 0
+}
+
 function toEntry(
   p: PlayerSeasonStats,
   score: number,
@@ -97,6 +113,7 @@ function toEntry(
     evilPoints,
     baseEvilPoints,
     extraEvilPoints,
+    ownsImmuranBook: p.profile?.ownsImmuranBook ?? null,
     rewards: false,
   }
 }
@@ -131,20 +148,17 @@ export function computeLeaderboardsAndRankings(
     waves: number
   }
 
-  const playerMap = new Map<string, { evilPoints: number; rewards: boolean }>()
   const scored: PlayerScores[] = []
 
   for (const p of players) {
-    const extraPoints = p.profile?.extraPoints ?? 0
-    const evilPointsCalc = calculateEvilPoints(p.stats || {}, 0, extraPoints)
-    const baseEvilPoints = evilPointsCalc.basePoints
-    const extraEvilPoints = evilPointsCalc.extraPoints
-    const evilPoints = evilPointsCalc.totalPoints
-
-    playerMap.set(p.wallet, {
-      evilPoints,
-      rewards: false,
-    })
+    const apiEvilPoints = toNumber(p.score) || toNumber(p.evilPoints)
+    const apiBaseEvilPoints = toNumber(p.baseEvilPoints)
+    const apiExtraEvilPoints = toNumber(p.extraEvilPoints)
+    const evilPoints =
+      apiEvilPoints ||
+      (apiBaseEvilPoints + apiExtraEvilPoints)
+    const baseEvilPoints = apiBaseEvilPoints || evilPoints
+    const extraEvilPoints = apiExtraEvilPoints
 
     const dungeons = sumObjectValues(p.stats?.dungeonsCompleted)
     const slayedHumans = sumObjectValues(p.stats?.enemiesKilled)
@@ -163,8 +177,8 @@ export function computeLeaderboardsAndRankings(
     })
   }
 
-  // Build sorted arrays for rankings (single sort each)
-  const byEvil = [...scored].filter((x) => x.evilPoints > 0).sort((a, b) => b.evilPoints - a.evilPoints)
+  // Keep backend ordering for evil points (already sorted server-side)
+  const byEvil = [...scored]
   const byDungeons = [...scored].filter((x) => x.dungeons > 0).sort((a, b) => b.dungeons - a.dungeons)
   const bySlayed = [...scored].filter((x) => x.slayedHumans > 0).sort((a, b) => b.slayedHumans - a.slayedHumans)
   const bySouls = [...scored].filter((x) => x.harvestedSouls > 0).sort((a, b) => b.harvestedSouls - a.harvestedSouls)

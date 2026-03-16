@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { Check, CircleAlert } from 'lucide-react'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
 
 interface LeaderboardEntry {
@@ -14,6 +15,7 @@ interface LeaderboardEntry {
   evilPoints: number
   baseEvilPoints?: number
   extraEvilPoints?: number
+  ownsImmuranBook?: boolean | null
   rewards: boolean
 }
 
@@ -80,12 +82,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         </div>
 
         <div className="pt-4 overflow-x-auto">
-          <div className={`grid gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px] ${
-            isEvilLeaderboard
-              ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-              : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-          }`}>
+          <div className="grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[380px]">
             <div className="h-4 bg-white/10 rounded w-20" />
+            <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
             <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
           </div>
 
@@ -93,11 +92,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div
                 key={i}
-                className={`grid gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[340px] ${
-                  isEvilLeaderboard
-                    ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-                    : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-                }`}
+                className="grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center min-w-[380px]"
               >
                 <div className="flex items-center gap-3 md:gap-2.5 sm:gap-1.5 min-w-0">
                   <div className="w-6 h-4 bg-white/10 rounded shrink-0" />
@@ -105,6 +100,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                   <div className="h-4 bg-white/10 rounded flex-1 max-w-[120px]" />
                 </div>
                 <div className="h-4 bg-white/10 rounded w-16 mx-auto" />
+                <div className="h-5 w-5 bg-white/10 rounded mx-auto" />
               </div>
             ))}
           </div>
@@ -138,14 +134,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       </div>
 
       <div className="pt-4 overflow-x-auto">
-        {/* Column headers: Demon + Stats or Demon + Evil (no Rewards) */}
-        <div
-          className={`grid gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[340px] ${
-            isEvilLeaderboard
-              ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-              : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-          }`}
-        >
+        {/* Column headers: Demon + Stats/Evil + Rewards */}
+        <div className="grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-3 px-4 border-b-2 border-white/5 min-w-[380px]">
           <span
             className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase md:whitespace-normal sm:whitespace-normal text-secondary"
             style={{ fontFamily: 'var(--font-harmonique)' }}
@@ -157,6 +147,12 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             style={{ fontFamily: 'var(--font-harmonique)' }}
           >
             {isEvilLeaderboard ? 'EVIL' : scoreLabel}
+          </span>
+          <span
+            className="text-base xl:text-lg font-light tracking-[1.5px] md:tracking-[0.5px] sm:tracking-[0.2px] uppercase text-center md:whitespace-normal sm:whitespace-normal text-secondary"
+            style={{ fontFamily: 'var(--font-harmonique)' }}
+          >
+            Rewards
           </span>
         </div>
 
@@ -205,11 +201,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[340px] ${
-                  isEvilLeaderboard
-                    ? 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-                    : 'grid-cols-[minmax(130px,1fr)_minmax(100px,auto)]'
-                } ${
+                className={`grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[380px] ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
@@ -265,6 +257,34 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                     {entry.score.toLocaleString()}
                   </span>
                 )}
+                <div className="flex justify-center">
+                  {entry.ownsImmuranBook === true ? (
+                    <div className="cursor-help" title="Eligible for rewards: owns Immuran Book">
+                      <Check
+                        className="w-4 h-4 text-green-netherak"
+                        strokeWidth={2.5}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative group cursor-help">
+                      <CircleAlert
+                        className="w-4 h-4 text-[#DFB7A4]"
+                        strokeWidth={2}
+                      />
+                      <div
+                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-[11px] whitespace-nowrap text-white"
+                        style={{
+                          backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                          border: '0.5px solid rgba(255, 255, 255, 0.15)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+                          fontFamily: 'var(--font-harmonique)',
+                        }}
+                      >
+                        No Immuran Book
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )
           })}
