@@ -201,7 +201,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             return (
               <div
                 key={`${entry.address}-${entry.ranking}`}
-                className={`grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-4 px-4 border-b border-white/5 items-center transition-all duration-200 min-w-[380px] ${
+                className={`grid grid-cols-[minmax(130px,1fr)_minmax(100px,auto)_minmax(72px,auto)] gap-x-4 py-5 px-4 min-h-[84px] border-b border-white/5 items-center transition-all duration-200 min-w-[380px] ${
                   isUser
                     ? 'bg-[rgba(131,233,150,0.15)] border border-green-netherak border-l-[3px] border-l-green-netherak shadow-[0_0_15px_rgba(131,233,150,0.3)] hover:bg-[rgba(131,233,150,0.2)] hover:translate-x-[3px]'
                     : 'hover:bg-[rgba(131,233,150,0.1)] hover:translate-x-[2px]'
@@ -220,7 +220,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                   <img
                     src={entry.avatar}
                     alt={entry.demon}
-                    className="w-10 h-10 md:w-8 md:h-8 sm:w-6.5 sm:h-6.5 rounded-full shrink-0 bg-[#2a2a2a] shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
+                    className="w-14 h-14 md:w-12 md:h-12 sm:w-10 sm:h-10 rounded-full shrink-0 bg-[#2a2a2a] shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
                     style={{
                       border: '0.25px solid #FD9D83',
                     }}
@@ -265,7 +265,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                         strokeWidth={2.25}
                       />
                       <div
-                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-[11px] whitespace-nowrap text-white"
+                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-sm whitespace-nowrap text-white"
                         style={{
                           backgroundColor: 'rgba(26, 26, 26, 0.95)',
                           border: '0.5px solid rgba(255, 255, 255, 0.15)',
@@ -283,7 +283,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                         strokeWidth={2}
                       />
                       <div
-                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-[11px] whitespace-nowrap text-white"
+                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-sm whitespace-nowrap text-white"
                         style={{
                           backgroundColor: 'rgba(26, 26, 26, 0.95)',
                           border: '0.5px solid rgba(255, 255, 255, 0.15)',
