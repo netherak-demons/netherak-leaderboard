@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { useUserPfp } from '../../hooks/useUserPfp'
@@ -117,6 +117,7 @@ function CursedItemMedia({
 export default function CursedItems() {
   const { address } = useAccount()
   const { userStats, loading, error, canShowData } = useUserStatsContext()
+  const [mounted, setMounted] = useState(false)
   const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
   const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const walletsForPfpAndBook = [
@@ -127,6 +128,10 @@ export default function CursedItems() {
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
   const { hasRecipes: hasNkdRecipes, imageUrls: nkdRecipesImageUrls } = useNkdRecipesOwnership(walletsForPfpAndBook)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const cursedItems: Array<{ id: number; src: string | null; alt: string; mediaType?: CursedItemMedia }> = []
   let nextId = 1
@@ -146,6 +151,10 @@ export default function CursedItems() {
         mediaType: 'image',
       })
     })
+  }
+
+  if (!mounted) {
+    return null
   }
 
   // Show skeleton when not connected (unless in observation/preview mode)

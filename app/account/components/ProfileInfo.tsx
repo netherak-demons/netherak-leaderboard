@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Trophy, Flame, BookCheck, CircleAlert, TicketCheck, Minus } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
@@ -50,6 +50,7 @@ function ImuranBookImage() {
 
 export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
+  const [mounted, setMounted] = useState(false)
   const {
     userStats,
     loading,
@@ -69,6 +70,60 @@ export default function ProfileInfo() {
   const hasPfp = profileOwnsPfp === true
   const hasImuranBook = profileHasImuranBook === true
   const bookLoading = loading
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Keep first server/client render identical to avoid hydration mismatches.
+  if (!mounted) {
+    return (
+      <div
+        className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px animate-pulse"
+        aria-busy="true"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, #81FF9F70 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-4 md:p-6 h-full justify-between"
+          style={{
+            backgroundColor: '#00000090',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-[62px] h-[62px] rounded-full bg-white/10 shrink-0" />
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="h-5 bg-white/10 rounded w-3/4" />
+              <div className="h-4 bg-white/10 rounded w-1/2" />
+            </div>
+          </div>
+          <div className="h-px w-full bg-white/10 rounded-full" />
+          <div className="flex items-center gap-3">
+            <div className="h-6 bg-white/10 rounded w-24" />
+            <div className="h-4 w-px bg-white/10 shrink-0" />
+            <div className="h-12 bg-white/10 rounded w-16" />
+          </div>
+          <div className="h-px w-full bg-white/10 rounded-full" />
+          <div className="w-full aspect-3/4 max-h-[240px] rounded-lg bg-white/10" />
+          <div className="h-5 bg-white/10 rounded w-32 mx-auto" />
+          <div className="flex flex-col gap-2">
+            <div className="h-4 bg-white/10 rounded w-full" />
+            <div className="h-4 bg-white/10 rounded w-3/4" />
+            <div className="h-4 bg-white/10 rounded w-2/3" />
+          </div>
+          <div className="min-h-[80px] bg-white/10 rounded-lg" />
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-5 h-5 bg-white/10 rounded" />
+            <div className="h-4 bg-white/10 rounded w-24" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {

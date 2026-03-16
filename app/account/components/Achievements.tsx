@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import AchievementCard from './AchievementCard'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
@@ -10,7 +10,12 @@ const CATEGORY_ORDER: AchievementCategory[] = ['monsters', 'dungeons', 'waves', 
 
 export default function Achievements() {
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
+  const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'ongoing' | 'completed'>('ongoing')
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const stats = useMemo(
     () =>
@@ -49,6 +54,10 @@ export default function Achievements() {
   const ongoing = achievements.filter((a) => !a.isCompleted)
   const completed = achievements.filter((a) => a.isCompleted)
   const displayed = activeTab === 'ongoing' ? ongoing : completed
+
+  if (!mounted) {
+    return null
+  }
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {

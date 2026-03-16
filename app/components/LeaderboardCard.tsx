@@ -259,11 +259,22 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 )}
                 <div className="flex justify-center">
                   {entry.ownsImmuranBook === true ? (
-                    <div className="cursor-help" title="Eligible for rewards: owns Immuran Book">
+                    <div className="relative group cursor-help">
                       <CircleCheck
                         className="w-4 h-4 text-white"
                         strokeWidth={2.25}
                       />
+                      <div
+                        className="hidden group-hover:block absolute right-full mr-2 top-1/2 -translate-y-1/2 z-10 px-2 py-1 rounded text-[11px] whitespace-nowrap text-white"
+                        style={{
+                          backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                          border: '0.5px solid rgba(255, 255, 255, 0.15)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+                          fontFamily: 'var(--font-harmonique)',
+                        }}
+                      >
+                        Has Imuran Book
+                      </div>
                     </div>
                   ) : (
                     <div className="relative group cursor-help">

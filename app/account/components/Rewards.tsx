@@ -1,19 +1,28 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import RewardCard from './RewardCard'
 import { useUserStatsContext } from '../context/UserStatsContext'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 
 export default function Rewards() {
   const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
+  const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'history' | 'claimables'>('history')
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // TODO: Replace with actual rewards data from API when available
   const rewardsHistory: Array<{ id: number; questName: string; amount: number }> = []
   const claimableRewards: Array<{ id: number; questName: string; amount: number }> = []
   
   const displayed = activeTab === 'history' ? rewardsHistory : claimableRewards
+
+  if (!mounted) {
+    return null
+  }
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
