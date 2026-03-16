@@ -134,9 +134,10 @@ export function UserStatsProvider({ children }: { children: React.ReactNode }) {
             ? source.profile.ownsPFP
             : null
         )
+        const rawOwnsImuranBook = source?.profile?.ownsImuranBook ?? source?.profile?.ownsImmuranBook
         setProfileHasImuranBook(
-          typeof source?.profile?.ownsImmuranBook === 'boolean'
-            ? source.profile.ownsImmuranBook
+          typeof rawOwnsImuranBook === 'boolean'
+            ? rawOwnsImuranBook
             : null
         )
       } catch (err) {

@@ -17,6 +17,7 @@ export interface PlayerSeasonStats {
     linkedWallet?: string
     LINKEDWALLET?: string
     ownsPFP?: boolean | null
+    ownsImuranBook?: boolean | null
     ownsImmuranBook?: boolean | null
     PFPImage?: string | null
     extraPoints?: number
@@ -103,17 +104,22 @@ function toEntry(
   baseEvilPoints: number,
   extraEvilPoints: number
 ): LeaderboardEntry {
+  const hasOwnedPfpImage =
+    p.profile?.ownsPFP === true &&
+    typeof p.profile?.PFPImage === 'string' &&
+    p.profile.PFPImage.trim().length > 0
+
   return {
     ranking: index + 1,
     demon: p.username || p.profile?.username || 'Unknown',
-    avatar: '/demons/avatar1.svg',
+    avatar: hasOwnedPfpImage ? p.profile!.PFPImage!.trim() : '/demons/avatar1.svg',
     score,
     address: p.wallet,
     username: p.username || p.profile?.username || 'Unknown',
     evilPoints,
     baseEvilPoints,
     extraEvilPoints,
-    ownsImmuranBook: p.profile?.ownsImmuranBook ?? null,
+    ownsImmuranBook: p.profile?.ownsImuranBook ?? p.profile?.ownsImmuranBook ?? null,
     rewards: false,
   }
 }

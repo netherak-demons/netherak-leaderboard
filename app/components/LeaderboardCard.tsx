@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Check, CircleAlert } from 'lucide-react'
+import { CircleAlert, CircleCheck } from 'lucide-react'
 import { EMPTY_STATE } from '../utils/emptyStateCopy'
 
 interface LeaderboardEntry {
@@ -260,9 +260,9 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
                 <div className="flex justify-center">
                   {entry.ownsImmuranBook === true ? (
                     <div className="cursor-help" title="Eligible for rewards: owns Immuran Book">
-                      <Check
-                        className="w-4 h-4 text-green-netherak"
-                        strokeWidth={2.5}
+                      <CircleCheck
+                        className="w-4 h-4 text-white"
+                        strokeWidth={2.25}
                       />
                     </div>
                   ) : (
