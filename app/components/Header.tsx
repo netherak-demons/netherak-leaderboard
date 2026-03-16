@@ -14,6 +14,7 @@ import { getEffectiveWallet, normalizeLinkedWallet } from '../utils/dataMode'
 import { getMultiplier } from '../config/multiplier'
 import { applyEvilPointsMultiplier } from '../utils/evilPoints'
 import MultiplierTooltip from './MultiplierTooltip'
+import { useUserStatsContext } from '../account/context/UserStatsContext'
 
 const EXTERNAL_LINKS = {
   shop: 'https://fascinating-alpaca-40611.sequence.market/shop',
@@ -23,7 +24,13 @@ const EXTERNAL_LINKS = {
 export default function Header() {
   const pathname = usePathname()
   const currentRoute = pathname?.startsWith('/account') ? 'account' : 'leaderboards'
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
+  const {
+    userStats: contextUserStats,
+    profilePfpImage: contextPfpImage,
+    profileOwnsPfp: contextOwnsPfp,
+    profileHasImuranBook: contextHasImuranBook,
+  } = useUserStatsContext()
   const effectiveWallet = getEffectiveWallet(address)
   const { userStats } = useUserStats(effectiveWallet)
   const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
@@ -33,10 +40,17 @@ export default function Header() {
   )
   const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
   const { hasBook: hasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
-  const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
-  const baseEvilPoints = userStats?.baseEvilPoints ?? 0
-  const extraEvilPoints = userStats?.extraEvilPoints ?? 0
-  const evilPoints = applyEvilPointsMultiplier(baseEvilPoints, extraEvilPoints, hasImuranBook, !!pfpUrl)
+  const activeUserStats = contextUserStats ?? userStats
+  const activePfpUrl = contextPfpImage ?? pfpUrl ?? undefined
+  const activeHasImuranBook =
+    typeof contextHasImuranBook === 'boolean' ? contextHasImuranBook : hasImuranBook
+  const activeOwnsPfp = typeof contextOwnsPfp === 'boolean' ? contextOwnsPfp : !!activePfpUrl
+  const multiplier = getMultiplier(activeHasImuranBook, activeOwnsPfp)
+  const baseEvilPoints = activeUserStats?.baseEvilPoints ?? 0
+  const extraEvilPoints = activeUserStats?.extraEvilPoints ?? 0
+  const evilPoints = contextUserStats
+    ? contextUserStats.evilPoints
+    : applyEvilPointsMultiplier(baseEvilPoints, extraEvilPoints, activeHasImuranBook, activeOwnsPfp)
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -116,7 +130,7 @@ export default function Header() {
             <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
             <span className="text-white text-lg">EVIL</span>
           </div>
-          <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+          <MultiplierTooltip multiplier={multiplier} hasImuranBook={activeHasImuranBook} hasPfp={activeOwnsPfp}>
             <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1 cursor-help">
               <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
               <span className="text-white text-lg">x{multiplier}</span>
@@ -131,7 +145,7 @@ export default function Header() {
 
         {/* Right: PFP (with settings overlay when connected) */}
         <div className="shrink-0 flex items-center">
-          <ConnectButton pfpUrl={pfpUrl ?? undefined} userStats={userStats ?? undefined} />
+          <ConnectButton pfpUrl={activePfpUrl} userStats={activeUserStats ?? undefined} />
         </div>
       </header>
 
@@ -165,7 +179,7 @@ export default function Header() {
                   <span className="text-green-netherak">{evilPoints.toLocaleString()}</span>
                   <span className="text-white">EVIL</span>
                 </div>
-                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={activeHasImuranBook} hasPfp={activeOwnsPfp}>
                   <div className="font-medium text-primary flex items-center gap-2 bg-white/10 rounded-md px-2 py-1 cursor-help">
                     <Flame className="w-4 h-4 shrink-0" style={{ color: '#FFD36C' }} strokeWidth={2} />
                     <span className="text-white">x{multiplier}</span>

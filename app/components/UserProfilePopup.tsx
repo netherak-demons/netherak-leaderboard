@@ -6,6 +6,7 @@ import { LogOut, Save, X, Copy, Check, CircleAlert } from 'lucide-react'
 import { clearCachedPlayers } from '../hooks/playersCache'
 import { getDataMode, normalizeLinkedWallet } from '../utils/dataMode'
 import { useModalA11y } from '../hooks/useModalA11y'
+import { useAppStore } from '../stores/useAppStore'
 
 import type { UserStats } from '../hooks/useUserStats'
 
@@ -60,6 +61,7 @@ export default function UserProfilePopup({
   const { disconnect } = useDisconnect()
   const sequenceWaaS = (connector as ConnectorWithSequenceWaas)?.sequenceWaas
   const modalRef = useModalA11y(isOpen, onClose)
+  const userFromApi = useAppStore((s) => s.userFromApi)
 
   const [username, setUsername] = useState('')
   const [linkedWallet, setLinkedWallet] = useState('')
@@ -78,24 +80,39 @@ export default function UserProfilePopup({
     })
   }, [userStats?.wallet, address])
 
-  // Data: prefer userStats (season-stats). If null (user not in leaderboard), fetch GET /api/user with JWT
+  // Data: prefer valid userStats username; otherwise hydrate from /api/user (JWT)
   useEffect(() => {
     if (!isOpen) return
     setError(null)
     setSaved(false)
 
-    if (userStats) {
-      setUsername(userStats.username ?? '')
+    const statsUsername = (userStats?.username ?? '').trim()
+    const hasResolvedStatsUsername =
+      statsUsername.length > 0 && statsUsername.toLowerCase() !== 'unknown'
+
+    if (userStats && hasResolvedStatsUsername) {
+      setUsername(statsUsername)
       setLinkedWallet(normalizeLinkedWallet(userStats.linkedWallet))
       setEmail('') // season-stats strips email
       return
     }
 
-    // User not in season-stats: fetch from GET /api/user (JWT from sequenceWaas.getIdToken())
-    if (!sequenceWaaS || !address) {
+    if (userStats?.linkedWallet) {
+      setLinkedWallet(normalizeLinkedWallet(userStats.linkedWallet))
+    }
+
+    if (userFromApi?.username) {
+      setUsername(userFromApi.username)
+    } else {
       setUsername('')
-      setLinkedWallet('')
+      if (!userStats?.linkedWallet) {
+        setLinkedWallet('')
+      }
       setEmail('')
+    }
+
+    // User not in season-stats (or unresolved username): fetch from GET /api/user
+    if (!sequenceWaaS || !address) {
       return
     }
 
@@ -118,14 +135,18 @@ export default function UserProfilePopup({
       }
     }).catch(() => {
       if (!cancelled) {
-        setUsername('')
-        setLinkedWallet('')
+        if (!userFromApi?.username) {
+          setUsername(hasResolvedStatsUsername ? statsUsername : '')
+        }
+        if (!userStats?.linkedWallet) {
+          setLinkedWallet('')
+        }
         setEmail('')
       }
     })
 
     return () => { cancelled = true }
-  }, [isOpen, userStats, sequenceWaaS, address])
+  }, [isOpen, userStats, sequenceWaaS, address, userFromApi])
 
   const handleSave = useCallback(async () => {
     if (!sequenceWaaS || !address) {

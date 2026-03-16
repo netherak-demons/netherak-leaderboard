@@ -4,14 +4,11 @@ import React, { useState } from 'react'
 import { Trophy, Flame, BookCheck, CircleAlert, TicketCheck, Minus } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useUserStatsContext } from '../context/UserStatsContext'
-import { useUserPfp } from '../../hooks/useUserPfp'
-import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 import { useAppStore } from '../../stores/useAppStore'
 import { getEffectiveWallet, normalizeLinkedWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
-import { getMultiplier } from '../../config/multiplier'
-import { applyEvilPointsMultiplier } from '../../utils/evilPoints'
 import MultiplierTooltip from '../../components/MultiplierTooltip'
+import { getMultiplier } from '../../config/multiplier'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -53,17 +50,25 @@ function ImuranBookImage() {
 
 export default function ProfileInfo() {
   const { address, isConnected } = useAccount()
-  const { userStats, loading, hasNoData, error, canShowData } = useUserStatsContext()
+  const {
+    userStats,
+    loading,
+    hasNoData,
+    error,
+    canShowData,
+    profilePfpImage,
+    profileOwnsPfp,
+    profileHasImuranBook,
+  } = useUserStatsContext()
   const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
   const userFromApi = useAppStore((s) => s.userFromApi)
   const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const effectiveWallet = getEffectiveWallet(address)
-  const walletsForPfpAndBook = [userStats?.wallet, linkedWallet, effectiveWallet].filter(
-    (w): w is string => !!w && typeof w === 'string'
-  )
-  const { pfpUrl } = useUserPfp(walletsForPfpAndBook)
+  const pfpUrl = profilePfpImage
   const displayWallet = userFromApi?.wallet ?? userStats?.wallet ?? effectiveWallet
-  const { hasBook: hasImuranBook, loading: bookLoading } = useImuranBookOwnership(walletsForPfpAndBook)
+  const hasPfp = profileOwnsPfp === true
+  const hasImuranBook = profileHasImuranBook === true
+  const bookLoading = loading
 
   // Show skeleton when not connected (unless in observation/preview mode)
   if (!canShowData) {
@@ -146,6 +151,12 @@ export default function ProfileInfo() {
 
   // Show error message
   if (error) {
+    const isStatsNotFound = error.includes('API error 404')
+    const errorTitle = isStatsNotFound ? 'No data to display for this wallet' : EMPTY_STATE.errorTitle
+    const errorBody = isStatsNotFound
+      ? 'Play the game to get your stats. Have you played the game, made scores and still not see stats? Contact the team.'
+      : EMPTY_STATE.errorSubtext
+
     return (
       <div
         className="flex flex-col gap-4 w-full md:max-w-[320px] shrink-0 rounded-xl p-px"
@@ -163,10 +174,10 @@ export default function ProfileInfo() {
           }}
         >
           <p className="text-[#FF8C8A] text-base text-center mb-2" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            {EMPTY_STATE.errorTitle}
+            {errorTitle}
           </p>
           <p className="text-secondary/70 text-sm text-center" style={{ fontFamily: 'var(--font-harmonique)' }}>
-            {EMPTY_STATE.errorSubtext}
+            {errorBody}
           </p>
         </div>
       </div>
@@ -178,7 +189,7 @@ export default function ProfileInfo() {
     const displayName =
       userFromApi?.username ||
       (displayWallet ? `${displayWallet.slice(0, 6)}...${displayWallet.slice(-4)}` : 'Guest')
-    const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
+    const multiplier = getMultiplier(hasImuranBook, hasPfp)
     const isEligible = hasImuranBook
 
     return (
@@ -229,7 +240,7 @@ export default function ProfileInfo() {
                     >
                       NOT ELIGIBLE
                     </span>
-                    <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+                    <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={hasPfp}>
                       <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
                     </MultiplierTooltip>
                   </div>
@@ -267,7 +278,7 @@ export default function ProfileInfo() {
             <div className="flex flex-col gap-0.5 items-center">
               <div className="flex items-center gap-1">
                 <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
-                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={hasPfp}>
                   <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
                 </MultiplierTooltip>
               </div>
@@ -371,10 +382,8 @@ export default function ProfileInfo() {
     (userStats.wallet ? `${userStats.wallet.slice(0, 6)}...${userStats.wallet.slice(-4)}` : 'Guest')
   const rankingPosition = userStats.ranking.dungeons || userStats.ranking.slayedHumans || userStats.ranking.harvestedSouls || userStats.ranking.waves || null
   const isEligible = hasImuranBook
-  const baseEvilPoints = userStats.baseEvilPoints ?? 0
-  const extraEvilPoints = userStats.extraEvilPoints ?? 0
-  const evilPoints = applyEvilPointsMultiplier(baseEvilPoints, extraEvilPoints, hasImuranBook, !!pfpUrl)
-  const multiplier = getMultiplier(hasImuranBook, !!pfpUrl)
+  const evilPoints = userStats.evilPoints ?? 0
+  const multiplier = getMultiplier(hasImuranBook, hasPfp)
 
   return (
     
@@ -435,7 +444,7 @@ export default function ProfileInfo() {
                 >
                   NOT ELIGIBLE
                 </span>
-                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+                <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={hasPfp}>
                   <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
                 </MultiplierTooltip>
               </div>
@@ -473,7 +482,7 @@ export default function ProfileInfo() {
         <div className="flex flex-col gap-0.5 items-center">
           <div className="flex items-center gap-1">
             <span className="text-sm uppercase text-text-secondary" style={{ fontFamily: 'var(--font-harmonique)' }}>multiplier</span>
-            <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={!!pfpUrl}>
+            <MultiplierTooltip multiplier={multiplier} hasImuranBook={hasImuranBook} hasPfp={hasPfp}>
               <CircleAlert className="w-3.5 h-3.5 shrink-0 text-[#808080]" strokeWidth={2} />
             </MultiplierTooltip>
           </div>

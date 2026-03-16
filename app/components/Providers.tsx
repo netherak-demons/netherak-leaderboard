@@ -7,6 +7,7 @@ import { useState } from 'react'
 import LoginHandler from './LoginHandler'
 import SomniaQuesterHandler from './SomniaQuesterHandler'
 import DataLoader from './DataLoader'
+import { UserStatsProvider } from '../account/context/UserStatsContext'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -14,10 +15,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SequenceConnect config={config}>
       <QueryClientProvider client={queryClient}>
-        <DataLoader />
-        <LoginHandler />
-        <SomniaQuesterHandler />
-        {children}
+        <UserStatsProvider>
+          <DataLoader />
+          <LoginHandler />
+          <SomniaQuesterHandler />
+          {children}
+        </UserStatsProvider>
       </QueryClientProvider>
     </SequenceConnect>
   )
