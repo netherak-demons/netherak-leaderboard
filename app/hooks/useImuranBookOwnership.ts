@@ -31,9 +31,10 @@ export function useImuranBookOwnership(
     if (!entry || Date.now() - entry.ts > ASSET_CACHE_TTL_MS) return null
     return entry.hasBook
   }
-  const allCached = wallets.length > 0 && wallets.every((w) => getCached(w) !== null)
-  const hasBook = allCached ? wallets.some((w) => getCached(w) === true) : false
-  const loading = wallets.length > 0 && !allCached && isLoading(wallets)
+  const cachedValues = wallets.map((w) => getCached(w))
+  const hasBook = cachedValues.some((v) => v === true)
+  const hasUnresolvedWallets = cachedValues.some((v) => v === null)
+  const loading = wallets.length > 0 && hasUnresolvedWallets && isLoading(wallets)
 
   return {
     hasBook,

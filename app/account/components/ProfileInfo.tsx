@@ -9,6 +9,8 @@ import { getEffectiveWallet, normalizeLinkedWallet } from '../../utils/dataMode'
 import { EMPTY_STATE } from '../../utils/emptyStateCopy'
 import MultiplierTooltip from '../../components/MultiplierTooltip'
 import { getMultiplier } from '../../config/multiplier'
+import { useUserPfp } from '../../hooks/useUserPfp'
+import { useImuranBookOwnership } from '../../hooks/useImuranBookOwnership'
 
 const DEFAULT_PFP = '/demons/avatar1.svg'
 
@@ -65,10 +67,15 @@ export default function ProfileInfo() {
   const userFromApi = useAppStore((s) => s.userFromApi)
   const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const effectiveWallet = getEffectiveWallet(address)
-  const pfpUrl = profilePfpImage
+  const walletsForPfpAndBook = [userFromApi?.wallet, userStats?.wallet, linkedWallet, effectiveWallet].filter(
+    (w): w is string => !!w && typeof w === 'string'
+  )
+  const { pfpUrl: fallbackPfpUrl } = useUserPfp(walletsForPfpAndBook)
+  const { hasBook: fallbackHasImuranBook } = useImuranBookOwnership(walletsForPfpAndBook)
+  const pfpUrl = profilePfpImage ?? fallbackPfpUrl
   const displayWallet = userFromApi?.wallet ?? userStats?.wallet ?? effectiveWallet
-  const hasPfp = profileOwnsPfp === true
-  const hasImuranBook = profileHasImuranBook === true
+  const hasPfp = profileOwnsPfp === null ? !!fallbackPfpUrl : profileOwnsPfp === true
+  const hasImuranBook = profileHasImuranBook === null ? fallbackHasImuranBook : profileHasImuranBook === true
   const bookLoading = loading
 
   useEffect(() => {
