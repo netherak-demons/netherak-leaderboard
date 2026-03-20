@@ -65,9 +65,8 @@ export default function ProfileInfo() {
   } = useUserStatsContext()
   const linkedWalletFromApi = useAppStore((s) => s.linkedWalletFromApi)
   const userFromApi = useAppStore((s) => s.userFromApi)
-  const linkedWallet = userStats?.linkedWallet ?? (normalizeLinkedWallet(linkedWalletFromApi) || undefined)
   const effectiveWallet = getEffectiveWallet(address)
-  const walletsForPfpAndBook = [userFromApi?.wallet, userStats?.wallet, linkedWallet, effectiveWallet].filter(
+  const walletsForPfpAndBook = [userFromApi?.wallet, userStats?.wallet, effectiveWallet].filter(
     (w): w is string => !!w && typeof w === 'string'
   )
   const { pfpUrl: fallbackPfpUrl } = useUserPfp(walletsForPfpAndBook)
